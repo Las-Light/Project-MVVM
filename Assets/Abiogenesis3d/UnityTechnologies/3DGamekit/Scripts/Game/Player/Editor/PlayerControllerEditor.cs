@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Gamekit3D
 {
     [CustomEditor(typeof(PlayerController))]
-    public class PlayerControllerEditor : Editor
+    public class PlayerControllerEditor : UnityEditor.Editor
     {
         SerializedProperty m_ScriptProp;
 

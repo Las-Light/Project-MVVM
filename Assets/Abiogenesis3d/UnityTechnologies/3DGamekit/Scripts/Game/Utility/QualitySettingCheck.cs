@@ -47,7 +47,7 @@ namespace Gamekit3D
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(QualitySettingCheck))]
-    public class QualitySettingCheckEditor : Editor
+    public class QualitySettingCheckEditor : UnityEditor.Editor
     {
         private QualitySettingCheck m_Target;
 

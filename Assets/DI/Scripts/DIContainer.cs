@@ -14,7 +14,7 @@ namespace DI.Scripts
             _parentContainer = parentContainer;
         }
 
-        public DIEntry RegisterFactory<T>(Func<DIContainer, T> factory)
+        public DIEntry RegisterFactory<T>(Func<DIContainer, T> factory) // создатся только при вызове
         {
             return RegisterFactory(null, factory);
         }

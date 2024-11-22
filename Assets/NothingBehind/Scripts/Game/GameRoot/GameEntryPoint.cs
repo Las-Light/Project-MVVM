@@ -62,7 +62,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             {
                 var enterParams =
                     new GameplayEnterParams(
-                        "StartFromGameplayScene.save"); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
+                        "StartFromGameplayScene.save", 0); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
                 _coroutines.StartCoroutine(LoadingAndStartGameplay(enterParams));
                 return;
             }

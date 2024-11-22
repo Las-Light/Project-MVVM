@@ -33,7 +33,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private void CreateCharacter(CharacterViewModel characterViewModel)
         {
             // для примера:
-            var characterLevel = Random.Range(1, 4);
+            var characterLevel = characterViewModel.Level.CurrentValue;
             //
             var characterType = characterViewModel.TypeId;
             var prefabCharacterLevelPath = $"Prefabs/Gameplay/World/Characters/Character_{characterType}_{characterLevel}";

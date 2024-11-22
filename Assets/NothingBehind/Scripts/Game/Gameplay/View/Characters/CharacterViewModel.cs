@@ -16,6 +16,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
 
         public readonly int CharacterEntityId;
         public ReadOnlyReactiveProperty<Vector3Int> Position { get; }
+        public ReadOnlyReactiveProperty<int> Level { get; }
         public readonly string TypeId;
 
         public CharacterViewModel(
@@ -25,6 +26,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
         {
             TypeId = characterEntityProxy.TypeId;
             CharacterEntityId = characterEntityProxy.Id;
+            Level = characterEntityProxy.Level;
             
             _characterEntityProxy = characterEntityProxy;
             _characterSettings = characterSettings;

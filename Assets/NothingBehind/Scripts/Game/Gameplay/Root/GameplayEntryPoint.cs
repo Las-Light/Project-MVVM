@@ -27,29 +27,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             GameplayViewModelsRegistrations.Register(gameplayViewModelsContainer);
 
             // Для теста:
-
-            var gameStateProvider = gameplayContainer.Resolve<IGameStateProvider>();
-
-            //
-
-            gameStateProvider.GameState.Characters.ObserveAdd().Subscribe(e =>
-            {
-                var character = e.Value;
-                Debug.Log("Character created. TypeId: " + character.TypeId
-                                                        + " Id: " + character.Id
-                                                        + ", Position: " + character.Position);
-            });
-
-            // Для теста:
-            // Вытаскиваем из контейнера CharactersService
-
-            var charactersService = gameplayContainer.Resolve<CharactersService>();
-
-            charactersService.CreateCharacter("Dummy", GetRandomPosition());
-            charactersService.CreateCharacter("Dummy", GetRandomPosition());
-            charactersService.CreateCharacter("Dummy", GetRandomPosition());
-
-            // Для теста:
             _worldRootBinder.Bind(gameplayViewModelsContainer.Resolve<WorldGameplayRootViewModel>());
 
             gameplayViewModelsContainer.Resolve<UIGameplayRootViewModel>();

@@ -31,7 +31,7 @@ namespace NothingBehind.Scripts.Game.MainMenu.Root
             Debug.Log($"MAIN MENU ENTRY POINT: Run main menu scene. Result: {enterParams?.Result}");
 
             var saveFileName = "saveFile.save";
-            var gameplayEnterParams = new GameplayEnterParams(saveFileName);
+            var gameplayEnterParams = new GameplayEnterParams(saveFileName, 0);
             var mainMenuExitParams = new MainMenuExitParams(gameplayEnterParams);
             var exitToGameplaySceneSignal = exitSignalSubj.Select(_ => mainMenuExitParams);
 

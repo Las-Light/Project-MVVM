@@ -1,5 +1,6 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
+using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
 
@@ -8,30 +9,33 @@ namespace NothingBehind.Scripts.Game.State.Root
     public class GameStateProxy
     {
         private readonly GameState _gameState;
-        public ObservableList<CharacterEntityProxy> Characters { get; } = new();
+        public readonly ReactiveProperty<int> CurrentMapId = new();
+        public ObservableList<Map> Maps { get; } = new();
 
         public GameStateProxy(GameState gameState)
         {
             _gameState = gameState;
-            gameState.Characters.ForEach(characterOrigin => Characters.Add(new CharacterEntityProxy(characterOrigin)));
-            Characters.ObserveAdd().Subscribe(e =>
+            gameState.Maps.ForEach(mapOrigin => Maps.Add(new Map(mapOrigin)));
+            Maps.ObserveAdd().Subscribe(e =>
             {
-                var addedCharacterEntity = e.Value;
-                gameState.Characters.Add(addedCharacterEntity.Origin);
+                var addedMap = e.Value;
+                gameState.Maps.Add(addedMap.Origin);
             });
 
-            Characters.ObserveRemove().Subscribe(e =>
+            Maps.ObserveRemove().Subscribe(e =>
             {
-                var removedCharacterEntityProxy = e.Value;
-                var removedCharacterEntity =
-                    gameState.Characters.FirstOrDefault(c => c.Id == removedCharacterEntityProxy.Id);
-                gameState.Characters.Remove(removedCharacterEntity);
+                var removedMap = e.Value;
+                var removedMapState =
+                    gameState.Maps.FirstOrDefault(c => c.Id == removedMap.Id);
+                gameState.Maps.Remove(removedMapState);
             });
+
+            CurrentMapId.Subscribe(newValue => { gameState.CurrentMapId = newValue; });
         }
 
-        public int GetEntityID()
+        public int CreateEntityId()
         {
-            return _gameState.GlobalEntityId++;
+            return _gameState.CreateEntityId();
         }
     }
 }

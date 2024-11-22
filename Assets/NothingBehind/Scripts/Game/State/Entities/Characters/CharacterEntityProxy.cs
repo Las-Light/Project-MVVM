@@ -7,19 +7,19 @@ namespace NothingBehind.Scripts.Game.State.Entities.Characters
     {
         public int Id { get; }
         public string TypeId { get; }
-        public int Level { get; }
         public CharacterEntity Origin { get; }
         
         public ReactiveProperty<Vector3Int> Position { get; }
+        public ReactiveProperty<int> Level { get; }
         public ReactiveProperty<float> Health { get; }
 
         public CharacterEntityProxy(CharacterEntity characterEntity)
         {
             Origin = characterEntity;
             Id = characterEntity.Id;
-            TypeId = characterEntity.TypeID;
-            Level = characterEntity.Level;
+            TypeId = characterEntity.TypeId;
             Position = new ReactiveProperty<Vector3Int>(characterEntity.Position);
+            Level = new ReactiveProperty<int>(characterEntity.Level);
             Health = new ReactiveProperty<float>(characterEntity.Health);
 
             Position.Skip(1).Subscribe(value => characterEntity.Position = value);

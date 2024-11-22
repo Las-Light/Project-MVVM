@@ -1,6 +1,8 @@
+using System.Linq;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Root;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands
 {
@@ -15,16 +17,23 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands
         
         public bool Handle(CmdCreateCharacter command)
         {
-            var entityId = _gameState.GetEntityID();
+            var currentMap = _gameState.Maps.FirstOrDefault(m => m.Id == _gameState.CurrentMapId.CurrentValue);
+            if (currentMap == null)
+            {
+                Debug.Log($"Couldn't find Mapstate for ID: {_gameState.CurrentMapId.CurrentValue}");
+                return false;
+            }
+            var entityId = _gameState.CreateEntityId();
             var newCharacterEntity = new CharacterEntity
             {
                 Id = entityId,
                 Position = command.Position,
-                TypeID = command.CharacterTypeId
+                TypeId = command.CharacterTypeId
             };
 
             var newCharacterEntityProxy = new CharacterEntityProxy(newCharacterEntity);
-            _gameState.Characters.Add(newCharacterEntityProxy);
+            
+            currentMap.Characters.Add(newCharacterEntityProxy);
 
             return true; // тут может быть валидация на создание сущности
         }

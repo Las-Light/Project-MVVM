@@ -1,4 +1,5 @@
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Settings
@@ -7,5 +8,6 @@ namespace NothingBehind.Scripts.Game.Settings
     public class GameSettings : ScriptableObject
     {
         public CharactersSettings CharactersSettings;
+        public MapsSettings MapsSettings;
     }
 }

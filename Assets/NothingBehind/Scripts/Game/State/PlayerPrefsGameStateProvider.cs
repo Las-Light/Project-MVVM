@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
+using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Root;
 using R3;
 using UnityEngine;
@@ -55,17 +56,7 @@ namespace NothingBehind.Scripts.Game.State
             // Состояние по умолчанию из настроек, мы делаем фейк
             _gameStateOrigin = new GameState
             {
-                Characters = new List<CharacterEntity>
-                {
-                    /*new()
-                    {
-                        TypeID = "Hero"
-                    },
-                    new()
-                    {
-                        TypeID = "Enemy"
-                    }*/
-                }
+                Maps = new List<MapState>()
             };
 
             return new GameStateProxy(_gameStateOrigin);

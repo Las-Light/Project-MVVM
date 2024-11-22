@@ -1,14 +1,13 @@
 using System;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.State.Entities.Characters
+namespace NothingBehind.Scripts.Game.Settings.Gameplay.Characters
 {
     [Serializable]
-    public class CharacterEntity : Entity
+    public class CharacterInitialStateSettings
     {
         public string TypeId;
         public int Level;
         public Vector3Int Position;
-        public float Health;
     }
 }

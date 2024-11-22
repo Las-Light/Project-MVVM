@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: GameSettings
   m_EditorClassIdentifier: 
   CharactersSettings: {fileID: 11400000, guid: 6eeb940890d75fb4ab918746b93564ad, type: 2}
+  MapsSettings: {fileID: 11400000, guid: a0467520b93e95f43a27c9409e429d2d, type: 2}

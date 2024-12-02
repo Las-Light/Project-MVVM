@@ -23,6 +23,7 @@ namespace NothingBehind.Scripts.Game.State.Entities.Characters
             Health = new ReactiveProperty<float>(characterEntity.Health);
 
             Position.Skip(1).Subscribe(value => characterEntity.Position = value);
+            Level.Skip(1).Subscribe(value => characterEntity.Level = value);
             Health.Skip(1).Subscribe(value => characterEntity.Health = value);
         }
     }

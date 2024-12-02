@@ -40,7 +40,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             uiScene.Bind(exitSceneSignalSubj);
 
             Debug.Log($"GAMEPLAY ENTRY POINT: save file name = {enterParams.SaveFileName}");
-
+            
             var mainMenuEnterParams = new MainMenuEnterParams("EnterParamsCheck");
             var gameplayExitParams = new GameplayExitParams(mainMenuEnterParams);
             var exitToMainMenuSceneSignal = exitSceneSignalSubj.Select(_ => gameplayExitParams);

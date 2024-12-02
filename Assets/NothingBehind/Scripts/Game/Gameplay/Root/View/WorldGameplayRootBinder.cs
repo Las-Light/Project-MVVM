@@ -32,6 +32,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
         private void CreateCharacter(CharacterViewModel characterViewModel)
         {
+            //создает CharacterView
             // для примера:
             var characterLevel = characterViewModel.Level.CurrentValue;
             //

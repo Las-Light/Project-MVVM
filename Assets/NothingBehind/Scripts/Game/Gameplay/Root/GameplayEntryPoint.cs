@@ -20,7 +20,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
         [SerializeField] private UIGameplayRootBinder _sceneUIRootPrefab;
         [SerializeField] private WorldGameplayRootBinder _worldRootBinder;
 
-        public Observable<GameplayExitParams> Run(DIContainer gameplayContainer, GameplayEnterParams enterParams)
+        public Subject<GameplayExitParams> Run(DIContainer gameplayContainer, SceneEnterParams enterParams)
         {
             GameplayRegistrations.Register(gameplayContainer, enterParams);
             var gameplayViewModelsContainer = new DIContainer(gameplayContainer);
@@ -34,18 +34,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var uiRoot = gameplayContainer.Resolve<UIRootView>();
             var uiScene = Instantiate(_sceneUIRootPrefab);
             uiRoot.AttachSceneUI(uiScene.gameObject);
+            
+            //Добавить сюда инициализацию мира (статик дату, героя, спавнеры врагов)
 
-            var exitSceneSignalSubj = new Subject<Unit>();
+            var exitSceneSignalSubj = new Subject<GameplayExitParams>();
 
             uiScene.Bind(exitSceneSignalSubj);
 
-            Debug.Log($"GAMEPLAY ENTRY POINT: save file name = {enterParams.SaveFileName}");
-            
-            var mainMenuEnterParams = new MainMenuEnterParams("EnterParamsCheck");
-            var gameplayExitParams = new GameplayExitParams(mainMenuEnterParams);
-            var exitToMainMenuSceneSignal = exitSceneSignalSubj.Select(_ => gameplayExitParams);
-
-            return exitToMainMenuSceneSignal;
+            return exitSceneSignalSubj;
         }
 
         private Vector3Int GetRandomPosition()

@@ -6,13 +6,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 {
     public class UIGameplayRootBinder : MonoBehaviour
     {
-        private Subject<Unit> _exitSceneSignalSubj;
+        [SerializeField] private string targetMapId = Scenes.GAMEPLAY_1;
+        private Subject<GameplayExitParams> _exitSceneSignalSubj;
+        
         public void HandleGoToMainMenuButtonClick()
         {
-            _exitSceneSignalSubj?.OnNext(Unit.Default);
+            _exitSceneSignalSubj?.OnNext(new GameplayExitParams(new SceneEnterParams(targetMapId)));
         }
 
-        public void Bind(Subject<Unit> exitSceneSignalSubj)
+        public void Bind(Subject<GameplayExitParams> exitSceneSignalSubj)
         {
             _exitSceneSignalSubj = exitSceneSignalSubj;
         }

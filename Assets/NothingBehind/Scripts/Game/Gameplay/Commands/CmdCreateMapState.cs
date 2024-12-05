@@ -4,9 +4,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands
 {
     public class CmdCreateMapState : ICommand
     {
-        public readonly int MapId;
+        public readonly string MapId;
 
-        public CmdCreateMapState(int mapId)
+        public CmdCreateMapState(string mapId)
         {
             MapId = mapId;
         }

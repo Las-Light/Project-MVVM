@@ -39,7 +39,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             _uiRoot = Object.Instantiate(prefabUIRoot);
             Object.DontDestroyOnLoad(_uiRoot.gameObject);
             _rootContainer.RegisterInstance(_uiRoot);
-            
+
             // Настройки приложения
 
             var settingsProvider = new SettingsProvider();
@@ -48,13 +48,13 @@ namespace NothingBehind.Scripts.Game.GameRoot
             var gameStateProvider = new PlayerPrefsGameStateProvider();
             _rootContainer.RegisterInstance<IGameStateProvider>(gameStateProvider);
 
-            _rootContainer.RegisterFactory(_ => new SomeCommonService()).AsSingle(); 
+            _rootContainer.RegisterFactory(_ => new SomeCommonService()).AsSingle();
         }
 
         private async void RunGame()
         {
             await _rootContainer.Resolve<ISettingsProvider>().LoadGameSettings();
-            
+
 #if UNITY_EDITOR
             var sceneName = SceneManager.GetActiveScene().name;
 
@@ -62,7 +62,8 @@ namespace NothingBehind.Scripts.Game.GameRoot
             {
                 var enterParams =
                     new GameplayEnterParams(
-                        "StartFromGameplayScene.save", 0); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
+                        "StartFromGameplayScene.save",
+                        Scenes.GAMEPLAY); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
                 _coroutines.StartCoroutine(LoadingAndStartGameplay(enterParams));
                 return;
             }
@@ -81,13 +82,13 @@ namespace NothingBehind.Scripts.Game.GameRoot
             _coroutines.StartCoroutine(LoadingAndStartMainMenu());
         }
 
-        private IEnumerator LoadingAndStartGameplay(GameplayEnterParams enterParams)
+        private IEnumerator LoadingAndStartGameplay(SceneEnterParams enterParams)
         {
             _uiRoot.ShowLoadingScreen();
             _cachedSceneContainer?.Dispose();
 
             yield return LoadScene(Scenes.BOOT);
-            yield return LoadScene(Scenes.GAMEPLAY);
+            yield return LoadScene(enterParams.MapId);
 
             yield return new WaitForSeconds(1);
 
@@ -99,33 +100,47 @@ namespace NothingBehind.Scripts.Game.GameRoot
             var gameplayContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
             sceneEntryPoint.Run(gameplayContainer, enterParams).Subscribe(gameplayExitParams =>
             {
-                _coroutines.StartCoroutine(LoadingAndStartMainMenu(gameplayExitParams.MainMenuEnterParams));
+                if (gameplayExitParams.SceneEnterParams.MapId == Scenes.MAIN_MENU)
+                {
+                    _coroutines.StartCoroutine(LoadingAndStartMainMenu(gameplayExitParams.SceneEnterParams));
+                }
+                else
+                {
+                    _coroutines.StartCoroutine(LoadingAndStartGameplay(gameplayExitParams.SceneEnterParams));
+                }
             });
 
             _uiRoot.HideLoadingScreen();
         }
 
-        private IEnumerator LoadingAndStartMainMenu(MainMenuEnterParams mainMenuEnterParam = null)
+        private IEnumerator LoadingAndStartMainMenu(SceneEnterParams enterParam = null)
         {
             _uiRoot.ShowLoadingScreen();
             _cachedSceneContainer?.Dispose();
 
             yield return LoadScene(Scenes.BOOT);
-            yield return LoadScene(Scenes.MAIN_MENU);
+            if (enterParam != null)
+            {
+                yield return LoadScene(enterParam.MapId);
+            }
+            else
+            {
+                yield return LoadScene(Scenes.MAIN_MENU);
+            }
 
             yield return new WaitForSeconds(1);
 
             var sceneEntryPoint = Object.FindFirstObjectByType<MainMenuEntryPoint>();
             var mainMenuContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
 
-            sceneEntryPoint.Run(mainMenuContainer, mainMenuEnterParam).Subscribe(mainMenuExitParams =>
+            sceneEntryPoint.Run(mainMenuContainer, enterParam).Subscribe(mainMenuExitParams =>
             {
-                var targetSceneName = mainMenuExitParams.TargetSceneEnterParams.SceneName;
+                var targetSceneName = mainMenuExitParams.SceneEnterParams.MapId;
 
                 if (targetSceneName == Scenes.GAMEPLAY)
                 {
                     _coroutines.StartCoroutine(
-                        LoadingAndStartGameplay(mainMenuExitParams.TargetSceneEnterParams.As<GameplayEnterParams>()));
+                        LoadingAndStartGameplay(mainMenuExitParams.SceneEnterParams));
                 }
             });
 

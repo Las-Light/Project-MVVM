@@ -4,11 +4,11 @@ namespace NothingBehind.Scripts.Game.MainMenu.Root
 {
     public class MainMenuExitParams
     {
-        public SceneEnterParams TargetSceneEnterParams { get; }
+        public SceneEnterParams SceneEnterParams { get; }
 
-        public MainMenuExitParams(SceneEnterParams targetSceneEnterParams)
+        public MainMenuExitParams(SceneEnterParams sceneEnterParams)
         {
-            TargetSceneEnterParams = targetSceneEnterParams;
+            SceneEnterParams = sceneEnterParams;
         }
     }
 }

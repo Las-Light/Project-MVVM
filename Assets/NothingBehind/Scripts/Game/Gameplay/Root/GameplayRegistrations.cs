@@ -3,6 +3,7 @@ using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Gameplay.Commands;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Commands;
@@ -11,7 +12,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 {
     public static class GameplayRegistrations
     {
-        public static void Register(DIContainer container, GameplayEnterParams gameplayEnterParams)
+        public static void Register(DIContainer container, SceneEnterParams gameplayEnterParams)
         {
             var gameStateProvider = container.Resolve<IGameStateProvider>();
             var gameState = gameStateProvider.GameState;
@@ -28,7 +29,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             // Создание карты - это модель, так что работать с ней нужно через команды, поэтому нужен обработчик команд
             // на случай, если состояния карты еще не суествует. Может мы этот момент передалаем потом, чтобы 
             // состояние карты создавалось ДО загрузки сцены и тут не было подобных проверок, но пока так. Делаем пошагово
-            var loadingMapId = gameplayEnterParams.MapId;
+            //var loadingMapId = gameplayEnterParams.MapId;
+            var loadingMapId = Scenes.GAMEPLAY;
             var loadingMap = gameState.Maps.FirstOrDefault(m => m.Id == loadingMapId);
             if (loadingMap == null)
             {

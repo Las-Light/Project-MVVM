@@ -12,7 +12,7 @@ namespace NothingBehind.Scripts.Game.MainMenu.Root
     {
         [SerializeField] private UIMainMenuRootBinder _sceneUIRootPrefab;
 
-        public Observable<MainMenuExitParams> Run(DIContainer mainMenuContainer, MainMenuEnterParams enterParams)
+        public Subject<MainMenuExitParams> Run(DIContainer mainMenuContainer, SceneEnterParams enterParams)
         {
             MainMenuRegistrations.Register(mainMenuContainer, enterParams);
             var mainMenuViewModelContainer = new DIContainer(mainMenuContainer);
@@ -25,17 +25,12 @@ namespace NothingBehind.Scripts.Game.MainMenu.Root
             var uiScene = Instantiate(_sceneUIRootPrefab);
             uiRoot.AttachSceneUI(uiScene.gameObject);
 
-            var exitSignalSubj = new Subject<Unit>();
+            var exitSignalSubj = new Subject<MainMenuExitParams>();
             uiScene.Bind(exitSignalSubj);
 
-            Debug.Log($"MAIN MENU ENTRY POINT: Run main menu scene. Result: {enterParams?.Result}");
-
-            var saveFileName = "saveFile.save";
-            var gameplayEnterParams = new GameplayEnterParams(saveFileName, 0);
-            var mainMenuExitParams = new MainMenuExitParams(gameplayEnterParams);
-            var exitToGameplaySceneSignal = exitSignalSubj.Select(_ => mainMenuExitParams);
-
-            return exitToGameplaySceneSignal;
+            //Debug.Log($"MAIN MENU ENTRY POINT: Run main menu scene. Result: {enterParams?.TargetSceneName}");
+            
+            return exitSignalSubj;
         }
         
     }

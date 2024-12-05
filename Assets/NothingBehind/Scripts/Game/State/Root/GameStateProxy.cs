@@ -9,7 +9,7 @@ namespace NothingBehind.Scripts.Game.State.Root
     public class GameStateProxy
     {
         private readonly GameState _gameState;
-        public readonly ReactiveProperty<int> CurrentMapId = new();
+        public readonly ReactiveProperty<string> CurrentMapId = new();
         public ObservableList<Map> Maps { get; } = new();
 
         public GameStateProxy(GameState gameState)

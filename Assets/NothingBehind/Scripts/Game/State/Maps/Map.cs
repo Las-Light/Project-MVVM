@@ -7,7 +7,7 @@ namespace NothingBehind.Scripts.Game.State.Maps
 {
     public class Map
     {
-        public int Id => Origin.Id;
+        public string Id => Origin.Id;
         public ObservableList<CharacterEntityProxy> Characters { get; } = new();
         public MapState Origin { get; }
 

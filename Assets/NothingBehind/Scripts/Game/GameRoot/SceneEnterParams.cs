@@ -1,12 +1,12 @@
 namespace NothingBehind.Scripts.Game.GameRoot
 {
-    public abstract class SceneEnterParams
+    public class SceneEnterParams
     {
-        public string SceneName { get; }
+        public string MapId { get; }
 
-        public SceneEnterParams(string sceneName)
+        public SceneEnterParams(string mapId)
         {
-            SceneName = sceneName;
+            MapId = mapId;
         }
 
         public T As<T>() where T : SceneEnterParams

@@ -1,12 +1,14 @@
+using NothingBehind.Scripts.Game.GameRoot;
+
 namespace NothingBehind.Scripts.Game.MainMenu.Root
 {
-    public class MainMenuEnterParams
+    public class MainMenuEnterParams : SceneEnterParams
     {
-        public string Result { get; }
+        public string MapId { get; }
 
-        public MainMenuEnterParams(string result)
+        public MainMenuEnterParams(string mapId) : base(mapId)
         {
-            Result = result;
+            MapId = mapId;
         }
     }
 }

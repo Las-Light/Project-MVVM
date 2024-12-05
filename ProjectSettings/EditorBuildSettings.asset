@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/NothingBehind/Scenes/Gameplay.unity
     guid: de4b74072ccc0844789a9e42973202e4
+  - enabled: 1
+    path: Assets/NothingBehind/Scenes/Gameplay 1.unity
+    guid: 4ba39edbc2df4c04fa9d4ed143e44a97
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

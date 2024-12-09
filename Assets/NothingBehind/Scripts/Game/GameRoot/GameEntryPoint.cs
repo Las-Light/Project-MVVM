@@ -93,7 +93,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return new WaitForSeconds(1);
 
             var isGameStateLoaded = false;
-            _rootContainer.Resolve<IGameStateProvider>().LoadGameState().Subscribe(_ => isGameStateLoaded = true);
+            _rootContainer.Resolve<IGameStateProvider>().LoadGameState(enterParams).Subscribe(_ => isGameStateLoaded = true);
             yield return new WaitUntil(() => isGameStateLoaded);
 
             var sceneEntryPoint = Object.FindFirstObjectByType<GameplayEntryPoint>();

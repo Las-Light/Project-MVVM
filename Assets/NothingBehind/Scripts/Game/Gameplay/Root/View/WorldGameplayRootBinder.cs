@@ -10,9 +10,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
     {
         private readonly Dictionary<int, CharacterBinder> _createCharactersMap = new();
         private readonly CompositeDisposable _disposables = new();
+        private WorldGameplayRootViewModel _viewModel;
 
         public void Bind(WorldGameplayRootViewModel viewModel)
         {
+            _viewModel = viewModel;
+            
             foreach (var characterViewModel in viewModel.AllCharacters)
             {
                 CreateCharacter(characterViewModel);
@@ -52,6 +55,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             {
                 Destroy(characterBinder.gameObject);
                 _createCharactersMap.Remove(characterViewModel.CharacterEntityId);
+            }
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                _viewModel.HandleTestInput();
             }
         }
     }

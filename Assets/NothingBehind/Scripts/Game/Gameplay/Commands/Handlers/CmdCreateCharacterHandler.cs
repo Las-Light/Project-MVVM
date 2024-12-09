@@ -4,7 +4,7 @@ using NothingBehind.Scripts.Game.State.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Root;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Commands
+namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
 {
     public class CmdCreateCharacterHandler : ICommandHandler<CmdCreateCharacter>
     {
@@ -28,6 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands
             {
                 Id = entityId,
                 Position = command.Position,
+                Level = command.Level,
                 TypeId = command.CharacterTypeId
             };
 

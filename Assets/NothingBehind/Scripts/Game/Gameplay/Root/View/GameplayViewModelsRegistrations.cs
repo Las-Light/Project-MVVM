@@ -1,5 +1,6 @@
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.State;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 {
@@ -9,7 +10,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         {
             container.RegisterFactory(c => new UIGameplayRootViewModel()).AsSingle();
             container.RegisterFactory(c => new WorldGameplayRootViewModel(c
-                .Resolve<CharactersService>())).AsSingle();
+                .Resolve<CharactersService>(), c.Resolve<IGameStateProvider>())).AsSingle();
         }
     }
 }

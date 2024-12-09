@@ -7,7 +7,7 @@ using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Root;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Commands
+namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
 {
     public class CmdCreateMapStateHandler : ICommandHandler<CmdCreateMapState>
     {

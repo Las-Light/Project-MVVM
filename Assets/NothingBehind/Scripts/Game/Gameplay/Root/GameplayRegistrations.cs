@@ -22,6 +22,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var commandProcessor = new CommandProcessor(gameStateProvider);
             commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState));
             commandProcessor.RegisterHandler(new CmdCreateMapStateHandler(gameState, gameSettings));
+            commandProcessor.RegisterHandler(new CmdResourcesAddHandler(gameState));
+            commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));
             container.RegisterInstance<ICommandProcessor>(commandProcessor);
             
             // регистрируем сервисы
@@ -37,6 +39,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
                 gameSettings.CharactersSettings,
                 commandProcessor)
             ).AsSingle();
+
+            container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor));
         }
     }
 }

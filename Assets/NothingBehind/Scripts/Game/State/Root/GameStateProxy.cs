@@ -1,5 +1,6 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
+using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
@@ -12,18 +13,17 @@ namespace NothingBehind.Scripts.Game.State.Root
         public readonly GameState _gameState;
         public readonly ReactiveProperty<string> CurrentMapId = new();
         public ObservableList<Map> Maps { get; } = new();
+        public ObservableList<Resource> Resources { get; } = new();
 
         public GameStateProxy(GameState gameState)
         {
             _gameState = gameState;
             CurrentMapId.Value = gameState.CurrentMapId;
+            
             InitMaps(gameState);
+            InitResources(gameState);
 
-            CurrentMapId.Skip(1).Subscribe(newValue =>
-            {
-                Debug.Log("Changed CurrentMap = " + newValue);
-                gameState.CurrentMapId = newValue;
-            });
+            CurrentMapId.Skip(1).Subscribe(newValue => gameState.CurrentMapId = newValue);
         }
 
         public int CreateEntityId()
@@ -47,6 +47,25 @@ namespace NothingBehind.Scripts.Game.State.Root
                 var removedMapState =
                     gameState.Maps.FirstOrDefault(c => c.Id == removedMap.Id);
                 gameState.Maps.Remove(removedMapState);
+            });
+        }
+        
+        private void InitResources(GameState gameState)
+        {
+            gameState.Resources.ForEach(resourceOrigin => Resources.Add(new Resource(resourceOrigin)));
+
+            Resources.ObserveAdd().Subscribe(e =>
+            {
+                var addedResource = e.Value;
+                gameState.Resources.Add(addedResource.Origin);
+            });
+
+            Resources.ObserveRemove().Subscribe(e =>
+            {
+                var removedResource = e.Value;
+                var removedResourceData =
+                    gameState.Resources.FirstOrDefault(c => c.ResourceType == removedResource.ResourceType);
+                gameState.Resources.Remove(removedResourceData);
             });
         }
     }

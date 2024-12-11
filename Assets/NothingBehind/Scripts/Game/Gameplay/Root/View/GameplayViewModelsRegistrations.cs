@@ -9,8 +9,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         public static void Register(DIContainer container)
         {
             container.RegisterFactory(c => new UIGameplayRootViewModel()).AsSingle();
-            container.RegisterFactory(c => new WorldGameplayRootViewModel(c
-                .Resolve<CharactersService>(), c.Resolve<IGameStateProvider>())).AsSingle();
+            container.RegisterFactory(c => new WorldGameplayRootViewModel(
+                    c.Resolve<CharactersService>(),
+                    c.Resolve<IGameStateProvider>(),
+                    c.Resolve<ResourcesService>()))
+                .AsSingle();
         }
     }
 }

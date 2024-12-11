@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Root;
 using R3;
@@ -103,7 +104,12 @@ namespace NothingBehind.Scripts.Game.State
             _gameStateOrigin = new GameState
             {
                 Maps = new List<MapState>(),
-                CurrentMapId = sceneEnterParams.MapId
+                CurrentMapId = sceneEnterParams.MapId,
+                Resources = new List<ResourceData>()
+                {
+                    new (){Amount = 0, ResourceType = ResourceType.SoftCurrency},
+                    new (){Amount = 0, ResourceType = ResourceType.HardCurrency}
+                }
             };
 
             var gameState = new GameStateProxy(_gameStateOrigin);

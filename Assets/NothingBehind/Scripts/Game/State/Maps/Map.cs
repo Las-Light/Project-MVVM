@@ -9,12 +9,14 @@ namespace NothingBehind.Scripts.Game.State.Maps
     {
         public string Id => Origin.Id;
         public ObservableList<CharacterEntityProxy> Characters { get; } = new();
+        public ObservableList<MapTransferData> MapTransfers { get; } = new();
         public MapState Origin { get; }
 
         public Map(MapState mapState)
         {
             Origin = mapState;
             mapState.Characters.ForEach(characterOrigin => Characters.Add(new CharacterEntityProxy(characterOrigin)));
+            mapState.MapTransfers.ForEach(mapTransfer => MapTransfers.Add(new MapTransferData(mapTransfer.MapTransferId, mapTransfer.Position)));
             Characters.ObserveAdd().Subscribe(e =>
             {
                 var addedCharacterEntity = e.Value;

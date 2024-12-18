@@ -532,3 +532,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6606e991918041247836ce103e06a1b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetMapId: Gameplay_1

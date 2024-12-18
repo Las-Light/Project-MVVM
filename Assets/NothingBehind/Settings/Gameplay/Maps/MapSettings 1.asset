@@ -24,3 +24,6 @@ MonoBehaviour:
     - TypeId: Dummy
       Level: 3
       Position: {x: 10, y: 5, z: 5}
+    MapTransfers:
+    - MapTransferId: 1
+      Position: {x: 0, y: 0, z: 0}

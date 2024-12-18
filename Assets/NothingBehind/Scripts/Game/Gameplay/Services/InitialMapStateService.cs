@@ -1,17 +1,28 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Commands;
+using NothingBehind.Scripts.Game.Gameplay.View.Maps;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Game.State.Maps;
+using ObservableCollections;
+using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Services
 {
     public class InitialMapStateService
     {
+        public readonly ObservableList<MapTransferViewModel> MapTransfers = new();
+
+        private readonly Dictionary<MapTransferId, MapTransferViewModel> _mapTransfers = new();
         private readonly IGameStateProvider _gameStateProvider;
         private readonly ICommandProcessor _commandProcessor;
         private readonly SceneEnterParams _sceneEnterParams;
+        public Map LoadingMap { get; }
+
 
         public InitialMapStateService(IGameStateProvider gameStateProvider, ICommandProcessor commandProcessor,
             SceneEnterParams sceneEnterParams)
@@ -20,10 +31,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             _commandProcessor = commandProcessor;
             _sceneEnterParams = sceneEnterParams;
 
-            InitialMapState();
+            LoadingMap = InitialMapState();
+            var mapTransfer = LoadingMap.MapTransfers;
+            
+            mapTransfer.ForEach(CreateMapTransferViewModel);
+            mapTransfer.ObserveAdd().Subscribe(e => CreateMapTransferViewModel(e.Value));
+            mapTransfer.ObserveRemove().Subscribe(e => RemoveMapTransferViewModel(e.Value));
         }
 
-        private void InitialMapState()
+        private Map InitialMapState()
         {
             var gameState = _gameStateProvider.GameState;
             var loadingMapId = _sceneEnterParams.MapId;
@@ -38,6 +54,26 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                 {
                     throw new Exception($"Couldn't create map state with id: ${loadingMapId}");
                 }
+            }
+            
+            var currentMap = gameState.Maps.First(m => m.Id == loadingMapId);
+            return currentMap;
+        }
+        
+        private void CreateMapTransferViewModel(MapTransferData mapTransferData)
+        {
+            var mapTransferViewModel = new MapTransferViewModel(mapTransferData);
+            _mapTransfers[mapTransferData.MapTransferId] = mapTransferViewModel;
+
+            MapTransfers.Add(mapTransferViewModel);
+        }
+
+        private void RemoveMapTransferViewModel(MapTransferData mapTransferData)
+        {
+            if (_mapTransfers.TryGetValue(mapTransferData.MapTransferId, out var mapTransferViewModel))
+            {
+                MapTransfers.Remove(mapTransferViewModel);
+                _mapTransfers.Remove(mapTransferData.MapTransferId);
             }
         }
     }

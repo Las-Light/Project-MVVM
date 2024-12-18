@@ -1,5 +1,6 @@
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
+using NothingBehind.Scripts.Game.Gameplay.View.Maps;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.GameResources;
 using ObservableCollections;
@@ -13,15 +14,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly CharactersService _charactersService;
         private readonly IGameStateProvider _gameStateProvider;
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
+        public readonly IObservableCollection<MapTransferViewModel> AllMapTransfers;
 
         public WorldGameplayRootViewModel(
             CharactersService charactersService,
             IGameStateProvider gameStateProvider,
-            ResourcesService resourcesService)
+            ResourcesService resourcesService,
+            InitialMapStateService initialMapService)
         {
             _charactersService = charactersService;
             _gameStateProvider = gameStateProvider;
             AllCharacters = charactersService.AllCharacters;
+            AllMapTransfers = initialMapService.MapTransfers;
 
             resourcesService.ObserveResource(ResourceType.SoftCurrency)
                 .Subscribe(newValue => Debug.Log($"SoftCurrency: {newValue}"));

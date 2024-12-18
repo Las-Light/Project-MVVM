@@ -9,5 +9,6 @@ namespace NothingBehind.Scripts.Game.State.Maps
     {
         public string Id;
         public List<CharacterEntity> Characters;
+        public List<MapTransferData> MapTransfers;
     }
 }

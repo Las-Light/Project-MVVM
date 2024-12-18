@@ -47,10 +47,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
                 initialCharacters.Add(initialCharacter);
             }
 
+            var initialMapTransfers = new List<MapTransferData>();
+            foreach (var mapTransferData in newMapInitialStateSettings.MapTransfers)
+            {
+                var initialMapTransfer = new MapTransferData(mapTransferData.MapTransferId, mapTransferData.Position);
+                initialMapTransfers.Add(initialMapTransfer);
+            }
+
             var newMapState = new MapState
             {
                 Id = command.MapId,
-                Characters = initialCharacters
+                Characters = initialCharacters,
+                MapTransfers = initialMapTransfers
             };
 
             var newMapStateProxy = new Map(newMapState);

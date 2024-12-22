@@ -19,8 +19,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Maps
             _exitSceneSignalSubj?.OnNext(
                 new GameplayExitParams(
                     new SceneEnterParams(
-                        _viewModel.SceneName,
-                        _viewModel.MapId.ToString())));
+                        _viewModel.MapId)));
             _triggered = true;
         }
 

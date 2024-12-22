@@ -9,7 +9,7 @@ namespace NothingBehind.Scripts.Game.State.Root
     public class GameState
     {
         public int GlobalEntityId;
-        public string CurrentMapId;
+        public MapId CurrentMapId;
         public List<MapState> Maps;
         public List<ResourceData> Resources;
 

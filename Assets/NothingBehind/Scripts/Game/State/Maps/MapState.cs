@@ -7,7 +7,7 @@ namespace NothingBehind.Scripts.Game.State.Maps
     [Serializable]
     public class MapState
     {
-        public string Id;
+        public MapId Id;
         public string SceneName;
         public List<CharacterEntity> Characters;
         public List<MapTransferData> MapTransfers;

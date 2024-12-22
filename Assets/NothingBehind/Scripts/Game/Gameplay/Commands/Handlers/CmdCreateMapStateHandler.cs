@@ -53,16 +53,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             foreach (var mapTransferData in newMapInitialStateSettings.MapTransfers)
             {
                 var initialMapTransfer = new MapTransferData(
-                    mapTransferData.SceneName, 
                     mapTransferData.MapId, 
                     mapTransferData.Position);
                 initialMapTransfers.Add(initialMapTransfer);
             }
 
+            var sceneName = newMapSettings.SceneName;
             var newMapState = new MapState
             {
                 Id = command.MapId,
-                SceneName = command.SceneName,
+                SceneName = sceneName,
                 Characters = initialCharacters,
                 MapTransfers = initialMapTransfers
             };

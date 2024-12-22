@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Gameplay.Root;
 using NothingBehind.Scripts.Game.GameRoot.Services;
@@ -64,8 +65,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 var enterParams =
                     new GameplayEnterParams(
                         "StartFromGameplayScene.save",
-                        MapId.Map_1.ToString(),
-                        Scenes.GAMEPLAY); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
+                        MapId.Map_1); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
                 _coroutines.StartCoroutine(LoadingAndStartGameplay(enterParams));
                 return;
             }
@@ -90,7 +90,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             _cachedSceneContainer?.Dispose();
 
             yield return LoadScene(Scenes.BOOT);
-            yield return LoadScene(enterParams.TargetSceneName);
+            yield return LoadScene(GetSceneName(enterParams.TargetMapId));
 
             yield return new WaitForSeconds(1);
 
@@ -102,7 +102,8 @@ namespace NothingBehind.Scripts.Game.GameRoot
             var gameplayContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
             sceneEntryPoint.Run(gameplayContainer, enterParams).Subscribe(gameplayExitParams =>
             {
-                if (gameplayExitParams.SceneEnterParams.TargetSceneName == Scenes.MAIN_MENU)
+                var targetSceneName = GetSceneName(gameplayExitParams.SceneEnterParams.TargetMapId);
+                if (targetSceneName == Scenes.MAIN_MENU)
                 {
                     _coroutines.StartCoroutine(LoadingAndStartMainMenu(gameplayExitParams.SceneEnterParams));
                 }
@@ -123,7 +124,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return LoadScene(Scenes.BOOT);
             if (enterParam != null)
             {
-                yield return LoadScene(enterParam.TargetSceneName);
+                yield return LoadScene(GetSceneName(enterParam.TargetMapId));
             }
             else
             {
@@ -137,7 +138,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
 
             sceneEntryPoint.Run(mainMenuContainer, enterParam).Subscribe(mainMenuExitParams =>
             {
-                var targetSceneName = mainMenuExitParams.SceneEnterParams.TargetSceneName;
+                var targetSceneName = GetSceneName(mainMenuExitParams.SceneEnterParams.TargetMapId);
 
                 if (targetSceneName == Scenes.GAMEPLAY)
                 {
@@ -152,6 +153,14 @@ namespace NothingBehind.Scripts.Game.GameRoot
         private IEnumerator LoadScene(string sceneName)
         {
             yield return SceneManager.LoadSceneAsync(sceneName);
+        }
+
+        private string GetSceneName(MapId targetMapId)
+        {
+            var settingsProvider = _rootContainer.Resolve<ISettingsProvider>();
+            var mapSettings = settingsProvider.GameSettings.MapsSettings.Maps.First(m => m.MapId == targetMapId);
+            
+            return mapSettings.SceneName;
         }
     }
 }

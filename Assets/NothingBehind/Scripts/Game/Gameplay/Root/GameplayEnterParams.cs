@@ -1,17 +1,16 @@
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.State.Maps;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Root
 {
     public class GameplayEnterParams : SceneEnterParams
     {
         public string SaveFileName { get; }
-        public string TargetSceneName { get; }
-        public string TargetMapId { get; }
+        public MapId TargetMapId { get; }
 
-        public GameplayEnterParams(string saveFileName, string targetSceneName, string targetMapId) : base(targetSceneName, targetMapId)
+        public GameplayEnterParams(string saveFileName, MapId targetMapId) : base(targetMapId)
         {
             SaveFileName = saveFileName;
-            TargetSceneName = targetSceneName;
             TargetMapId = targetMapId;
         }
     }

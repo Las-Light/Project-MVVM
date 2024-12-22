@@ -1,15 +1,14 @@
 using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Game.State.Maps;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands
 {
     public class CmdCreateMapState : ICommand
     {
-        public readonly string MapId;
-        public readonly string SceneName;
+        public readonly MapId MapId;
 
-        public CmdCreateMapState(string sceneName, string mapId)
+        public CmdCreateMapState(MapId mapId)
         {
-            SceneName = sceneName;
             MapId = mapId;
         }
 

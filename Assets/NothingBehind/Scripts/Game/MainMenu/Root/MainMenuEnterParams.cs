@@ -1,15 +1,14 @@
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.State.Maps;
 
 namespace NothingBehind.Scripts.Game.MainMenu.Root
 {
     public class MainMenuEnterParams : SceneEnterParams
     {
-        public string TargetSceneName { get; }
-        public string TargetMapId { get; }
+        public MapId TargetMapId { get; }
 
-        public MainMenuEnterParams(string targetSceneName, string targetMapId) : base(targetSceneName, targetMapId)
+        public MainMenuEnterParams(MapId targetMapId) : base(targetMapId)
         {
-            TargetSceneName = targetSceneName;
             TargetMapId = targetMapId;
         }
     }

@@ -7,7 +7,7 @@ namespace NothingBehind.Scripts.Game.State.Maps
 {
     public class Map
     {
-        public string Id => Origin.Id;
+        public MapId Id => Origin.Id;
         public string SceneName => Origin.SceneName;
         public ObservableList<CharacterEntityProxy> Characters { get; } = new();
         public ObservableList<MapTransferData> MapTransfers { get; } = new();
@@ -19,7 +19,6 @@ namespace NothingBehind.Scripts.Game.State.Maps
             mapState.Characters.ForEach(characterOrigin => Characters.Add(new CharacterEntityProxy(characterOrigin)));
             mapState.MapTransfers.ForEach(mapTransfer =>
                 MapTransfers.Add(new MapTransferData(
-                    mapTransfer.SceneName,
                     mapTransfer.MapId,
                     mapTransfer.Position)));
             Characters.ObserveAdd().Subscribe(e =>

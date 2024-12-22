@@ -1,13 +1,13 @@
+using NothingBehind.Scripts.Game.State.Maps;
+
 namespace NothingBehind.Scripts.Game.GameRoot
 {
     public class SceneEnterParams
     {
-        public string TargetSceneName { get; }
-        public string TargetMapId { get; }
+        public MapId TargetMapId { get; }
 
-        public SceneEnterParams(string targetSceneName, string targetMapId)
+        public SceneEnterParams(MapId targetMapId)
         {
-            TargetSceneName = targetSceneName;
             TargetMapId = targetMapId;
         }
 

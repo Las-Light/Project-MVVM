@@ -43,13 +43,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         {
             var gameState = _gameStateProvider.GameState;
             var loadingMapId = _sceneEnterParams.TargetMapId;
-            var loadingScene = _sceneEnterParams.TargetSceneName;
 
             var loadingMap = gameState.Maps.FirstOrDefault(m => m.Id == loadingMapId);
             if (loadingMap == null)
             {
                 // Создание состояния, если его еще нет через команду.
-                var command = new CmdCreateMapState(loadingScene, loadingMapId);
+                var command = new CmdCreateMapState(loadingMapId);
                 var success = _commandProcessor.Process(command);
                 if (!success)
                 {

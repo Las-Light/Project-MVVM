@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a129c86f554b41ff86c03101b4681e6c, type: 3}
   m_Name: MapSettings 3
   m_EditorClassIdentifier: 
-  MapId: Map_3
+  MapId: 2
   SceneName: Gameplay_1
   InitialStateSettings:
     Characters:

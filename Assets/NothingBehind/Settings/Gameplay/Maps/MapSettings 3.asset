@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a129c86f554b41ff86c03101b4681e6c, type: 3}
-  m_Name: MapSettings 2
+  m_Name: MapSettings 3
   m_EditorClassIdentifier: 
-  MapId: Map_2
+  MapId: Map_3
   SceneName: Gameplay_1
   InitialStateSettings:
     Characters:
     - TypeId: Dummy
-      Level: 1
+      Level: 2
       Position: {x: 45, y: 0, z: 50}
     - TypeId: Dummy
       Level: 2
       Position: {x: 75, y: 0, z: 27}
     - TypeId: Dummy
-      Level: 3
-      Position: {x: 12, y: 5, z: 15}
+      Level: 2
+      Position: {x: 75, y: 0, z: 27}
     MapTransfers:
     - SceneName: Gameplay
       MapTransferId: 0

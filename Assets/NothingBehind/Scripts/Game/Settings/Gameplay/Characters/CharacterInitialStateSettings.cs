@@ -8,6 +8,7 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Characters
     {
         public string TypeId;
         public int Level;
+        public float Health;
         public Vector3Int Position;
     }
 }

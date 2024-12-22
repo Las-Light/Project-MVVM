@@ -48,9 +48,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             });
         }
 
-        public bool CreateCharacter(string characterTypeId, int level, Vector3Int position)
+        public bool CreateCharacter(string characterTypeId, int level, int health, Vector3Int position)
         {
-            var command = new CmdCreateCharacter(characterTypeId, level, position);
+            var command = new CmdCreateCharacter(characterTypeId, level, health, position);
             var result = _commandProcessor.Process(command);
             
             return result;

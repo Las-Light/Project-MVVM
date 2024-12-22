@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a129c86f554b41ff86c03101b4681e6c, type: 3}
   m_Name: MapSettings 1
   m_EditorClassIdentifier: 
-  MapId: Gameplay
+  MapId: Map_1
+  SceneName: Gameplay
   InitialStateSettings:
     Characters:
     - TypeId: Dummy
@@ -25,5 +26,6 @@ MonoBehaviour:
       Level: 3
       Position: {x: 10, y: 5, z: 5}
     MapTransfers:
-    - MapTransferId: 1
+    - SceneName: Gameplay_1
+      MapTransferId: 1
       Position: {x: 0, y: 0, z: 0}

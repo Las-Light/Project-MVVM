@@ -2,9 +2,10 @@ using NothingBehind.Scripts.Game.GameRoot;
 
 namespace NothingBehind.Scripts.Game.State.Maps
 {
-    public enum MapTransferId
+    public enum MapId
     {
-        Gameplay = 0,
-        Gameplay_1 = 1
+        Map_1,
+        Map_2,
+        Map_3
     }
 }

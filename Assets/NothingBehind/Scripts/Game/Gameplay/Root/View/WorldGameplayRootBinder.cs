@@ -11,7 +11,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
     public class WorldGameplayRootBinder : MonoBehaviour
     {
         private readonly Dictionary<int, CharacterBinder> _createCharactersMap = new();
-        private readonly Dictionary<MapTransferId, MapTransferBinder> _createMapTransfersMap = new();
+        private readonly Dictionary<MapId, MapTransferBinder> _createMapTransfersMap = new();
         private readonly CompositeDisposable _disposables = new();
         private WorldGameplayRootViewModel _viewModel;
 
@@ -65,7 +65,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
         private void CreateMapTransfer(MapTransferViewModel transferViewModel, Subject<GameplayExitParams> exitSceneSignal)
         {
-            var transferId = transferViewModel.MapTransferId;
+            var transferId = transferViewModel.MapId;
             var prefabMapTransferPath = "Prefabs/Gameplay/World/MapTransfers/MapTransfer";
             var mapTransferPrefab = Resources.Load<MapTransferBinder>(prefabMapTransferPath);
 

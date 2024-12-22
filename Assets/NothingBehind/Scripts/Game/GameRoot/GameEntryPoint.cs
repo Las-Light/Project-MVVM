@@ -5,6 +5,7 @@ using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.MainMenu.Root;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
+using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Utils;
 using R3;
 using UnityEngine;
@@ -63,6 +64,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 var enterParams =
                     new GameplayEnterParams(
                         "StartFromGameplayScene.save",
+                        MapId.Map_1.ToString(),
                         Scenes.GAMEPLAY); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
                 _coroutines.StartCoroutine(LoadingAndStartGameplay(enterParams));
                 return;
@@ -88,7 +90,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             _cachedSceneContainer?.Dispose();
 
             yield return LoadScene(Scenes.BOOT);
-            yield return LoadScene(enterParams.MapId);
+            yield return LoadScene(enterParams.TargetSceneName);
 
             yield return new WaitForSeconds(1);
 
@@ -100,7 +102,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             var gameplayContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
             sceneEntryPoint.Run(gameplayContainer, enterParams).Subscribe(gameplayExitParams =>
             {
-                if (gameplayExitParams.SceneEnterParams.MapId == Scenes.MAIN_MENU)
+                if (gameplayExitParams.SceneEnterParams.TargetSceneName == Scenes.MAIN_MENU)
                 {
                     _coroutines.StartCoroutine(LoadingAndStartMainMenu(gameplayExitParams.SceneEnterParams));
                 }
@@ -121,7 +123,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return LoadScene(Scenes.BOOT);
             if (enterParam != null)
             {
-                yield return LoadScene(enterParam.MapId);
+                yield return LoadScene(enterParam.TargetSceneName);
             }
             else
             {
@@ -135,7 +137,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
 
             sceneEntryPoint.Run(mainMenuContainer, enterParam).Subscribe(mainMenuExitParams =>
             {
-                var targetSceneName = mainMenuExitParams.SceneEnterParams.MapId;
+                var targetSceneName = mainMenuExitParams.SceneEnterParams.TargetSceneName;
 
                 if (targetSceneName == Scenes.GAMEPLAY)
                 {

@@ -17,7 +17,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
     {
         public readonly ObservableList<MapTransferViewModel> MapTransfers = new();
 
-        private readonly Dictionary<MapTransferId, MapTransferViewModel> _mapTransfers = new();
+        private readonly Dictionary<MapId, MapTransferViewModel> _mapTransfers = new();
         private readonly IGameStateProvider _gameStateProvider;
         private readonly ICommandProcessor _commandProcessor;
         private readonly SceneEnterParams _sceneEnterParams;
@@ -42,13 +42,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         private Map InitialMapState()
         {
             var gameState = _gameStateProvider.GameState;
-            var loadingMapId = _sceneEnterParams.MapId;
+            var loadingMapId = _sceneEnterParams.TargetMapId;
+            var loadingScene = _sceneEnterParams.TargetSceneName;
 
             var loadingMap = gameState.Maps.FirstOrDefault(m => m.Id == loadingMapId);
             if (loadingMap == null)
             {
                 // Создание состояния, если его еще нет через команду.
-                var command = new CmdCreateMapState(loadingMapId);
+                var command = new CmdCreateMapState(loadingScene, loadingMapId);
                 var success = _commandProcessor.Process(command);
                 if (!success)
                 {
@@ -63,17 +64,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         private void CreateMapTransferViewModel(MapTransferData mapTransferData)
         {
             var mapTransferViewModel = new MapTransferViewModel(mapTransferData);
-            _mapTransfers[mapTransferData.MapTransferId] = mapTransferViewModel;
+            _mapTransfers[mapTransferData.MapId] = mapTransferViewModel;
 
             MapTransfers.Add(mapTransferViewModel);
         }
 
         private void RemoveMapTransferViewModel(MapTransferData mapTransferData)
         {
-            if (_mapTransfers.TryGetValue(mapTransferData.MapTransferId, out var mapTransferViewModel))
+            if (_mapTransfers.TryGetValue(mapTransferData.MapId, out var mapTransferViewModel))
             {
                 MapTransfers.Remove(mapTransferViewModel);
-                _mapTransfers.Remove(mapTransferData.MapTransferId);
+                _mapTransfers.Remove(mapTransferData.MapId);
             }
         }
     }

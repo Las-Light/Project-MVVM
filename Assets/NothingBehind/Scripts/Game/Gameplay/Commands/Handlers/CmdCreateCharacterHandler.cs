@@ -29,6 +29,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
                 Id = entityId,
                 Position = command.Position,
                 Level = command.Level,
+                Health = command.Health,
                 TypeId = command.CharacterTypeId
             };
 

@@ -4,11 +4,13 @@ namespace NothingBehind.Scripts.Game.MainMenu.Root
 {
     public class MainMenuEnterParams : SceneEnterParams
     {
-        public string MapId { get; }
+        public string TargetSceneName { get; }
+        public string TargetMapId { get; }
 
-        public MainMenuEnterParams(string mapId) : base(mapId)
+        public MainMenuEnterParams(string targetSceneName, string targetMapId) : base(targetSceneName, targetMapId)
         {
-            MapId = mapId;
+            TargetSceneName = targetSceneName;
+            TargetMapId = targetMapId;
         }
     }
 }

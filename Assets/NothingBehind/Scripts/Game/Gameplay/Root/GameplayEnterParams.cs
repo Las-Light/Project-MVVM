@@ -5,12 +5,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
     public class GameplayEnterParams : SceneEnterParams
     {
         public string SaveFileName { get; }
-        public string MapId { get; }
+        public string TargetSceneName { get; }
+        public string TargetMapId { get; }
 
-        public GameplayEnterParams(string saveFileName, string mapId) : base(mapId)
+        public GameplayEnterParams(string saveFileName, string targetSceneName, string targetMapId) : base(targetSceneName, targetMapId)
         {
             SaveFileName = saveFileName;
-            MapId = mapId;
+            TargetSceneName = targetSceneName;
+            TargetMapId = targetMapId;
         }
     }
 }

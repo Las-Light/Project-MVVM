@@ -41,6 +41,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
                     Id = _gameState.CreateEntityId(),
                     TypeId = characterSettings.TypeId,
                     Position = characterSettings.Position,
+                    Health = characterSettings.Health,
                     Level = characterSettings.Level
                 };
 
@@ -50,13 +51,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             var initialMapTransfers = new List<MapTransferData>();
             foreach (var mapTransferData in newMapInitialStateSettings.MapTransfers)
             {
-                var initialMapTransfer = new MapTransferData(mapTransferData.MapTransferId, mapTransferData.Position);
+                var initialMapTransfer = new MapTransferData(
+                    mapTransferData.SceneName, 
+                    mapTransferData.MapId, 
+                    mapTransferData.Position);
                 initialMapTransfers.Add(initialMapTransfer);
             }
 
             var newMapState = new MapState
             {
                 Id = command.MapId,
+                SceneName = command.SceneName,
                 Characters = initialCharacters,
                 MapTransfers = initialMapTransfers
             };

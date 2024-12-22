@@ -1,3 +1,4 @@
+using NothingBehind.Scripts.Game.State.Maps;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Settings.Gameplay.Maps
@@ -6,6 +7,7 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Maps
     public class MapSettings : ScriptableObject
     {
         public string MapId;
+        public string SceneName;
         public MapInitialStateSettings InitialStateSettings;
     }
 }

@@ -16,7 +16,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Maps
         {
             if (_triggered)
                 return;
-            _exitSceneSignalSubj?.OnNext(new GameplayExitParams(new SceneEnterParams((_viewModel.MapTransferId).ToString())));
+            _exitSceneSignalSubj?.OnNext(
+                new GameplayExitParams(
+                    new SceneEnterParams(
+                        _viewModel.SceneName,
+                        _viewModel.MapId.ToString())));
             _triggered = true;
         }
 

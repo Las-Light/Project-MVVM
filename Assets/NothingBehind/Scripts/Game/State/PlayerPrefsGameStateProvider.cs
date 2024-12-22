@@ -36,7 +36,7 @@ namespace NothingBehind.Scripts.Game.State
 
                 GameState = new GameStateProxy(_gameStateOrigin);
                 // добавил передачу куррентМэпИд
-                GameState.CurrentMapId.Value = sceneEnterParams.MapId;
+                GameState.CurrentMapId.Value = sceneEnterParams.TargetMapId;
 
                 // выдает в лог джейсон с оригинальным стейтом который был сохранен
                 Debug.Log("Game State loaded: " + json);
@@ -104,7 +104,7 @@ namespace NothingBehind.Scripts.Game.State
             _gameStateOrigin = new GameState
             {
                 Maps = new List<MapState>(),
-                CurrentMapId = sceneEnterParams.MapId,
+                CurrentMapId = sceneEnterParams.TargetMapId,
                 Resources = new List<ResourceData>()
                 {
                     new (){Amount = 0, ResourceType = ResourceType.SoftCurrency},
@@ -113,7 +113,6 @@ namespace NothingBehind.Scripts.Game.State
             };
 
             var gameState = new GameStateProxy(_gameStateOrigin);
-            Debug.Log(gameState.CurrentMapId.Value);
 
             return gameState;
         }

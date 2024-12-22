@@ -1,4 +1,5 @@
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.State.Maps;
 using R3;
 using UnityEngine;
 
@@ -6,12 +7,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 {
     public class UIGameplayRootBinder : MonoBehaviour
     {
-        [SerializeField] private string targetMapId = Scenes.GAMEPLAY_1;
+        [SerializeField] private MapId targetMapId = MapId.Map_1;
+        [SerializeField] private string targetSceneName = Scenes.GAMEPLAY_1;
         private Subject<GameplayExitParams> _exitSceneSignalSubj;
         
         public void HandleGoToMainMenuButtonClick()
         {
-            _exitSceneSignalSubj?.OnNext(new GameplayExitParams(new SceneEnterParams(targetMapId)));
+            _exitSceneSignalSubj?.OnNext(new GameplayExitParams(new SceneEnterParams(targetSceneName, targetMapId.ToString())));
         }
 
         public void Bind(Subject<GameplayExitParams> exitSceneSignalSubj)

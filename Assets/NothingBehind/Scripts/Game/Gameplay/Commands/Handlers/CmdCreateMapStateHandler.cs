@@ -36,13 +36,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             var initialCharacters = new List<CharacterEntity>();
             foreach (var characterSettings in newMapInitialStateSettings.Characters)
             {
+                var characterLevelSettings = characterSettings.LevelSettings;
                 var initialCharacter = new CharacterEntity
                 {
                     Id = _gameState.CreateEntityId(),
                     TypeId = characterSettings.TypeId,
                     Position = characterSettings.Position,
-                    Health = characterSettings.Health,
-                    Level = characterSettings.Level
+                    Level = characterLevelSettings.Level,
+                    Health = characterLevelSettings.Health
                 };
 
                 initialCharacters.Add(initialCharacter);

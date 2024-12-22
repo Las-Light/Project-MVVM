@@ -7,8 +7,7 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Characters
     public class CharacterInitialStateSettings
     {
         public string TypeId;
-        public int Level;
-        public float Health;
+        public CharacterLevelSettings LevelSettings;
         public Vector3Int Position;
     }
 }

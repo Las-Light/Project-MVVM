@@ -1,4 +1,6 @@
 using System.Linq;
+using NothingBehind.Scripts.Game.Settings;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Root;
@@ -9,10 +11,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
     public class CmdCreateCharacterHandler : ICommandHandler<CmdCreateCharacter>
     {
         private readonly GameStateProxy _gameState;
+        private readonly CharactersSettings _charactersSettings;
 
-        public CmdCreateCharacterHandler(GameStateProxy gameState)
+        public CmdCreateCharacterHandler(GameStateProxy gameState, CharactersSettings charactersSettings)
         {
             _gameState = gameState;
+            _charactersSettings = charactersSettings;
         }
         
         public bool Handle(CmdCreateCharacter command)
@@ -24,12 +28,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
                 return false;
             }
             var entityId = _gameState.CreateEntityId();
+            var characterSettings = _charactersSettings.AllCharacters.First(c=>c.TypeId == command.CharacterTypeId);
+            var characterLevel = characterSettings.LevelSettings.First(l => l.Level == command.Level);
             var newCharacterEntity = new CharacterEntity
             {
                 Id = entityId,
                 Position = command.Position,
                 Level = command.Level,
-                Health = command.Health,
+                Health = characterLevel.Health,
                 TypeId = command.CharacterTypeId
             };
 

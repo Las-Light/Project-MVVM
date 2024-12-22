@@ -38,11 +38,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _charactersService.CreateCharacter(
                 "Dummy", 
                 Random.Range(1, 3),
-                Random.Range(1, 10),
                 new Vector3Int(Random.Range(0, 6), Random.Range(0, 6), Random.Range(0, 6)));
             foreach (var characterViewModel in AllCharacters)
             {
-                Debug.Log(characterViewModel.TypeId + " + " + characterViewModel.Level + " + " + characterViewModel.Position);
+                Debug.Log(characterViewModel.TypeId + " + " + characterViewModel.Level + " + " + characterViewModel.Health);
             }
         }
     }

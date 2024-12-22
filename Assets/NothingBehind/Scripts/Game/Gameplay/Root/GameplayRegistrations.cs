@@ -19,10 +19,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var gameState = gameStateProvider.GameState;
             var settingsProvider = container.Resolve<ISettingsProvider>();
             var gameSettings = settingsProvider.GameSettings;
+            var charsctersSettings = gameSettings.CharactersSettings;
             
             // регистрируем процессор и команды, а также кладём CommandProcessor в контейнер
             var commandProcessor = new CommandProcessor(gameStateProvider);
-            commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState));
+            commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState, charsctersSettings));
             commandProcessor.RegisterHandler(new CmdCreateMapStateHandler(gameState, gameSettings));
             commandProcessor.RegisterHandler(new CmdResourcesAddHandler(gameState));
             commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));

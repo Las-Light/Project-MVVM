@@ -17,15 +17,15 @@ MonoBehaviour:
   InitialStateSettings:
     Characters:
     - TypeId: Dummy
-      Level: 1
+      LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
       Position: {x: 45, y: 0, z: 50}
     - TypeId: Dummy
-      Level: 2
+      LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
       Position: {x: 75, y: 0, z: 27}
     - TypeId: Dummy
-      Level: 3
+      LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
       Position: {x: 12, y: 5, z: 15}
     MapTransfers:
     - SceneName: Gameplay
-      MapTransferId: 0
+      MapId: 0
       Position: {x: 0, y: 0, z: 0}

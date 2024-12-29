@@ -7,9 +7,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands
     {
         public readonly string CharacterTypeId;
         public readonly int Level;
-        public readonly Vector3Int Position;
+        public readonly Vector3 Position;
 
-        public CmdCreateCharacter(string characterTypeId, int level, Vector3Int position)
+        public CmdCreateCharacter(string characterTypeId, int level, Vector3 position)
         {
             CharacterTypeId = characterTypeId;
             Level = level;

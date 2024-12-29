@@ -8,6 +8,13 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Characters
     {
         public string TypeId;
         public CharacterLevelSettings LevelSettings;
-        public Vector3Int Position;
+        public Vector3 Position;
+
+        public CharacterInitialStateSettings(string typeId, CharacterLevelSettings levelSettings, Vector3 position)
+        {
+            TypeId = typeId;
+            LevelSettings = levelSettings;
+            Position = position;
+        }
     }
 }

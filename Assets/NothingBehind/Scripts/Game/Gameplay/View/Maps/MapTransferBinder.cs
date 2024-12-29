@@ -8,9 +8,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Maps
 {
     public class MapTransferBinder : MonoBehaviour
     {
-        private Subject<GameplayExitParams> _exitSceneSignalSubj;
         private bool _triggered;
+        private Subject<GameplayExitParams> _exitSceneSignalSubj;
         private MapTransferViewModel _viewModel;
+
+        public void Bind(Subject<GameplayExitParams> exitSceneSignal, MapTransferViewModel viewModel)
+        {
+            _exitSceneSignalSubj = exitSceneSignal;
+            _viewModel = viewModel;
+
+            transform.position = viewModel.Position;
+        }
 
         private void OnTriggerEnter(Collider other)
         {
@@ -21,14 +29,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Maps
                     new SceneEnterParams(
                         _viewModel.MapId)));
             _triggered = true;
-        }
-
-        public void Bind(Subject<GameplayExitParams> exitSceneSignal, MapTransferViewModel viewModel)
-        {
-            _exitSceneSignalSubj = exitSceneSignal;
-            _viewModel = viewModel;
-
-            transform.position = viewModel.Position;
         }
     }
 }

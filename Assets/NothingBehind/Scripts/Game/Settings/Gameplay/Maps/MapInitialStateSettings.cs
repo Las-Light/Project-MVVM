@@ -10,5 +10,16 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Maps
     {
         public List<CharacterInitialStateSettings> Characters;
         public List<MapTransferData> MapTransfers;
+        public List<EnemySpawnData> EnemySpawns;
+
+        public MapInitialStateSettings(
+            List<CharacterInitialStateSettings> characters, 
+            List<MapTransferData> mapTransfers, 
+            List<EnemySpawnData> enemySpawns)
+        {
+            Characters = characters;
+            MapTransfers = mapTransfers;
+            EnemySpawns = enemySpawns;
+        }
     }
 }

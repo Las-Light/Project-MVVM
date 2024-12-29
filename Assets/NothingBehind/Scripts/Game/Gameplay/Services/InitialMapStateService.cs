@@ -9,22 +9,23 @@ using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
-using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Services
 {
     public class InitialMapStateService
     {
         public readonly ObservableList<MapTransferViewModel> MapTransfers = new();
-
         private readonly Dictionary<MapId, MapTransferViewModel> _mapTransfers = new();
+
         private readonly IGameStateProvider _gameStateProvider;
         private readonly ICommandProcessor _commandProcessor;
         private readonly SceneEnterParams _sceneEnterParams;
         public Map LoadingMap { get; }
 
 
-        public InitialMapStateService(IGameStateProvider gameStateProvider, ICommandProcessor commandProcessor,
+        public InitialMapStateService(
+            IGameStateProvider gameStateProvider,
+            ICommandProcessor commandProcessor,
             SceneEnterParams sceneEnterParams)
         {
             _gameStateProvider = gameStateProvider;
@@ -32,11 +33,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             _sceneEnterParams = sceneEnterParams;
 
             LoadingMap = InitialMapState();
-            var mapTransfer = LoadingMap.MapTransfers;
-            
-            mapTransfer.ForEach(CreateMapTransferViewModel);
-            mapTransfer.ObserveAdd().Subscribe(e => CreateMapTransferViewModel(e.Value));
-            mapTransfer.ObserveRemove().Subscribe(e => RemoveMapTransferViewModel(e.Value));
+
+            InitialMapTransfers();
+            // InitialEnemySpawn();
         }
 
         private Map InitialMapState()
@@ -55,25 +54,33 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                     throw new Exception($"Couldn't create map state with id: ${loadingMapId}");
                 }
             }
-            
+
             var currentMap = gameState.Maps.First(m => m.Id == loadingMapId);
             return currentMap;
         }
-        
+
+        private void InitialMapTransfers()
+        {
+            var mapTransfer = LoadingMap.MapTransfers;
+            mapTransfer.ForEach(CreateMapTransferViewModel);
+            mapTransfer.ObserveAdd().Subscribe(e => CreateMapTransferViewModel(e.Value));
+            mapTransfer.ObserveRemove().Subscribe(e => RemoveMapTransferViewModel(e.Value));
+        }
+
         private void CreateMapTransferViewModel(MapTransferData mapTransferData)
         {
             var mapTransferViewModel = new MapTransferViewModel(mapTransferData);
-            _mapTransfers[mapTransferData.MapId] = mapTransferViewModel;
+            _mapTransfers[mapTransferData.TargetMapId] = mapTransferViewModel;
 
             MapTransfers.Add(mapTransferViewModel);
         }
 
         private void RemoveMapTransferViewModel(MapTransferData mapTransferData)
         {
-            if (_mapTransfers.TryGetValue(mapTransferData.MapId, out var mapTransferViewModel))
+            if (_mapTransfers.TryGetValue(mapTransferData.TargetMapId, out var mapTransferViewModel))
             {
                 MapTransfers.Remove(mapTransferViewModel);
-                _mapTransfers.Remove(mapTransferData.MapId);
+                _mapTransfers.Remove(mapTransferData.TargetMapId);
             }
         }
     }

@@ -6,12 +6,12 @@ namespace NothingBehind.Scripts.Game.State.Maps
     [Serializable]
     public class MapTransferData
     {
-        public MapId MapId;
-        public Vector3Int Position;
+        public MapId TargetMapId;
+        public Vector3 Position;
 
-        public MapTransferData(MapId mapId, Vector3Int position)
+        public MapTransferData(MapId targetMapId, Vector3 position)
         {
-            MapId = mapId;
+            TargetMapId = targetMapId;
             Position = position;
         }
     }

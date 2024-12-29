@@ -11,5 +11,6 @@ namespace NothingBehind.Scripts.Game.State.Maps
         public string SceneName;
         public List<CharacterEntity> Characters;
         public List<MapTransferData> MapTransfers;
+        public List<EnemySpawnData> EnemySpawns;
     }
 }

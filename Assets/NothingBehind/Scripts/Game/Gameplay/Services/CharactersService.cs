@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Commands;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
+using NothingBehind.Scripts.Game.State.Root;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -48,7 +50,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             });
         }
 
-        public bool CreateCharacter(string characterTypeId, int level, Vector3Int position)
+        public bool CreateCharacter(string characterTypeId, int level, Vector3 position)
         {
             var command = new CmdCreateCharacter(characterTypeId, level, position);
             var result = _commandProcessor.Process(command);

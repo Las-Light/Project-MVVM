@@ -12,23 +12,28 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
     {
         private readonly Dictionary<int, CharacterBinder> _createCharactersMap = new();
         private readonly Dictionary<MapId, MapTransferBinder> _createMapTransfersMap = new();
+        private readonly Dictionary<string, EnemySpawnBinder> _createSpawns = new();
         private readonly CompositeDisposable _disposables = new();
         private WorldGameplayRootViewModel _viewModel;
 
         public void Bind(WorldGameplayRootViewModel viewModel, Subject<GameplayExitParams> exitSceneSignalSubj)
         {
             _viewModel = viewModel;
-            
+
             foreach (var characterViewModel in viewModel.AllCharacters) CreateCharacter(characterViewModel);
             foreach (var mapTransferViewModel in viewModel.AllMapTransfers)
                 CreateMapTransfer(mapTransferViewModel, exitSceneSignalSubj);
+            foreach (var enemySpawnViewModel in viewModel.AllSpawns) CreateSpawnTrigger(enemySpawnViewModel);
 
             _disposables.Add(viewModel.AllCharacters.ObserveAdd()
                 .Subscribe(e => CreateCharacter(e.Value)));
-            
+
             _disposables.Add(viewModel.AllMapTransfers.ObserveAdd()
                 .Subscribe(e => CreateMapTransfer(e.Value, exitSceneSignalSubj)));
-            
+
+            _disposables.Add(viewModel.AllSpawns.ObserveAdd()
+                .Subscribe(e => CreateSpawnTrigger(e.Value)));
+
             _disposables.Add(viewModel.AllCharacters.ObserveRemove()
                 .Subscribe(e => DestroyCharacter(e.Value)));
         }
@@ -45,9 +50,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             var characterLevel = characterViewModel.Level.CurrentValue;
             //
             var characterType = characterViewModel.TypeId;
-            var prefabCharacterLevelPath = $"Prefabs/Gameplay/World/Characters/Character_{characterType}_{characterLevel}";
+            var prefabCharacterLevelPath =
+                $"Prefabs/Gameplay/World/Characters/Character_{characterType}_{characterLevel}";
             var characterPrefab = Resources.Load<CharacterBinder>(prefabCharacterLevelPath);
-            
+
             var createdCharacter = Instantiate(characterPrefab);
             createdCharacter.Bind(characterViewModel);
 
@@ -63,7 +69,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             }
         }
 
-        private void CreateMapTransfer(MapTransferViewModel transferViewModel, Subject<GameplayExitParams> exitSceneSignal)
+        private void CreateMapTransfer(MapTransferViewModel transferViewModel,
+            Subject<GameplayExitParams> exitSceneSignal)
         {
             var transferId = transferViewModel.MapId;
             var prefabMapTransferPath = "Prefabs/Gameplay/World/MapTransfers/MapTransfer";
@@ -73,6 +80,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             createdMapTransfer.Bind(exitSceneSignal, transferViewModel);
 
             _createMapTransfersMap[transferId] = createdMapTransfer;
+        }
+
+        private void CreateSpawnTrigger(EnemySpawnViewModel spawnViewModel)
+        {
+            var spawnId = spawnViewModel.Id;
+            var prefabSpawnPath = "Prefabs/Gameplay/World/Spawns/SpawnTrigger";
+            var spawnPrefab = Resources.Load<EnemySpawnBinder>(prefabSpawnPath);
+
+            var createdSpawn = Instantiate(spawnPrefab);
+            createdSpawn.Bind(spawnViewModel);
+
+            _createSpawns[spawnId] = createdSpawn;
         }
 
         private void Update()

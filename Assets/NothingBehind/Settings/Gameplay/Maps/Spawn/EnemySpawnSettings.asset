@@ -9,24 +9,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a129c86f554b41ff86c03101b4681e6c, type: 3}
-  m_Name: MapSettings 2
+  m_Script: {fileID: 11500000, guid: f45c6c86c94d4ec6b7f5133a731f3057, type: 3}
+  m_Name: EnemySpawnSettings
   m_EditorClassIdentifier: 
-  MapId: 1
-  SceneName: Gameplay_1
-  InitialStateSettings:
+  enemySpawnData:
+    Id: Initial_1
     Characters:
     - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
-      Position: {x: 45, y: 0, z: 50}
+      LevelSettings: {fileID: 11400000, guid: 31629df1004bf8641838a8695ea6e01f, type: 2}
+      Position: {x: 50, y: 50, z: 50}
     - TypeId: Dummy
       LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
-      Position: {x: 75, y: 0, z: 27}
+      Position: {x: 25, y: 25, z: 25}
     - TypeId: Dummy
       LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
-      Position: {x: 12, y: 5, z: 15}
-    MapTransfers:
-    - TargetMapId: 2
-      Position: {x: 0, y: 0, z: 0}
-    EnemySpawns:
-    - {fileID: 11400000, guid: ff9eaf447f5a65b40bad921dff6110bc, type: 2}
+      Position: {x: 25, y: 0, z: 25}
+    - TypeId: Dummy
+      LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
+      Position: {x: 50, y: 0, z: 50}
+    Position: {x: -10, y: -10, z: -10}

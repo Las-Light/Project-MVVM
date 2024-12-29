@@ -13,6 +13,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                     c.Resolve<CharactersService>(),
                     c.Resolve<IGameStateProvider>(),
                     c.Resolve<ResourcesService>(),
+                    c.Resolve<SpawnService>(),
                     c.Resolve<InitialMapStateService>()))
                 .AsSingle();
         }

@@ -15,7 +15,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
         private readonly Dictionary<int, CharacterLevelSettings> _levelSettingsMap = new();
 
         public readonly int CharacterEntityId;
-        public ReadOnlyReactiveProperty<Vector3Int> Position { get; }
+        public ReadOnlyReactiveProperty<Vector3> Position { get; }
         public ReadOnlyReactiveProperty<int> Level { get; }
         public ReadOnlyReactiveProperty<float> Health { get; }
         public readonly string TypeId;

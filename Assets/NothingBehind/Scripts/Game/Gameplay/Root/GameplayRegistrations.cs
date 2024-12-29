@@ -31,15 +31,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             
             // регистрируем сервисы
 
-            container.RegisterFactory(c => new InitialMapStateService(gameStateProvider, commandProcessor, enterParams)).AsSingle();
 
             // var loadingMap = GetLoadingMap(container, enterParams, gameState);
+            container.RegisterFactory(c => new InitialMapStateService(
+                gameStateProvider,
+                commandProcessor,
+                enterParams)).AsSingle();
+
+            var loadingMap = container.Resolve<InitialMapStateService>().LoadingMap;
 
             container.RegisterFactory(c => new CharactersService(
-                c.Resolve<InitialMapStateService>().LoadingMap.Characters,
+                loadingMap.Characters,
                 gameSettings.CharactersSettings,
                 commandProcessor)
             ).AsSingle();
+
+            container.RegisterFactory(c => new SpawnService(loadingMap, container.Resolve<CharactersService>()));
 
             container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor));
         }

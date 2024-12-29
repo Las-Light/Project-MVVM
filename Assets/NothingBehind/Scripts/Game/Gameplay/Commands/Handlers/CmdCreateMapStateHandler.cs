@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Settings;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Maps;
@@ -52,10 +53,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             var initialMapTransfers = new List<MapTransferData>();
             foreach (var mapTransferData in newMapInitialStateSettings.MapTransfers)
             {
-                var initialMapTransfer = new MapTransferData(
-                    mapTransferData.MapId, 
-                    mapTransferData.Position);
-                initialMapTransfers.Add(initialMapTransfer);
+                initialMapTransfers.Add(mapTransferData);
+            }
+
+            var initialEnemySpawns = new List<EnemySpawnData>();
+            foreach (var spawnSettings in newMapInitialStateSettings.EnemySpawns)
+            {
+                initialEnemySpawns.Add(spawnSettings);
             }
 
             var sceneName = newMapSettings.SceneName;
@@ -64,7 +68,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
                 Id = command.MapId,
                 SceneName = sceneName,
                 Characters = initialCharacters,
-                MapTransfers = initialMapTransfers
+                MapTransfers = initialMapTransfers,
+                EnemySpawns = initialEnemySpawns
             };
 
             var newMapStateProxy = new Map(newMapState);

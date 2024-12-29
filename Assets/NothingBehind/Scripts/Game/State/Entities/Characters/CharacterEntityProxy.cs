@@ -9,7 +9,7 @@ namespace NothingBehind.Scripts.Game.State.Entities.Characters
         public string TypeId { get; }
         public CharacterEntity Origin { get; }
         
-        public ReactiveProperty<Vector3Int> Position { get; }
+        public ReactiveProperty<Vector3> Position { get; }
         public ReactiveProperty<int> Level { get; }
         public ReactiveProperty<float> Health { get; }
 
@@ -18,7 +18,7 @@ namespace NothingBehind.Scripts.Game.State.Entities.Characters
             Origin = characterEntity;
             Id = characterEntity.Id;
             TypeId = characterEntity.TypeId;
-            Position = new ReactiveProperty<Vector3Int>(characterEntity.Position);
+            Position = new ReactiveProperty<Vector3>(characterEntity.Position);
             Level = new ReactiveProperty<int>(characterEntity.Level);
             Health = new ReactiveProperty<float>(characterEntity.Health);
 

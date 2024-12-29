@@ -6,11 +6,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Maps
     public class MapTransferViewModel
     {
         public readonly MapId MapId;
-        public readonly Vector3Int Position;
+        public readonly Vector3 Position;
 
         public MapTransferViewModel(MapTransferData mapTransferData)
         {
-            MapId = mapTransferData.MapId;
+            MapId = mapTransferData.TargetMapId;
             Position = mapTransferData.Position;
         }
     }

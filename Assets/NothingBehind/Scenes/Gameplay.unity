@@ -42,7 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -161,6 +162,7 @@ MonoBehaviour:
       LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
       Position: {x: -16, y: 4.9435387, z: -17.3}
     Position: {x: -5.3, y: -14.41289, z: -9.6}
+    Triggered: 0
 --- !u!4 &130388958
 Transform:
   m_ObjectHideFlags: 0

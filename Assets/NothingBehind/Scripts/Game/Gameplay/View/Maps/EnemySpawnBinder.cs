@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Maps

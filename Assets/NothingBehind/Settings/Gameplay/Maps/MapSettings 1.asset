@@ -13,52 +13,8 @@ MonoBehaviour:
   m_Name: MapSettings 1
   m_EditorClassIdentifier: 
   MapId: 0
-  SceneName: Gameplay
+  SceneName: MainMenu
   InitialStateSettings:
-    Characters:
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
-      Position: {x: 11.199998, y: -14.41289, z: -7.4999995}
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: 31629df1004bf8641838a8695ea6e01f, type: 2}
-      Position: {x: 31.199999, y: -14.41289, z: 4.7}
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-      Position: {x: 41.1, y: -14.41289, z: -6.4}
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: 31629df1004bf8641838a8695ea6e01f, type: 2}
-      Position: {x: 15.809998, y: -14.41289, z: 3.2699995}
-    MapTransfers:
-    - TargetMapId: 1
-      Position: {x: 11.1, y: -19.710701, z: -30.2}
-    EnemySpawns:
-    - Id: SpawnMarker
-      Characters:
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
-        Position: {x: 11.199998, y: -14.41289, z: -7.4999995}
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: 31629df1004bf8641838a8695ea6e01f, type: 2}
-        Position: {x: 31.199999, y: -14.41289, z: 4.7}
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-        Position: {x: 41.1, y: -14.41289, z: -6.4}
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: 31629df1004bf8641838a8695ea6e01f, type: 2}
-        Position: {x: 15.809998, y: -14.41289, z: 3.2699995}
-      Position: {x: 13.96, y: -14.41289, z: 19.68}
-    - Id: SpawnMarker (1)
-      Characters:
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
-        Position: {x: -13.160001, y: -14.41289, z: -0.77999926}
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: 31629df1004bf8641838a8695ea6e01f, type: 2}
-        Position: {x: 6.84, y: -14.41289, z: 11.42}
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-        Position: {x: 16.74, y: -14.41289, z: 0.32}
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: 31629df1004bf8641838a8695ea6e01f, type: 2}
-        Position: {x: -8.550001, y: -14.41289, z: 9.99}
-      Position: {x: -5.3, y: -14.41289, z: -9.6}
+    Characters: []
+    MapTransfers: []
+    EnemySpawns: []

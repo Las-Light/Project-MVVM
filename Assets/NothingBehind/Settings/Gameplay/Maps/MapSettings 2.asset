@@ -13,20 +13,36 @@ MonoBehaviour:
   m_Name: MapSettings 2
   m_EditorClassIdentifier: 
   MapId: 1
-  SceneName: Gameplay_1
+  SceneName: Gameplay
   InitialStateSettings:
-    Characters:
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
-      Position: {x: 45, y: 0, z: 50}
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
-      Position: {x: 75, y: 0, z: 27}
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: ad6e8dd1a9b4a464494dda7128df5bf3, type: 2}
-      Position: {x: 12, y: 5, z: 15}
+    Characters: []
     MapTransfers:
     - TargetMapId: 2
-      Position: {x: 0, y: 0, z: 0}
+      Position: {x: 11.1, y: -19.710701, z: -30.2}
     EnemySpawns:
-    - {fileID: 11400000, guid: ff9eaf447f5a65b40bad921dff6110bc, type: 2}
+    - Id: SpawnMarker_2
+      Characters:
+      - TypeId: Dummy
+        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
+        Position: {x: -11.44, y: 4.9435387, z: -14.83}
+      - TypeId: Dummy
+        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
+        Position: {x: -16.21, y: 4.9435387, z: -22.39}
+      - TypeId: Dummy
+        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
+        Position: {x: -16, y: 4.9435387, z: -17.3}
+      Position: {x: -5.3, y: -14.41289, z: -9.6}
+      Triggered: 0
+    - Id: SpawnMarker_1
+      Characters:
+      - TypeId: Dummy
+        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
+        Position: {x: -18.279999, y: 4.9435387, z: -6.410001}
+      - TypeId: Dummy
+        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
+        Position: {x: -23.05, y: 4.9435387, z: -13.97}
+      - TypeId: Dummy
+        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
+        Position: {x: -22.84, y: 4.9435387, z: -8.88}
+      Position: {x: 13.96, y: -14.41289, z: 19.68}
+      Triggered: 0

@@ -1,4 +1,3 @@
-using System;
 using NothingBehind.Scripts.Game.Gameplay.Root;
 using NothingBehind.Scripts.Game.GameRoot;
 using R3;

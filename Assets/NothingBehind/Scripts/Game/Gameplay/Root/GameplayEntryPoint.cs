@@ -1,9 +1,10 @@
 using DI.Scripts;
+using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Root.View;
+using NothingBehind.Scripts.Game.Gameplay.View.UI;
 using NothingBehind.Scripts.Game.GameRoot;
 using R3;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Root
 {
@@ -18,34 +19,39 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var gameplayViewModelsContainer = new DIContainer(gameplayContainer);
             GameplayViewModelsRegistrations.Register(gameplayViewModelsContainer);
 
-            var exitSceneSignalSubj = new Subject<GameplayExitParams>();
+            var exitSceneRequest =
+                gameplayContainer.Resolve<Subject<GameplayExitParams>>(AppConstants.EXIT_SCENE_REQUEST_TAG);
+
             // Для теста:
-            _worldRootBinder.Bind(
-                gameplayViewModelsContainer.Resolve<WorldGameplayRootViewModel>(),
-                exitSceneSignalSubj
-                );
+            InitWorld(gameplayViewModelsContainer, exitSceneRequest);
+            InitUI(gameplayViewModelsContainer);
 
-            gameplayViewModelsContainer.Resolve<UIGameplayRootViewModel>();
-
-            var uiRoot = gameplayContainer.Resolve<UIRootView>();
-            var uiScene = Instantiate(_sceneUIRootPrefab);
-            uiRoot.AttachSceneUI(uiScene.gameObject);
-
-            //Добавить сюда инициализацию мира (статик дату, героя, спавнеры врагов)
-
-
-            uiScene.Bind(exitSceneSignalSubj);
-
-            return exitSceneSignalSubj;
+            return exitSceneRequest;
         }
 
-        private Vector3Int GetRandomPosition()
+        private void InitWorld(DIContainer gameplayViewModelsContainer, Subject<GameplayExitParams> exitSceneRequest)
         {
-            var rX = Random.Range(-10, 10);
-            var rY = Random.Range(-10, 10);
-            var rPosition = new Vector3Int(rX, rY, 0);
+            //Добавить сюда инициализацию мира (статик дату, героя, спавнеры врагов)
+            _worldRootBinder.Bind(
+                gameplayViewModelsContainer.Resolve<WorldGameplayRootViewModel>(),
+                exitSceneRequest
+            );
+        }
 
-            return rPosition;
+        private void InitUI(DIContainer viewsContainer)
+        {
+            // Создали UI для сцены
+            var uiRoot = viewsContainer.Resolve<UIRootView>();
+            var uiSceneRootBinder = Instantiate(_sceneUIRootPrefab);
+            uiRoot.AttachSceneUI(uiSceneRootBinder.gameObject);
+            
+            // Запрашиваем рутовую вью модель и пихаем её в байндер, который создали
+            var uiSceneRootViewModel = viewsContainer.Resolve<UIGameplayRootViewModel>();
+            uiSceneRootBinder.Bind(uiSceneRootViewModel);
+            
+            // Можно открывать окошки
+            var uiManager = viewsContainer.Resolve<GameplayUIManager>();
+            uiManager.OpeScreenGameplay();
         }
     }
 }

@@ -1,13 +1,12 @@
-using System.Linq;
 using DI.Scripts;
+using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Commands;
-using NothingBehind.Scripts.Game.State.Maps;
-using NothingBehind.Scripts.Game.State.Root;
+using R3;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Root
 {
@@ -20,6 +19,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var settingsProvider = container.Resolve<ISettingsProvider>();
             var gameSettings = settingsProvider.GameSettings;
             var charsctersSettings = gameSettings.CharactersSettings;
+            
+            container.RegisterInstance(AppConstants.EXIT_SCENE_REQUEST_TAG, new Subject<GameplayExitParams>());
             
             // регистрируем процессор и команды, а также кладём CommandProcessor в контейнер
             var commandProcessor = new CommandProcessor(gameStateProvider);
@@ -46,7 +47,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
                 commandProcessor)
             ).AsSingle();
 
-            container.RegisterFactory(c => new SpawnService(loadingMap, container.Resolve<CharactersService>()));
+            container.RegisterFactory(c => new SpawnService(
+                loadingMap,
+                container.Resolve<CharactersService>()));
 
             container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor));
         }

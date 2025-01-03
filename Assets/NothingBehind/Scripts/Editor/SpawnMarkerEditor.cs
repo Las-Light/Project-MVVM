@@ -1,6 +1,7 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Markers;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Maps;
 using UnityEditor;
 using UnityEngine;
@@ -18,18 +19,23 @@ namespace NothingBehind.Scripts.Editor
 
             if (GUILayout.Button("Collect"))
             {
-                spawnMarker.EnemySpawn = new EnemySpawnData(
-                    spawnMarker.Id,
+                spawnMarker.Id = spawnMarker.name;
+                spawnMarker.Characters =
                     FindObjectsByType<CharacterMarker>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
                         .Select(x => new CharacterInitialStateSettings(
                             x.Character.TypeId,
                             x.Character.LevelSettings,
                             x.transform.position
-                        )).ToList(),
-                    spawnMarker.transform.position);
+                        )).ToList();
+                spawnMarker.Position = spawnMarker.transform.position;
             }
 
-            if (GUILayout.Button("Clear")) spawnMarker.EnemySpawn.Characters.Clear();
+            if (GUILayout.Button("Clear"))
+            {
+                spawnMarker.Id = "";
+                spawnMarker.Characters.Clear();
+                spawnMarker.Position = Vector3.zero;
+            }
 
             EditorUtility.SetDirty(target);
         }

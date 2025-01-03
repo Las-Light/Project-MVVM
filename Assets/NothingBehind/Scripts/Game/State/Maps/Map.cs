@@ -11,22 +11,20 @@ namespace NothingBehind.Scripts.Game.State.Maps
         public string SceneName => Origin.SceneName;
         public ObservableList<CharacterEntityProxy> Characters { get; } = new();
         public ObservableList<MapTransferData> MapTransfers { get; } = new();
-        public ObservableList<EnemySpawnData> EnemySpawns { get; } = new();
+        public ObservableList<EnemySpawnProxy> EnemySpawns { get; } = new();
         public MapState Origin { get; }
 
         public Map(MapState mapState)
         {
             Origin = mapState;
-            mapState.Characters.ForEach(characterOrigin => Characters.Add(new CharacterEntityProxy(characterOrigin)));
+            mapState.Characters.ForEach(characterOrigin =>
+                Characters.Add(new CharacterEntityProxy(characterOrigin)));
             mapState.MapTransfers.ForEach(mapTransferData =>
                 MapTransfers.Add(new MapTransferData(
                     mapTransferData.TargetMapId,
                     mapTransferData.Position)));
             mapState.EnemySpawns.ForEach(enemySpawnData =>
-                EnemySpawns.Add(new EnemySpawnData(
-                    enemySpawnData.Id,
-                    enemySpawnData.Characters,
-                    enemySpawnData.Position)));
+                EnemySpawns.Add(new EnemySpawnProxy(enemySpawnData)));
 
             Characters.ObserveAdd().Subscribe(e =>
             {

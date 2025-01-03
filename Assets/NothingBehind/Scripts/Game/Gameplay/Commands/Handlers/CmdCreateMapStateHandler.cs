@@ -51,15 +51,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             }
 
             var initialMapTransfers = new List<MapTransferData>();
-            foreach (var mapTransferData in newMapInitialStateSettings.MapTransfers)
+            foreach (var mapTransferSettings in newMapInitialStateSettings.MapTransfers)
             {
+                var mapTransferData = new MapTransferData(mapTransferSettings.TargetMapId,
+                    mapTransferSettings.Position);
                 initialMapTransfers.Add(mapTransferData);
             }
 
             var initialEnemySpawns = new List<EnemySpawnData>();
-            foreach (var spawnSettings in newMapInitialStateSettings.EnemySpawns)
+            foreach (var enemySpawnSettings in newMapInitialStateSettings.EnemySpawns)
             {
-                initialEnemySpawns.Add(spawnSettings);
+                var enemySpawnData = new EnemySpawnData(enemySpawnSettings.Id,
+                    enemySpawnSettings.Characters, enemySpawnSettings.Position, enemySpawnSettings.IsTriggered);
+                initialEnemySpawns.Add(enemySpawnData);
             }
 
             var sceneName = newMapSettings.SceneName;

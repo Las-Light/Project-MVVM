@@ -28,6 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             commandProcessor.RegisterHandler(new CmdCreateMapStateHandler(gameState, gameSettings));
             commandProcessor.RegisterHandler(new CmdResourcesAddHandler(gameState));
             commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));
+            commandProcessor.RegisterHandler(new CmdTriggeredEnemySpawnHandler(gameState));
             container.RegisterInstance<ICommandProcessor>(commandProcessor);
             
             // регистрируем сервисы
@@ -49,7 +50,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 
             container.RegisterFactory(c => new SpawnService(
                 loadingMap,
-                container.Resolve<CharactersService>()));
+                container.Resolve<CharactersService>(),
+                commandProcessor));
 
             container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor));
         }

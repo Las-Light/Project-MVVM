@@ -17,7 +17,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
         public bool Handle(CmdResourcesAdd command)
         {
             var requiredResourceType = command.ResourceType;
-            var requiredResource = _gameState.Resources.FirstOrDefault(r => r.ResourceType == requiredResourceType);
+            var requiredResource = _gameState.Resources.FirstOrDefault(
+                r => r.ResourceType == requiredResourceType);
+            
             if (requiredResource == null)
             {
                 requiredResource = CreateNewResource(requiredResourceType);

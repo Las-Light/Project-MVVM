@@ -12,12 +12,14 @@ namespace NothingBehind.Scripts.Game.State.Maps
         public string Id;
         public List<CharacterInitialStateSettings> Characters;
         public Vector3 Position;
+        public bool IsTriggered;
 
-        public EnemySpawnData(string spawnId, List<CharacterInitialStateSettings> characters, Vector3 position)
+        public EnemySpawnData(string spawnId, List<CharacterInitialStateSettings> characters, Vector3 position, bool isTriggered)
         {
             Id = spawnId;
             Characters = characters;
             Position = position;
+            IsTriggered = isTriggered;
         }
     }
 }

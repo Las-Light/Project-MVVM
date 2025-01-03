@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.Gameplay.Commands;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
+using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
@@ -14,12 +16,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         private readonly Map _loadingMap;
         private readonly CharactersService _charactersService;
-        
-        public SpawnService(Map loadingMap, CharactersService charactersService)
+        private readonly ICommandProcessor _cmd;
+
+        public SpawnService(Map loadingMap, CharactersService charactersService, ICommandProcessor cmd)
         {
             _loadingMap = loadingMap;
             _charactersService = charactersService;
-            
+            _cmd = cmd;
+
             InitialEnemySpawn();
         }
         
@@ -31,15 +35,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             enemySpawns.ObserveRemove().Subscribe(e => RemoveEnemySpawn(e.Value));
         }
         
-        private void CreateEnemySpawnViewModel(EnemySpawnData enemySpawnData)
+        private void CreateEnemySpawnViewModel(EnemySpawnProxy enemySpawnProxy)
         {
-            var viewModel = new EnemySpawnViewModel(enemySpawnData, _charactersService);
-            _enemySpawns[enemySpawnData.Id] = viewModel;
+            var viewModel = new EnemySpawnViewModel(enemySpawnProxy, _charactersService, this);
+            _enemySpawns[enemySpawnProxy.Id] = viewModel;
 
             EnemySpawns.Add(viewModel);
         }
 
-        private void RemoveEnemySpawn(EnemySpawnData enemySpawnData)
+        private void RemoveEnemySpawn(EnemySpawnProxy enemySpawnData)
         {
             if (_enemySpawns.TryGetValue(enemySpawnData.Id, out var viewModel))
             {
@@ -47,5 +51,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                 _enemySpawns.Remove(enemySpawnData.Id);
             }
         }
+
+        public bool TriggeredEnemySpawn(string id)
+        {
+            var command = new CmdTriggeredEnemySpawn(id);
+
+            return _cmd.Process(command);
+        } 
     }
 }

@@ -9,6 +9,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Markers
     public class SpawnMarker: MonoBehaviour
     {
         public string Id;
-        public EnemySpawnData EnemySpawn;
+        public List<CharacterInitialStateSettings> Characters;
+        public Vector3 Position;
+        public bool IsTriggered;
     }
 }

@@ -41,4 +41,4 @@ MonoBehaviour:
         LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
         Position: {x: 13.1, y: 0, z: -25.2}
       Position: {x: -1.6145668, y: 0, z: -30.860727}
-      Triggered: 0
+      IsTriggered: 0

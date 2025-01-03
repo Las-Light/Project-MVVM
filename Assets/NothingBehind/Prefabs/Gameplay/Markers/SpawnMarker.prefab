@@ -45,7 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Id: SpawnMarker_1
-  EnemySpawn:
-    Id: 
-    Characters: []
-    Position: {x: 0, y: 0, z: 0}
+  Characters: []
+  Position: {x: 0, y: 0, z: 0}
+  IsTriggered: 0

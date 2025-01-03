@@ -25,10 +25,5 @@ MonoBehaviour:
     - TypeId: Dummy
       LevelSettings: {fileID: 11400000, guid: 31629df1004bf8641838a8695ea6e01f, type: 2}
       Position: {x: 75, y: 0, z: 27}
-    MapTransfers:
-    - TargetMapId: 0
-      Position: {x: 0, y: 0, z: 0}
-    EnemySpawns:
-    - Id: 
-      Characters: []
-      Position: {x: 0, y: 0, z: 0}
+    MapTransfers: []
+    EnemySpawns: []

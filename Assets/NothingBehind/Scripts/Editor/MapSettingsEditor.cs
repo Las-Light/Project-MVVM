@@ -5,6 +5,7 @@ using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Maps;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace NothingBehind.Scripts.Editor
 {
@@ -19,6 +20,7 @@ namespace NothingBehind.Scripts.Editor
 
             if (GUILayout.Button("Collect"))
             {
+                mapSettings.SceneName = SceneManager.GetActiveScene().name;
                 mapSettings.InitialStateSettings = new MapInitialStateSettings(
                     FindObjectsByType<CharacterMarker>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
                         .Select(x => new CharacterInitialStateSettings(
@@ -26,11 +28,21 @@ namespace NothingBehind.Scripts.Editor
                             x.Character.LevelSettings,
                             x.transform.position
                         )).ToList(),
-                    FindObjectsByType<MapTransferMarker>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
-                        .Select(x => new MapTransferData(x.TargetMapId, x.transform.position)).ToList(),
-                    FindObjectsByType<SpawnMarker>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
-                        .Select(x => x.EnemySpawn)
-                        .ToList());
+                    FindObjectsByType<MapTransferMarker>(FindObjectsInactive.Exclude,
+                            FindObjectsSortMode.None)
+                        .Select(x=> new MapTransferData(x.TargetMapId, x.transform.position))
+                        .ToList(),
+                    FindObjectsByType<SpawnMarker>(FindObjectsInactive.Exclude,
+                        FindObjectsSortMode.None)
+                        .Select(x=> new EnemySpawnData(x.Id, x.Characters, x.Position, x.IsTriggered))
+                        .ToList()
+                    );
+            }
+            
+            if (GUILayout.Button("Clear"))
+            {
+                mapSettings.SceneName = "";
+                mapSettings.InitialStateSettings = null;
             }
 
             EditorUtility.SetDirty(target);

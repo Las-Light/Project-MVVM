@@ -14,6 +14,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             container.RegisterFactory(c => new WorldGameplayRootViewModel(
                     c.Resolve<CharactersService>(),
                     c.Resolve<IGameStateProvider>(),
+                    c.Resolve<HeroService>(),
                     c.Resolve<ResourcesService>(),
                     c.Resolve<SpawnService>(),
                     c.Resolve<InitialMapStateService>()))

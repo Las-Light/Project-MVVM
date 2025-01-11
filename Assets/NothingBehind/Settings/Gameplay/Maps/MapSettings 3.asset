@@ -15,30 +15,13 @@ MonoBehaviour:
   MapId: 2
   SceneName: Gameplay_1
   InitialStateSettings:
-    Characters:
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-      Position: {x: 18.81056, y: 0, z: 15.896252}
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-      Position: {x: 38, y: 0, z: 0.7}
-    - TypeId: Dummy
-      LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-      Position: {x: 13.1, y: 0, z: -25.2}
+    PlayerInitialPosition: {x: -12.503803, y: 0, z: -1.8886919}
+    Characters: []
     MapTransfers:
     - TargetMapId: 1
       Position: {x: -8.7181, y: 0, z: 8.882269}
     EnemySpawns:
-    - Id: SpawnMarker_1
-      Characters:
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-        Position: {x: 18.81056, y: 0, z: 15.896252}
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-        Position: {x: 38, y: 0, z: 0.7}
-      - TypeId: Dummy
-        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-        Position: {x: 13.1, y: 0, z: -25.2}
+    - Id: SpawnMarker
+      Characters: []
       Position: {x: -1.6145668, y: 0, z: -30.860727}
       IsTriggered: 0

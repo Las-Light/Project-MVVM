@@ -1,4 +1,5 @@
 using NothingBehind.Scripts.Game.State.Maps;
+using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Maps

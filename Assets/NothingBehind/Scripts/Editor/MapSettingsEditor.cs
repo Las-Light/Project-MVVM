@@ -3,6 +3,8 @@ using NothingBehind.Scripts.Game.Gameplay.Markers;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Maps;
+using NothingBehind.Scripts.Game.State.Maps.EnemySpawn;
+using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,6 +24,7 @@ namespace NothingBehind.Scripts.Editor
             {
                 mapSettings.SceneName = SceneManager.GetActiveScene().name;
                 mapSettings.InitialStateSettings = new MapInitialStateSettings(
+                    GameObject.FindGameObjectWithTag("InitialPoint").transform.position,
                     FindObjectsByType<CharacterMarker>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
                         .Select(x => new CharacterInitialStateSettings(
                             x.Character.TypeId,

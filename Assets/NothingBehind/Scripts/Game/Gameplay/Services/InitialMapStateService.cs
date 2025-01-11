@@ -7,6 +7,7 @@ using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Maps;
+using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using ObservableCollections;
 using R3;
 
@@ -35,7 +36,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             LoadingMap = InitialMapState();
 
             InitialMapTransfers();
-            // InitialEnemySpawn();
         }
 
         private Map InitialMapState()
@@ -53,10 +53,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                 {
                     throw new Exception($"Couldn't create map state with id: ${loadingMapId}");
                 }
+                loadingMap = gameState.Maps.First(m => m.Id == loadingMapId);
             }
 
-            var currentMap = gameState.Maps.First(m => m.Id == loadingMapId);
-            return currentMap;
+            return loadingMap;
         }
 
         private void InitialMapTransfers()

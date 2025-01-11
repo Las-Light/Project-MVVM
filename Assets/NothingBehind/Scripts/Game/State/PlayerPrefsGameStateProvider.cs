@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.Settings;
+using NothingBehind.Scripts.Game.State.Entities.Hero;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Root;
@@ -19,11 +22,11 @@ namespace NothingBehind.Scripts.Game.State
         private GameState _gameStateOrigin;
         private GameSettingsState _gameSettingsStateOrigin;
 
-        public Observable<GameStateProxy> LoadGameState(SceneEnterParams sceneEnterParams)
+        public Observable<GameStateProxy> LoadGameState(GameSettings gameSettings, SceneEnterParams sceneEnterParams)
         {
             if (!PlayerPrefs.HasKey(GAME_STATE_KEY))
             {
-                GameState = CreateGameStateFromSettings(sceneEnterParams);
+                GameState = CreateGameStateFromSettings(gameSettings, sceneEnterParams);
                 Debug.Log("Game State created from settings" + JsonUtility.ToJson(_gameStateOrigin, true));
 
                 SaveGameState(); // Сохраним дефолтное состояние
@@ -82,9 +85,9 @@ namespace NothingBehind.Scripts.Game.State
             return Observable.Return(true);
         }
 
-        public Observable<bool> ResetGameState(SceneEnterParams sceneEnterParams)
+        public Observable<bool> ResetGameState(GameSettings gameSettings, SceneEnterParams sceneEnterParams)
         {
-            GameState = CreateGameStateFromSettings(sceneEnterParams);
+            GameState = CreateGameStateFromSettings(gameSettings, sceneEnterParams);
             SaveGameState();
 
             return Observable.Return(true);
@@ -98,13 +101,25 @@ namespace NothingBehind.Scripts.Game.State
             return Observable.Return(SettingsState);
         }
 
-        private GameStateProxy CreateGameStateFromSettings(SceneEnterParams sceneEnterParams)
+        private GameStateProxy CreateGameStateFromSettings(GameSettings gameSettings, SceneEnterParams sceneEnterParams)
         {
             // Состояние по умолчанию из настроек, мы делаем фейк
+            var currentMapId = sceneEnterParams.TargetMapId;
+            var currentMapSettings = gameSettings.MapsSettings.Maps.First(settings =>
+                settings.MapId == currentMapId);
             _gameStateOrigin = new GameState
             {
                 Maps = new List<MapState>(),
                 CurrentMapId = sceneEnterParams.TargetMapId,
+                Hero = new Hero()
+                {
+                    CurrentMap = currentMapId,
+                    PositionOnMaps = new List<PositionOnMap>()
+                    {
+                        new (){MapId = currentMapId, Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition,}
+                    }, 
+                    Health = gameSettings.HeroSettings.Health
+                },
                 Resources = new List<ResourceData>()
                 {
                     new (){Amount = 0, ResourceType = ResourceType.SoftCurrency},

@@ -15,6 +15,7 @@ MonoBehaviour:
   MapId: 0
   SceneName: MainMenu
   InitialStateSettings:
+    PlayerInitialPosition: {x: 0, y: 0, z: 0}
     Characters: []
     MapTransfers: []
     EnemySpawns: []

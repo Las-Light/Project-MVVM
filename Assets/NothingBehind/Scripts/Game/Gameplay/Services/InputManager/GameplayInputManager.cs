@@ -1,0 +1,109 @@
+using System;
+using InputController;
+using UnityEngine;
+
+namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
+{
+    public class GameplayInputManager
+    {
+        public event Action<bool> AimInputReceived;
+        public event Action RotationCameraRightInputReceived;
+        public event Action RotationCameraLeftInputReceived;
+        public event Action CrouchInputReceived;
+        public event Action ReloadInputReceived;
+        public event Action SwitchWeaponInputReceived;
+
+        public Vector2 Move { get; private set; }
+        public Vector2 LookGamepad { get; private set; }
+        public Vector2 LookMouse { get; private set; }
+        public bool MouseIsActive => _inputController.Player.Look.WasPerformedThisFrame();
+        public bool IsSprint { get; private set; }
+        public bool IsShoot { get; private set; }
+
+
+        private readonly InputControl _inputController;
+        private PlayerGameplayInput _gameplayInput;
+
+        public GameplayInputManager()
+        {
+            // Возможно его надо создавать на уровне GameRoot в GameEntryPoint
+            _inputController = new InputControl();
+            _inputController.Enable();
+
+            InitPlayerInput(_inputController);
+        }
+        
+        private void InitPlayerInput(InputControl inputController)
+        {
+            _gameplayInput = new PlayerGameplayInput(inputController);
+            
+            _gameplayInput.LookGamepadInputReceived += OnLookGamepadInputReceived;
+            _gameplayInput.LookMouseInputReceived += OnLookMouseInputReceived;
+            _gameplayInput.MoveInputReceived += OnMoveInputReceived;
+            _gameplayInput.AimInputReceived += OnAimInputReceived;
+            _gameplayInput.CameraRotateRightInputReceived += OnCameraRotateRightInputReceived;
+            _gameplayInput.CameraRotateLeftInputReceived += OnCameraRotateLeftInputReceived;
+            _gameplayInput.CrouchInputReceived += OnCrouchInputReceived;
+            _gameplayInput.ShootInputReceived += OnShootInputReceived;
+            _gameplayInput.ReloadInputReceived += OnReloadInputReceived;
+            _gameplayInput.SprintInputReceived += OnSprintInputReceived;
+            _gameplayInput.SwitchWeaponInputReceived += OnSwitchWeaponInputReceived;
+        }
+
+        private void OnAimInputReceived(bool pressed)
+        {
+            AimInputReceived?.Invoke(pressed);
+        }
+        
+        private void OnSwitchWeaponInputReceived()
+        {
+            SwitchWeaponInputReceived?.Invoke();
+        }
+
+        private void OnReloadInputReceived()
+        {
+            ReloadInputReceived?.Invoke();
+        }
+
+        private void OnCrouchInputReceived()
+        {
+            
+            CrouchInputReceived?.Invoke();
+        }
+        
+        private void OnCameraRotateRightInputReceived()
+        {
+            RotationCameraRightInputReceived?.Invoke();
+        }
+        
+        private void OnCameraRotateLeftInputReceived()
+        {
+            RotationCameraLeftInputReceived?.Invoke();
+        }
+        
+        private void OnSprintInputReceived(bool pressed)
+        {
+            IsSprint = pressed;
+        }
+        
+        private void OnShootInputReceived(bool pressed)
+        {
+            IsShoot = pressed;
+        }
+        
+        private void OnLookMouseInputReceived(Vector2 position)
+        {
+            LookMouse = position;
+        }
+
+        private void OnLookGamepadInputReceived(Vector2 direction)
+        {
+            LookGamepad = direction;
+        }
+        
+        private void OnMoveInputReceived(Vector2 movementDirection)
+        {
+            Move = movementDirection;
+        }
+    }
+}

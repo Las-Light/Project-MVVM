@@ -15,7 +15,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
     {
         private readonly CharactersService _charactersService;
         private readonly IGameStateProvider _gameStateProvider;
+        private readonly HeroService _heroService;
         private readonly ResourcesService _resourcesService;
+        public readonly ReactiveProperty<HeroViewModel> Hero;
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
         public readonly IObservableCollection<MapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<EnemySpawnViewModel> AllSpawns;
@@ -23,13 +25,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         public WorldGameplayRootViewModel(
             CharactersService charactersService,
             IGameStateProvider gameStateProvider,
+            HeroService heroService,
             ResourcesService resourcesService,
             SpawnService spawnService,
             InitialMapStateService initialMapService)
         {
             _charactersService = charactersService;
             _gameStateProvider = gameStateProvider;
+            _heroService = heroService;
             _resourcesService = resourcesService;
+            Hero = heroService.HeroViewModel;
             AllCharacters = charactersService.AllCharacters;
             AllMapTransfers = initialMapService.MapTransfers;
             AllSpawns = spawnService.EnemySpawns;
@@ -49,14 +54,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             
             var gameState = _gameStateProvider.GameState._gameState;
 
-            foreach (var mapState in gameState.Maps)
-            {
-                foreach (var enemySpawn in mapState.EnemySpawns)
-                {
-                    Debug.Log(enemySpawn.Id);
-                }
-            }
-            
+            Debug.Log("Hero now is - " + " " + gameState.Hero.CurrentMap);
             // foreach (var characterViewModel in AllCharacters)
             // {
             //     Debug.Log(characterViewModel.TypeId + " + " + characterViewModel.Level + " + " +

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Maps;
+using NothingBehind.Scripts.Game.State.Maps.EnemySpawn;
 using R3;
 using UnityEngine;
 

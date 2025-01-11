@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.State.Maps
+namespace NothingBehind.Scripts.Game.State.Maps.MapTransfer
 {
     [Serializable]
     public class MapTransferData

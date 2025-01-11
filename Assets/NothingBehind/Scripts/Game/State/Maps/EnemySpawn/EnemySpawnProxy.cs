@@ -3,7 +3,7 @@ using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using R3;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.State.Maps
+namespace NothingBehind.Scripts.Game.State.Maps.EnemySpawn
 {
     public class EnemySpawnProxy
     {

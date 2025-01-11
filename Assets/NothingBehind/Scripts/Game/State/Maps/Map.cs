@@ -1,5 +1,8 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
+using NothingBehind.Scripts.Game.State.Entities.Hero;
+using NothingBehind.Scripts.Game.State.Maps.EnemySpawn;
+using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using ObservableCollections;
 using R3;
 

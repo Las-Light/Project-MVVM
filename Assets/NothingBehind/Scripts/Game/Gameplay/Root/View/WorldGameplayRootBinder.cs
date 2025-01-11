@@ -13,6 +13,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly Dictionary<int, CharacterBinder> _createCharactersMap = new();
         private readonly Dictionary<MapId, MapTransferBinder> _createMapTransfersMap = new();
         private readonly Dictionary<string, EnemySpawnBinder> _createSpawns = new();
+        private readonly ReactiveProperty<HeroBinder> _hero;
         private readonly CompositeDisposable _disposables = new();
         private WorldGameplayRootViewModel _viewModel;
 
@@ -20,11 +21,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         {
             _viewModel = viewModel;
 
+            viewModel.Hero.Subscribe(CreateHero);
             foreach (var characterViewModel in viewModel.AllCharacters) CreateCharacter(characterViewModel);
             foreach (var mapTransferViewModel in viewModel.AllMapTransfers)
                 CreateMapTransfer(mapTransferViewModel, exitSceneSignalSubj);
             foreach (var enemySpawnViewModel in viewModel.AllSpawns) CreateSpawnTrigger(enemySpawnViewModel);
 
+            _disposables.Add(viewModel.Hero);
             _disposables.Add(viewModel.AllCharacters.ObserveAdd()
                 .Subscribe(e => CreateCharacter(e.Value)));
 
@@ -41,6 +44,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private void OnDestroy()
         {
             _disposables.Dispose();
+        }
+
+        private void CreateHero(HeroViewModel heroViewModel)
+        {
+            var prefabHeroPath = "Prefabs/Gameplay/World/Characters/Hero";
+            var heroPrefab = Resources.Load<HeroBinder>(prefabHeroPath);
+
+            var heroBinder = Instantiate(heroPrefab);
+            heroBinder.Bind(heroViewModel);
         }
 
         private void CreateCharacter(CharacterViewModel characterViewModel)

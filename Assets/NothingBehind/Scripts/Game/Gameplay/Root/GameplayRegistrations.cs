@@ -2,6 +2,7 @@ using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.Gameplay.Services.InputManager;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
@@ -18,13 +19,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var gameState = gameStateProvider.GameState;
             var settingsProvider = container.Resolve<ISettingsProvider>();
             var gameSettings = settingsProvider.GameSettings;
-            var charsctersSettings = gameSettings.CharactersSettings;
+            var charactersSettings = gameSettings.CharactersSettings;
+
+            var inputManager = container.RegisterFactory(c => new GameplayInputManager()).AsSingle();
             
             container.RegisterInstance(AppConstants.EXIT_SCENE_REQUEST_TAG, new Subject<GameplayExitParams>());
             
             // регистрируем процессор и команды, а также кладём CommandProcessor в контейнер
             var commandProcessor = new CommandProcessor(gameStateProvider);
-            commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState, charsctersSettings));
+            commandProcessor.RegisterHandler(new CmdCreateHeroHandler(gameState, gameSettings));
+            commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState, charactersSettings));
             commandProcessor.RegisterHandler(new CmdCreateMapStateHandler(gameState, gameSettings));
             commandProcessor.RegisterHandler(new CmdResourcesAddHandler(gameState));
             commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));
@@ -33,13 +37,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             
             // регистрируем сервисы
 
-
-            // var loadingMap = GetLoadingMap(container, enterParams, gameState);
+            container.RegisterFactory(c => new HeroService(gameState, commandProcessor, enterParams)).AsSingle();
+            
             container.RegisterFactory(c => new InitialMapStateService(
                 gameStateProvider,
                 commandProcessor,
                 enterParams)).AsSingle();
 
+            //попробовать вместо инициализации карты сделать передачу loadingMap из enterParams и gameSettings
+            //(или полная инициализация из настроек)
             var loadingMap = container.Resolve<InitialMapStateService>().LoadingMap;
 
             container.RegisterFactory(c => new CharactersService(
@@ -55,13 +61,5 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 
             container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor));
         }
-
-        // private static Map GetLoadingMap(DIContainer container, SceneEnterParams enterParams, GameStateProxy gameState)
-        // {
-        //     container.Resolve<InitialMapStateService>();
-        //     var currentMap = enterParams.MapId;
-        //     var loadingMap = gameState.Maps.First(m => m.Id == currentMap);
-        //     return loadingMap;
-        // }
     }
 }

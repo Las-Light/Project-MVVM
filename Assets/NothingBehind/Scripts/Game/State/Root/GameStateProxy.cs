@@ -1,10 +1,9 @@
 using System.Linq;
-using NothingBehind.Scripts.Game.State.Entities.Characters;
+using NothingBehind.Scripts.Game.State.Entities.Hero;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
-using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Root
 {
@@ -12,6 +11,7 @@ namespace NothingBehind.Scripts.Game.State.Root
     {
         public readonly GameState _gameState;
         public readonly ReactiveProperty<MapId> CurrentMapId = new();
+        public ReactiveProperty<HeroProxy> Hero { get; } = new();
         public ObservableList<Map> Maps { get; } = new();
         public ObservableList<Resource> Resources { get; } = new();
 
@@ -19,9 +19,10 @@ namespace NothingBehind.Scripts.Game.State.Root
         {
             _gameState = gameState;
             CurrentMapId.Value = gameState.CurrentMapId;
-            
+
             InitMaps(gameState);
             InitResources(gameState);
+            InitHero(gameState);
 
             CurrentMapId.Skip(1).Subscribe(newValue => gameState.CurrentMapId = newValue);
         }
@@ -29,6 +30,11 @@ namespace NothingBehind.Scripts.Game.State.Root
         public int CreateEntityId()
         {
             return _gameState.CreateEntityId();
+        }
+
+        private void InitHero(GameState gameState)
+        {
+            Hero.Value = new HeroProxy(gameState.Hero);
         }
 
         private void InitMaps(GameState gameState)
@@ -49,7 +55,7 @@ namespace NothingBehind.Scripts.Game.State.Root
                 gameState.Maps.Remove(removedMapState);
             });
         }
-        
+
         private void InitResources(GameState gameState)
         {
             gameState.Resources.ForEach(resourceOrigin => Resources.Add(new Resource(resourceOrigin)));

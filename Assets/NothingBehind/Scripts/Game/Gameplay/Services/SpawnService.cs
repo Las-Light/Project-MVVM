@@ -3,6 +3,7 @@ using NothingBehind.Scripts.Game.Gameplay.Commands;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Maps;
+using NothingBehind.Scripts.Game.State.Maps.EnemySpawn;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -26,7 +27,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
             InitialEnemySpawn();
         }
-        
+
+        public bool TriggeredEnemySpawn(string id)
+        {
+            var command = new CmdTriggeredEnemySpawn(id);
+
+            return _cmd.Process(command);
+        }
+
         private void InitialEnemySpawn()
         {
             var enemySpawns = _loadingMap.EnemySpawns;
@@ -34,7 +42,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             enemySpawns.ObserveAdd().Subscribe(e => CreateEnemySpawnViewModel(e.Value));
             enemySpawns.ObserveRemove().Subscribe(e => RemoveEnemySpawn(e.Value));
         }
-        
+
         private void CreateEnemySpawnViewModel(EnemySpawnProxy enemySpawnProxy)
         {
             var viewModel = new EnemySpawnViewModel(enemySpawnProxy, _charactersService, this);
@@ -51,12 +59,5 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                 _enemySpawns.Remove(enemySpawnData.Id);
             }
         }
-
-        public bool TriggeredEnemySpawn(string id)
-        {
-            var command = new CmdTriggeredEnemySpawn(id);
-
-            return _cmd.Process(command);
-        } 
     }
 }

@@ -5,11 +5,11 @@ namespace NothingBehind.Scripts.Game.MainMenu.Services
 {
     public class SomeMainMenuService
     {
-        private readonly SomeCommonService _someCommonService;
+        private readonly InitialGameStateService _initialGameStateService;
 
-        public SomeMainMenuService(SomeCommonService someCommonService)
+        public SomeMainMenuService(InitialGameStateService initialGameStateService)
         {
-            _someCommonService = someCommonService;
+            _initialGameStateService = initialGameStateService;
             Debug.Log(GetType().Name + " has been created");
         }
 

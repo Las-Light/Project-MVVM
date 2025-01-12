@@ -17,7 +17,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                     c.Resolve<HeroService>(),
                     c.Resolve<ResourcesService>(),
                     c.Resolve<SpawnService>(),
-                    c.Resolve<InitialMapStateService>()))
+                    c.Resolve<MapTransferService>()))
                 .AsSingle();
         }
     }

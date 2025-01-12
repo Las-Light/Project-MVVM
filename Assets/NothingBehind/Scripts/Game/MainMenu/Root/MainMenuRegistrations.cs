@@ -9,7 +9,7 @@ namespace NothingBehind.Scripts.Game.MainMenu.Root
     {
         public static void Register(DIContainer container, SceneEnterParams sceneEnterParams)
         {
-            container.RegisterFactory(c => new SomeMainMenuService(c.Resolve<SomeCommonService>())).AsSingle();
+            container.RegisterFactory(c => new SomeMainMenuService(c.Resolve<InitialGameStateService>())).AsSingle();
         }
     }
 }

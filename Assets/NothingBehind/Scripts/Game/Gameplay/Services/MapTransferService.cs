@@ -1,0 +1,56 @@
+using System.Collections.Generic;
+using NothingBehind.Scripts.Game.Gameplay.View.Maps;
+using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Game.State.Maps;
+using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
+using ObservableCollections;
+using R3;
+
+namespace NothingBehind.Scripts.Game.Gameplay.Services
+{
+    public class MapTransferService
+    {
+        public readonly ObservableList<MapTransferViewModel> _mapTransfers = new();
+        private readonly Dictionary<MapId, MapTransferViewModel> _mapTransfersMap = new();
+
+        private readonly ICommandProcessor _commandProcessor;
+
+        public IObservableCollection<MapTransferViewModel> MapTransfers => _mapTransfers;
+
+        public MapTransferService(
+            IObservableCollection<MapTransferData> mapTransfers,
+            ICommandProcessor commandProcessor)
+        {
+            _commandProcessor = commandProcessor;
+
+            InitialMapTransfers(mapTransfers);
+        }
+
+        private void InitialMapTransfers(IObservableCollection<MapTransferData> mapTransfers)
+        {
+            foreach (var mapTransferData in mapTransfers)
+            {
+                CreateMapTransferViewModel(mapTransferData);
+            }
+            mapTransfers.ObserveAdd().Subscribe(e => CreateMapTransferViewModel(e.Value));
+            mapTransfers.ObserveRemove().Subscribe(e => RemoveMapTransferViewModel(e.Value));
+        }
+
+        private void CreateMapTransferViewModel(MapTransferData mapTransferData)
+        {
+            var mapTransferViewModel = new MapTransferViewModel(mapTransferData);
+            _mapTransfersMap[mapTransferData.TargetMapId] = mapTransferViewModel;
+
+            _mapTransfers.Add(mapTransferViewModel);
+        }
+
+        private void RemoveMapTransferViewModel(MapTransferData mapTransferData)
+        {
+            if (_mapTransfersMap.TryGetValue(mapTransferData.TargetMapId, out var mapTransferViewModel))
+            {
+                _mapTransfers.Remove(mapTransferViewModel);
+                _mapTransfersMap.Remove(mapTransferData.TargetMapId);
+            }
+        }
+    }
+}

@@ -1,10 +1,8 @@
-using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.GameResources;
-using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -28,7 +26,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             HeroService heroService,
             ResourcesService resourcesService,
             SpawnService spawnService,
-            InitialMapStateService initialMapService)
+            MapTransferService mapService)
         {
             _charactersService = charactersService;
             _gameStateProvider = gameStateProvider;
@@ -36,7 +34,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _resourcesService = resourcesService;
             Hero = heroService.HeroViewModel;
             AllCharacters = charactersService.AllCharacters;
-            AllMapTransfers = initialMapService.MapTransfers;
+            AllMapTransfers = mapService._mapTransfers;
             AllSpawns = spawnService.EnemySpawns;
 
             resourcesService.ObserveResource(ResourceType.SoftCurrency)
@@ -54,7 +52,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             
             var gameState = _gameStateProvider.GameState._gameState;
 
-            Debug.Log("Hero now is - " + " " + gameState.Hero.CurrentMap);
             // foreach (var characterViewModel in AllCharacters)
             // {
             //     Debug.Log(characterViewModel.TypeId + " + " + characterViewModel.Level + " + " +

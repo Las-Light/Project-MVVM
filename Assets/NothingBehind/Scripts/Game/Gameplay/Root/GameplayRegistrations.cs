@@ -1,3 +1,4 @@
+using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers;
@@ -29,7 +30,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var commandProcessor = new CommandProcessor(gameStateProvider);
             commandProcessor.RegisterHandler(new CmdCreateHeroHandler(gameState, gameSettings));
             commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState, charactersSettings));
-            commandProcessor.RegisterHandler(new CmdCreateMapStateHandler(gameState, gameSettings));
             commandProcessor.RegisterHandler(new CmdResourcesAddHandler(gameState));
             commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));
             commandProcessor.RegisterHandler(new CmdTriggeredEnemySpawnHandler(gameState));
@@ -38,16 +38,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             // регистрируем сервисы
 
             container.RegisterFactory(c => new HeroService(gameState, commandProcessor, enterParams)).AsSingle();
+            container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor));
             
-            container.RegisterFactory(c => new InitialMapStateService(
-                gameStateProvider,
-                commandProcessor,
-                enterParams)).AsSingle();
+            var loadingMap = gameState.Maps.First(m => m.Id == enterParams.TargetMapId);
 
-            //попробовать вместо инициализации карты сделать передачу loadingMap из enterParams и gameSettings
-            //(или полная инициализация из настроек)
-            var loadingMap = container.Resolve<InitialMapStateService>().LoadingMap;
-
+            container.RegisterFactory(c => new MapTransferService(
+                loadingMap.MapTransfers,
+                commandProcessor)).AsSingle();
+            
             container.RegisterFactory(c => new CharactersService(
                 loadingMap.Characters,
                 gameSettings.CharactersSettings,
@@ -55,11 +53,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             ).AsSingle();
 
             container.RegisterFactory(c => new SpawnService(
-                loadingMap,
+                loadingMap.EnemySpawns,
                 container.Resolve<CharactersService>(),
                 commandProcessor));
 
-            container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor));
         }
     }
 }

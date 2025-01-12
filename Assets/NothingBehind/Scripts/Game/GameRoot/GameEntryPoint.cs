@@ -46,11 +46,10 @@ namespace NothingBehind.Scripts.Game.GameRoot
 
             var settingsProvider = new SettingsProvider();
             _rootContainer.RegisterInstance<ISettingsProvider>(settingsProvider);
+            _rootContainer.RegisterFactory(_ => new InitialGameStateService()).AsSingle();
 
-            var gameStateProvider = new PlayerPrefsGameStateProvider();
+            var gameStateProvider = new PlayerPrefsGameStateProvider(_rootContainer.Resolve<InitialGameStateService>());
             _rootContainer.RegisterInstance<IGameStateProvider>(gameStateProvider);
-
-            _rootContainer.RegisterFactory(_ => new SomeCommonService()).AsSingle();
         }
 
         private async void RunGame()
@@ -69,6 +68,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 _coroutines.StartCoroutine(LoadingAndStartGameplay(gameSettings, enterParams));
                 return;
             }
+
             if (sceneName == Scenes.GAMEPLAY_1)
             {
                 var enterParams =
@@ -104,8 +104,8 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return new WaitForSeconds(1);
 
             var isGameStateLoaded = false;
-            _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams).
-                Subscribe(_ => isGameStateLoaded = true);
+            _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
+                .Subscribe(_ => isGameStateLoaded = true);
             yield return new WaitUntil(() => isGameStateLoaded);
 
             var sceneEntryPoint = Object.FindFirstObjectByType<GameplayEntryPoint>();
@@ -115,11 +115,13 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 var targetSceneName = GetSceneName(gameplayExitParams.SceneEnterParams.TargetMapId);
                 if (targetSceneName == Scenes.MAIN_MENU)
                 {
-                    _coroutines.StartCoroutine(LoadingAndStartMainMenu(gameSettings, gameplayExitParams.SceneEnterParams));
+                    _coroutines.StartCoroutine(LoadingAndStartMainMenu(gameSettings,
+                        gameplayExitParams.SceneEnterParams));
                 }
                 else
                 {
-                    _coroutines.StartCoroutine(LoadingAndStartGameplay(gameSettings, gameplayExitParams.SceneEnterParams));
+                    _coroutines.StartCoroutine(LoadingAndStartGameplay(gameSettings,
+                        gameplayExitParams.SceneEnterParams));
                 }
             });
 
@@ -169,7 +171,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
         {
             var settingsProvider = _rootContainer.Resolve<ISettingsProvider>();
             var mapSettings = settingsProvider.GameSettings.MapsSettings.Maps.First(m => m.MapId == targetMapId);
-            
+
             return mapSettings.SceneName;
         }
     }

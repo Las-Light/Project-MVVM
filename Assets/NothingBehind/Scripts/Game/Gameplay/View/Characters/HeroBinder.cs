@@ -1,14 +1,25 @@
-using System.Linq;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
 {
     public class HeroBinder : MonoBehaviour
     {
+        public CharacterController CharacterController;
+        private Camera _mainCamera;
+        private HeroViewModel _viewModel;
+
         public void Bind(HeroViewModel viewModel)
         {
-            var currentPosOnMap = viewModel.PositionOnMaps.First(p => p.MapId == viewModel.CurrentMap.CurrentValue);
-            transform.position = currentPosOnMap.Position.Value;
+            _viewModel = viewModel; 
+            var currentPosOnMap = viewModel.CurrentMap;
+            transform.position = currentPosOnMap.CurrentValue.Position.Value;
+            CharacterController = GetComponent<CharacterController>();
+            viewModel.SetHeroView(this);
+        }
+
+        private void Update()
+        {
+            _viewModel.Move();
         }
     }
 }

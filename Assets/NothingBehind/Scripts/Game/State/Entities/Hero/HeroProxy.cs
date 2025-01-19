@@ -1,5 +1,4 @@
 using System.Linq;
-using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
 
@@ -8,7 +7,7 @@ namespace NothingBehind.Scripts.Game.State.Entities.Hero
     public class HeroProxy
     {
         public Hero Origin { get; }
-        public ReactiveProperty<MapId> CurrentMap { get; }
+        public ReactiveProperty<PositionOnMapProxy> CurrentMap { get; }
         
         public ObservableList<PositionOnMapProxy> PositionOnMaps { get; } = new();
         public ReactiveProperty<float> Health { get; }
@@ -19,9 +18,9 @@ namespace NothingBehind.Scripts.Game.State.Entities.Hero
             
             InitPosOnMap(hero);
 
-            CurrentMap = new ReactiveProperty<MapId>(hero.CurrentMap);
+            CurrentMap = new ReactiveProperty<PositionOnMapProxy>(new PositionOnMapProxy(hero.CurrentMap));
             Health = new ReactiveProperty<float>(hero.Health);
-            CurrentMap.Skip(1).Subscribe(value => hero.CurrentMap = value);
+            CurrentMap.Skip(1).Subscribe(value => hero.CurrentMap = value.Origin);
             Health.Skip(1).Subscribe(value => hero.Health = value);
         }
 

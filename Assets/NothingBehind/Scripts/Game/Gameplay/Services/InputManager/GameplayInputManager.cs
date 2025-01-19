@@ -1,5 +1,6 @@
 using System;
 using InputController;
+using R3;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
@@ -13,12 +14,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
         public event Action ReloadInputReceived;
         public event Action SwitchWeaponInputReceived;
 
-        public Vector2 Move { get; private set; }
+        public ReadOnlyReactiveProperty<Vector2> Move => _move;
         public Vector2 LookGamepad { get; private set; }
         public Vector2 LookMouse { get; private set; }
         public bool MouseIsActive => _inputController.Player.Look.WasPerformedThisFrame();
         public bool IsSprint { get; private set; }
         public bool IsShoot { get; private set; }
+
+        private ReactiveProperty<Vector2> _move = new();
 
 
         private readonly InputControl _inputController;
@@ -32,11 +35,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
 
             InitPlayerInput(_inputController);
         }
-        
+
         private void InitPlayerInput(InputControl inputController)
         {
             _gameplayInput = new PlayerGameplayInput(inputController);
-            
+
             _gameplayInput.LookGamepadInputReceived += OnLookGamepadInputReceived;
             _gameplayInput.LookMouseInputReceived += OnLookMouseInputReceived;
             _gameplayInput.MoveInputReceived += OnMoveInputReceived;
@@ -54,7 +57,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
         {
             AimInputReceived?.Invoke(pressed);
         }
-        
+
         private void OnSwitchWeaponInputReceived()
         {
             SwitchWeaponInputReceived?.Invoke();
@@ -67,30 +70,29 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
 
         private void OnCrouchInputReceived()
         {
-            
             CrouchInputReceived?.Invoke();
         }
-        
+
         private void OnCameraRotateRightInputReceived()
         {
             RotationCameraRightInputReceived?.Invoke();
         }
-        
+
         private void OnCameraRotateLeftInputReceived()
         {
             RotationCameraLeftInputReceived?.Invoke();
         }
-        
+
         private void OnSprintInputReceived(bool pressed)
         {
             IsSprint = pressed;
         }
-        
+
         private void OnShootInputReceived(bool pressed)
         {
             IsShoot = pressed;
         }
-        
+
         private void OnLookMouseInputReceived(Vector2 position)
         {
             LookMouse = position;
@@ -100,10 +102,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
         {
             LookGamepad = direction;
         }
-        
+
         private void OnMoveInputReceived(Vector2 movementDirection)
         {
-            Move = movementDirection;
+            _move.OnNext(movementDirection);
         }
     }
 }

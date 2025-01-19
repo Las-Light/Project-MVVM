@@ -2,7 +2,9 @@ using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers;
+using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Hero;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
 using NothingBehind.Scripts.Game.Gameplay.Services.InputManager;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.Settings;
@@ -21,31 +23,37 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var settingsProvider = container.Resolve<ISettingsProvider>();
             var gameSettings = settingsProvider.GameSettings;
             var charactersSettings = gameSettings.CharactersSettings;
+            var heroSettings = gameSettings.HeroSettings;
 
-            var inputManager = container.RegisterFactory(c => new GameplayInputManager()).AsSingle();
-            
+            container.RegisterFactory(c => new GameplayInputManager()).AsSingle();
+            var inputManager = container.Resolve<GameplayInputManager>();
+
             container.RegisterInstance(AppConstants.EXIT_SCENE_REQUEST_TAG, new Subject<GameplayExitParams>());
-            
+
             // регистрируем процессор и команды, а также кладём CommandProcessor в контейнер
             var commandProcessor = new CommandProcessor(gameStateProvider);
-            commandProcessor.RegisterHandler(new CmdCreateHeroHandler(gameState, gameSettings));
+            commandProcessor.RegisterHandler(new CmdInitHeroPosOnMapHandler(gameState, gameSettings));
             commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState, charactersSettings));
             commandProcessor.RegisterHandler(new CmdResourcesAddHandler(gameState));
             commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));
             commandProcessor.RegisterHandler(new CmdTriggeredEnemySpawnHandler(gameState));
+            commandProcessor.RegisterHandler(new CmdUpdateHeroPosOnMapHandler(gameState));
             container.RegisterInstance<ICommandProcessor>(commandProcessor);
-            
+
             // регистрируем сервисы
 
-            container.RegisterFactory(c => new HeroService(gameState, commandProcessor, enterParams)).AsSingle();
-            container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor));
-            
+            container.RegisterFactory(c =>
+                new MoveHeroService(gameSettings, inputManager)).AsSingle();
+            container.RegisterFactory(c => new HeroService(container.Resolve<MoveHeroService>(), gameState, commandProcessor, enterParams)).AsSingle();
+
+            container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor)).AsSingle();
+
             var loadingMap = gameState.Maps.First(m => m.Id == enterParams.TargetMapId);
 
             container.RegisterFactory(c => new MapTransferService(
                 loadingMap.MapTransfers,
                 commandProcessor)).AsSingle();
-            
+
             container.RegisterFactory(c => new CharactersService(
                 loadingMap.Characters,
                 gameSettings.CharactersSettings,
@@ -55,8 +63,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             container.RegisterFactory(c => new SpawnService(
                 loadingMap.EnemySpawns,
                 container.Resolve<CharactersService>(),
-                commandProcessor));
-
+                commandProcessor)).AsSingle();
         }
     }
 }

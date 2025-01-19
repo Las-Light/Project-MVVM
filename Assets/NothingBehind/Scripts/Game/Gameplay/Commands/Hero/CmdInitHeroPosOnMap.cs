@@ -1,13 +1,13 @@
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Maps;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Commands
+namespace NothingBehind.Scripts.Game.Gameplay.Commands.Hero
 {
-    public class CmdCreateHero : ICommand
+    public class CmdInitHeroPosOnMap : ICommand
     {
         public MapId CurrentMapId;
 
-        public CmdCreateHero(MapId currentMapId)
+        public CmdInitHeroPosOnMap(MapId currentMapId)
         {
             CurrentMapId = currentMapId;
         }

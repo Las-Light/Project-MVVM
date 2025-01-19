@@ -1,4 +1,5 @@
 using System.Linq;
+using NothingBehind.Scripts.Game.Gameplay.Commands.Hero;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Commands;
@@ -6,25 +7,25 @@ using NothingBehind.Scripts.Game.State.Entities.Hero;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Root;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
+namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Hero
 {
-    public class CmdCreateHeroHandler : ICommandHandler<CmdCreateHero>
+    public class CmdInitHeroPosOnMapHandler : ICommandHandler<CmdInitHeroPosOnMap>
     {
         private readonly GameStateProxy _gameState;
         private readonly GameSettings _gameSettings;
 
-        public CmdCreateHeroHandler(GameStateProxy gameState, GameSettings gameSettings)
+        public CmdInitHeroPosOnMapHandler(GameStateProxy gameState, GameSettings gameSettings)
         {
             _gameState = gameState;
             _gameSettings = gameSettings;
         }
-        public bool Handle(CmdCreateHero command)
+        public bool Handle(CmdInitHeroPosOnMap command)
         {
             InitialHeroPosition(command);
             return true;
         }
         
-        private void InitialHeroPosition(CmdCreateHero command)
+        private void InitialHeroPosition(CmdInitHeroPosOnMap command)
         {
             var requiredMap = command.CurrentMapId;
             var requiredPosOnMap = _gameState.Hero.Value.PositionOnMaps.FirstOrDefault(
@@ -34,13 +35,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             
             if (requiredPosOnMap == null)
             {
-                CreateNewPosOnMap(requiredMap, initialStateSettings);
+                requiredPosOnMap = CreateNewPosOnMap(requiredMap, initialStateSettings);
             }
 
-            _gameState.Hero.Value.CurrentMap.Value = command.CurrentMapId;
+            _gameState.Hero.Value.CurrentMap.Value = requiredPosOnMap;
         }
 
-        private void CreateNewPosOnMap(MapId requiredMap, MapInitialStateSettings initialStateSettings)
+        private PositionOnMapProxy CreateNewPosOnMap(MapId requiredMap, MapInitialStateSettings initialStateSettings)
         {
             var newPosOnMap = new PositionOnMap()
             {
@@ -50,6 +51,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             
             var posOnMap = new PositionOnMapProxy(newPosOnMap);
             _gameState.Hero.Value.PositionOnMaps.Add(posOnMap);
+            _gameState.Hero.Value.CurrentMap.Value = posOnMap;
+            return posOnMap;
         }
     }
 }

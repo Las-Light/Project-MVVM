@@ -19,19 +19,18 @@ MonoBehaviour:
     Characters: []
     MapTransfers:
     - TargetMapId: 2
-      Position: {x: 11.1, y: -19.710701, z: -30.2}
+      Position: {x: -9.971256, y: 0, z: -16.402199}
     EnemySpawns:
     - Id: SpawnMarker
       Characters:
       - TypeId: Dummy
         LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-        Position: {x: -19.8, y: 0, z: 4.7}
-      Position: {x: 13.96, y: -14.41289, z: 19.68}
-      IsTriggered: 0
-    - Id: SpawnMarker (1)
-      Characters:
+        Position: {x: 13.6, y: 0.0000038146973, z: 12.8}
       - TypeId: Dummy
         LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-        Position: {x: -18.15, y: 0, z: -22.58}
-      Position: {x: -5.3, y: -14.41289, z: -9.6}
+        Position: {x: -10.4, y: 0.0000038146973, z: 12.4}
+      - TypeId: Dummy
+        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
+        Position: {x: -34.2, y: 0.0000038146973, z: 12.4}
+      Position: {x: -10.954521, y: -0.0000038146973, z: 26.492702}
       IsTriggered: 0

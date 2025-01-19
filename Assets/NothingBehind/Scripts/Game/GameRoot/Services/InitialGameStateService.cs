@@ -24,12 +24,15 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             gameState.CurrentMapId = currentMapId;
             gameState.Hero = new Hero()
             {
-                CurrentMap = currentMapId,
+                CurrentMap = new PositionOnMap()
+                {
+                    MapId = currentMapId, Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition
+                },
                 PositionOnMaps = new List<PositionOnMap>()
                 {
                     new()
                     {
-                        MapId = currentMapId, Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition,
+                        MapId = currentMapId, Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition
                     }
                 },
                 Health = gameSettings.HeroSettings.Health

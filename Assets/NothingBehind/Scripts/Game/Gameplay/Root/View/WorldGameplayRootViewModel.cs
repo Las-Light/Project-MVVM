@@ -1,4 +1,6 @@
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
+using NothingBehind.Scripts.Game.Gameplay.Services.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
 using NothingBehind.Scripts.Game.State;
@@ -15,23 +17,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly IGameStateProvider _gameStateProvider;
         private readonly HeroService _heroService;
         private readonly ResourcesService _resourcesService;
-        public readonly ReactiveProperty<HeroViewModel> Hero;
+        private readonly GameplayInputManager _gameplayInputManager;
+        
+        public readonly ReadOnlyReactiveProperty<HeroViewModel> Hero;
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
         public readonly IObservableCollection<MapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<EnemySpawnViewModel> AllSpawns;
 
-        public WorldGameplayRootViewModel(
-            CharactersService charactersService,
+        public WorldGameplayRootViewModel(CharactersService charactersService,
             IGameStateProvider gameStateProvider,
             HeroService heroService,
             ResourcesService resourcesService,
             SpawnService spawnService,
-            MapTransferService mapService)
+            MapTransferService mapService, GameplayInputManager gameplayInputManager)
         {
             _charactersService = charactersService;
             _gameStateProvider = gameStateProvider;
             _heroService = heroService;
             _resourcesService = resourcesService;
+            _gameplayInputManager = gameplayInputManager;
             Hero = heroService.HeroViewModel;
             AllCharacters = charactersService.AllCharacters;
             AllMapTransfers = mapService._mapTransfers;
@@ -51,6 +55,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                 new Vector3Int(Random.Range(0, 6), Random.Range(0, 6), Random.Range(0, 6)));
             
             var gameState = _gameStateProvider.GameState._gameState;
+            
+            Debug.Log(_gameplayInputManager.Move);
 
             // foreach (var characterViewModel in AllCharacters)
             // {

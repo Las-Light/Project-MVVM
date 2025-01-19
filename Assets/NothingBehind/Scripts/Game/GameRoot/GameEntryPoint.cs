@@ -107,7 +107,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
                 .Subscribe(_ => isGameStateLoaded = true);
             yield return new WaitUntil(() => isGameStateLoaded);
-
+            
             var sceneEntryPoint = Object.FindFirstObjectByType<GameplayEntryPoint>();
             var gameplayContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
             sceneEntryPoint.Run(gameplayContainer, enterParams).Subscribe(gameplayExitParams =>

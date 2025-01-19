@@ -28,6 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
             _inputController.Player.Look.performed += OnLookMousePerformed;
             _inputController.Player.LookGamepad.performed += OnLookGamepadPerformed;
             _inputController.Player.Move.performed += OnMovePerformed;
+            _inputController.Player.Move.canceled += OnMovePerformed;
             _inputController.Player.Aim.performed += OnAimPerformed;
             _inputController.Player.RotateCameraRight.performed += OnRotateCameraRightPerformed;
             _inputController.Player.RotateCameraLeft.performed += OnRotateCameraLeftPerformed;
@@ -72,17 +73,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
         {
             LookMouseInputReceived?.Invoke(context.ReadValue<Vector2>());
         }
-        
+
         private void OnLookGamepadPerformed(InputAction.CallbackContext context)
         {
             LookGamepadInputReceived?.Invoke(context.ReadValue<Vector2>());
         }
-        
+
         private void OnRotateCameraRightPerformed(InputAction.CallbackContext context)
         {
             CameraRotateRightInputReceived?.Invoke();
         }
-        
+
         private void OnRotateCameraLeftPerformed(InputAction.CallbackContext context)
         {
             CameraRotateLeftInputReceived?.Invoke();

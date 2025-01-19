@@ -74,7 +74,7 @@ namespace NothingBehind.Scripts.Game.State
             var json = JsonUtility.ToJson(_gameStateOrigin, true);
             PlayerPrefs.SetString(GAME_STATE_KEY, json);
 
-            Debug.Log("Save GameState");
+            //Debug.Log("Save GameState");
 
             return Observable.Return(true);
         }

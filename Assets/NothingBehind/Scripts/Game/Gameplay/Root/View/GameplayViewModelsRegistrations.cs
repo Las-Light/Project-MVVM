@@ -1,5 +1,7 @@
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
+using NothingBehind.Scripts.Game.Gameplay.Services.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.View.UI;
 using NothingBehind.Scripts.Game.State;
 
@@ -17,7 +19,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                     c.Resolve<HeroService>(),
                     c.Resolve<ResourcesService>(),
                     c.Resolve<SpawnService>(),
-                    c.Resolve<MapTransferService>()))
+                    c.Resolve<MapTransferService>(),
+                    c.Resolve<GameplayInputManager>()))
                 .AsSingle();
         }
     }

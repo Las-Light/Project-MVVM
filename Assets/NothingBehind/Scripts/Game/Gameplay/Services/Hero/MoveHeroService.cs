@@ -1,20 +1,20 @@
 using NothingBehind.Scripts.Game.Gameplay.Services.InputManager;
-using NothingBehind.Scripts.Game.Settings;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Services.Hero
 {
     public class MoveHeroService
     {
-        private readonly GameSettings _gameSettings;
+        private readonly HeroSettings _heroSettings;
         private readonly GameplayInputManager _inputManager;
         
         private float _speed = 4.0f;
 
-        public MoveHeroService(GameSettings gameSettings, GameplayInputManager inputManager)
+        public MoveHeroService(HeroSettings heroSettings, GameplayInputManager inputManager)
         {
             _inputManager = inputManager;
-            _gameSettings = gameSettings;
+            _heroSettings = heroSettings;
         }
 
 
@@ -33,6 +33,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.Hero
 
             // move direction the player
             return inputDirection * (_speed * Time.deltaTime);
+        }
+
+        public bool InteractiveActionPressed()
+        {
+            return _inputManager.IsInteract.CurrentValue;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             // регистрируем сервисы
 
             container.RegisterFactory(c =>
-                new MoveHeroService(gameSettings, inputManager)).AsSingle();
+                new MoveHeroService(heroSettings, inputManager)).AsSingle();
             container.RegisterFactory(c => new HeroService(container.Resolve<MoveHeroService>(), gameState, commandProcessor, enterParams)).AsSingle();
 
             container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor)).AsSingle();
@@ -51,8 +51,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var loadingMap = gameState.Maps.First(m => m.Id == enterParams.TargetMapId);
 
             container.RegisterFactory(c => new MapTransferService(
-                loadingMap.MapTransfers,
-                commandProcessor)).AsSingle();
+                loadingMap.MapTransfers)).AsSingle();
 
             container.RegisterFactory(c => new CharactersService(
                 loadingMap.Characters,

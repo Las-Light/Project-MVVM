@@ -21,5 +21,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
         {
             _viewModel.Move();
         }
+
+        public bool IsInteractiveActionPressed()
+        {
+            return _viewModel.InteractiveActionPressed();
+        }
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
-using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using ObservableCollections;
@@ -13,16 +12,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         public readonly ObservableList<MapTransferViewModel> _mapTransfers = new();
         private readonly Dictionary<MapId, MapTransferViewModel> _mapTransfersMap = new();
 
-        private readonly ICommandProcessor _commandProcessor;
-
         public IObservableCollection<MapTransferViewModel> MapTransfers => _mapTransfers;
 
         public MapTransferService(
-            IObservableCollection<MapTransferData> mapTransfers,
-            ICommandProcessor commandProcessor)
+            IObservableCollection<MapTransferData> mapTransfers)
         {
-            _commandProcessor = commandProcessor;
-
             InitialMapTransfers(mapTransfers);
         }
 

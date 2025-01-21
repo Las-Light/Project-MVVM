@@ -40,5 +40,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
             HeroView.CharacterController.Move(_moveHeroService.Move());
             _heroService.UpdateHeroPosOnMap(HeroView.transform.position);
         }
+
+        public bool InteractiveActionPressed()
+        {
+            return _moveHeroService.InteractiveActionPressed();
+        }
     }
 }

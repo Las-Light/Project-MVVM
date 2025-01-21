@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
 {
-    public class GameplayInputManager
+    public class GameplayInputManager : IDisposable
     {
         public event Action<bool> AimInputReceived;
         public event Action RotationCameraRightInputReceived;
@@ -15,13 +15,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
         public event Action SwitchWeaponInputReceived;
 
         public ReadOnlyReactiveProperty<Vector2> Move => _move;
+        public ReadOnlyReactiveProperty<bool> IsInteract => _isInteract;
+        public ReadOnlyReactiveProperty<bool> IsAttack => _isAttack;
         public Vector2 LookGamepad { get; private set; }
         public Vector2 LookMouse { get; private set; }
         public bool MouseIsActive => _inputController.Player.Look.WasPerformedThisFrame();
         public bool IsSprint { get; private set; }
-        public bool IsShoot { get; private set; }
+        
+        private readonly ReactiveProperty<bool> _isInteract = new();
+        private readonly ReactiveProperty<bool> _isAttack = new();
 
-        private ReactiveProperty<Vector2> _move = new();
+        private readonly ReactiveProperty<Vector2> _move = new();
 
 
         private readonly InputControl _inputController;
@@ -47,7 +51,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
             _gameplayInput.CameraRotateRightInputReceived += OnCameraRotateRightInputReceived;
             _gameplayInput.CameraRotateLeftInputReceived += OnCameraRotateLeftInputReceived;
             _gameplayInput.CrouchInputReceived += OnCrouchInputReceived;
-            _gameplayInput.ShootInputReceived += OnShootInputReceived;
+            _gameplayInput.InteractInputReceived += OnInteractInputReceived;
+            _gameplayInput.AttackInputReceived += OnAttackInputReceived;
             _gameplayInput.ReloadInputReceived += OnReloadInputReceived;
             _gameplayInput.SprintInputReceived += OnSprintInputReceived;
             _gameplayInput.SwitchWeaponInputReceived += OnSwitchWeaponInputReceived;
@@ -88,9 +93,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
             IsSprint = pressed;
         }
 
-        private void OnShootInputReceived(bool pressed)
+        private void OnAttackInputReceived(bool pressed)
         {
-            IsShoot = pressed;
+            _isAttack.OnNext(pressed);
+        }
+
+        private void OnInteractInputReceived(bool pressed)
+        {
+            _isInteract.OnNext(pressed);
         }
 
         private void OnLookMouseInputReceived(Vector2 position)
@@ -106,6 +116,23 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
         private void OnMoveInputReceived(Vector2 movementDirection)
         {
             _move.OnNext(movementDirection);
+        }
+
+        public void Dispose()
+        {
+            _gameplayInput.LookGamepadInputReceived -= OnLookGamepadInputReceived;
+            _gameplayInput.LookMouseInputReceived -= OnLookMouseInputReceived;
+            _gameplayInput.MoveInputReceived -= OnMoveInputReceived;
+            _gameplayInput.AimInputReceived -= OnAimInputReceived;
+            _gameplayInput.CameraRotateRightInputReceived -= OnCameraRotateRightInputReceived;
+            _gameplayInput.CameraRotateLeftInputReceived -= OnCameraRotateLeftInputReceived;
+            _gameplayInput.CrouchInputReceived -= OnCrouchInputReceived;
+            _gameplayInput.InteractInputReceived -= OnInteractInputReceived;
+            _gameplayInput.AttackInputReceived -= OnAttackInputReceived;
+            _gameplayInput.ReloadInputReceived -= OnReloadInputReceived;
+            _gameplayInput.SprintInputReceived -= OnSprintInputReceived;
+            _gameplayInput.SwitchWeaponInputReceived -= OnSwitchWeaponInputReceived;
+            _inputController.Disable();
         }
     }
 }

@@ -101,7 +101,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return LoadScene(Scenes.BOOT);
             yield return LoadScene(GetSceneName(enterParams.TargetMapId));
 
-            yield return new WaitForSeconds(1);
+            //yield return new WaitForSeconds(1);
 
             var isGameStateLoaded = false;
             _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.Gameplay.View;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
 using NothingBehind.Scripts.Game.State.Maps;
@@ -13,7 +14,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly Dictionary<int, CharacterBinder> _createCharactersMap = new();
         private readonly Dictionary<MapId, MapTransferBinder> _createMapTransfersMap = new();
         private readonly Dictionary<string, EnemySpawnBinder> _createSpawns = new();
-        private readonly ReactiveProperty<HeroBinder> _hero;
+        private HeroBinder _hero;
+        private CameraBinder _camera;
         private readonly CompositeDisposable _disposables = new();
         private WorldGameplayRootViewModel _viewModel;
 
@@ -22,6 +24,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _viewModel = viewModel;
 
             viewModel.Hero.Subscribe(CreateHero);
+            viewModel.CameraViewModel.Subscribe(cvm => CreateCamera(cvm, _hero));
             foreach (var characterViewModel in viewModel.AllCharacters) CreateCharacter(characterViewModel);
             foreach (var mapTransferViewModel in viewModel.AllMapTransfers)
                 CreateMapTransfer(mapTransferViewModel, exitSceneSignalSubj);
@@ -46,6 +49,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _disposables.Dispose();
         }
 
+        private void CreateCamera(CameraViewModel cameraViewModel, HeroBinder hero)
+        {
+            var prefabCameraPath = "Prefabs/Gameplay/World/VirtualCamera";
+            var cameraPrefab = Resources.Load<CameraBinder>(prefabCameraPath);
+
+            var cameraBinder = Instantiate(cameraPrefab);
+            cameraBinder.Bind(cameraViewModel, hero);
+            _camera = cameraBinder;
+        }
+
         private void CreateHero(HeroViewModel heroViewModel)
         {
             var prefabHeroPath = "Prefabs/Gameplay/World/Characters/Hero";
@@ -53,6 +66,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             var heroBinder = Instantiate(heroPrefab);
             heroBinder.Bind(heroViewModel);
+            _hero = heroBinder;
         }
 
         private void CreateCharacter(CharacterViewModel characterViewModel)

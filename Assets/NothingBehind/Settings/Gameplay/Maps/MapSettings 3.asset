@@ -15,7 +15,7 @@ MonoBehaviour:
   MapId: 2
   SceneName: Gameplay_1
   InitialStateSettings:
-    PlayerInitialPosition: {x: -12.503803, y: 0, z: -1.8886919}
+    PlayerInitialPosition: {x: -12.503803, y: 0.6, z: -1.8886919}
     Characters: []
     MapTransfers:
     - TargetMapId: 1

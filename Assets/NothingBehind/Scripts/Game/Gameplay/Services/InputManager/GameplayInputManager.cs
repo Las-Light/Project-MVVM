@@ -7,9 +7,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
 {
     public class GameplayInputManager : IDisposable
     {
-        public event Action<bool> AimInputReceived;
-        public event Action RotationCameraRightInputReceived;
-        public event Action RotationCameraLeftInputReceived;
         public event Action CrouchInputReceived;
         public event Action ReloadInputReceived;
         public event Action SwitchWeaponInputReceived;
@@ -17,15 +14,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
         public ReadOnlyReactiveProperty<Vector2> Move => _move;
         public ReadOnlyReactiveProperty<bool> IsInteract => _isInteract;
         public ReadOnlyReactiveProperty<bool> IsAttack => _isAttack;
-        public Vector2 LookGamepad { get; private set; }
-        public Vector2 LookMouse { get; private set; }
+        public ReadOnlyReactiveProperty<bool> IsSprint => _isSprint;
+        public ReadOnlyReactiveProperty<bool> IsAim => _isAim;
+        public ReadOnlyReactiveProperty<bool> IsRotateCameraLeft => _isRotateCameraLeft;
+        public ReadOnlyReactiveProperty<bool> IsRotateCameraRight => _isRotateCameraRight;
+        public ReadOnlyReactiveProperty<Vector2> LookGamepad => _lookGamepad;
+        public ReadOnlyReactiveProperty<Vector2> LookMouse => _lookMouse;
         public bool MouseIsActive => _inputController.Player.Look.WasPerformedThisFrame();
-        public bool IsSprint { get; private set; }
         
         private readonly ReactiveProperty<bool> _isInteract = new();
         private readonly ReactiveProperty<bool> _isAttack = new();
-
+        private readonly ReactiveProperty<bool> _isSprint = new();
+        private readonly ReactiveProperty<bool> _isAim = new();
+        private readonly ReactiveProperty<bool> _isRotateCameraLeft = new();
+        private readonly ReactiveProperty<bool> _isRotateCameraRight = new();
         private readonly ReactiveProperty<Vector2> _move = new();
+        private readonly ReactiveProperty<Vector2> _lookGamepad = new();
+        private readonly ReactiveProperty<Vector2> _lookMouse = new();
+
+        private readonly CompositeDisposable _disposables = new();
 
 
         private readonly InputControl _inputController;
@@ -38,6 +45,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
             _inputController.Enable();
 
             InitPlayerInput(_inputController);
+            AddDisposables();
         }
 
         private void InitPlayerInput(InputControl inputController)
@@ -60,7 +68,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
 
         private void OnAimInputReceived(bool pressed)
         {
-            AimInputReceived?.Invoke(pressed);
+            _isAim.OnNext(pressed);
         }
 
         private void OnSwitchWeaponInputReceived()
@@ -78,19 +86,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
             CrouchInputReceived?.Invoke();
         }
 
-        private void OnCameraRotateRightInputReceived()
+        private void OnCameraRotateRightInputReceived(bool pressed)
         {
-            RotationCameraRightInputReceived?.Invoke();
+            _isRotateCameraRight.OnNext(pressed);
         }
 
-        private void OnCameraRotateLeftInputReceived()
+        private void OnCameraRotateLeftInputReceived(bool pressed)
         {
-            RotationCameraLeftInputReceived?.Invoke();
+            _isRotateCameraLeft.OnNext(pressed);
         }
 
         private void OnSprintInputReceived(bool pressed)
         {
-            IsSprint = pressed;
+            _isSprint.OnNext(pressed);
         }
 
         private void OnAttackInputReceived(bool pressed)
@@ -105,17 +113,30 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
 
         private void OnLookMouseInputReceived(Vector2 position)
         {
-            LookMouse = position;
+            _lookMouse.OnNext(position);
         }
 
         private void OnLookGamepadInputReceived(Vector2 direction)
         {
-            LookGamepad = direction;
+            _lookGamepad.OnNext(direction);
         }
 
         private void OnMoveInputReceived(Vector2 movementDirection)
         {
             _move.OnNext(movementDirection);
+        }
+
+        private void AddDisposables()
+        {
+            _disposables.Add(_isInteract);
+            _disposables.Add(_isAttack);
+            _disposables.Add(_isSprint);
+            _disposables.Add(_isAim);
+            _disposables.Add(_isRotateCameraLeft);
+            _disposables.Add(_isRotateCameraRight);
+            _disposables.Add(_move);
+            _disposables.Add(_lookGamepad);
+            _disposables.Add(_lookMouse);
         }
 
         public void Dispose()
@@ -133,6 +154,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
             _gameplayInput.SprintInputReceived -= OnSprintInputReceived;
             _gameplayInput.SwitchWeaponInputReceived -= OnSwitchWeaponInputReceived;
             _inputController.Disable();
+            _disposables.Dispose();
         }
     }
 }

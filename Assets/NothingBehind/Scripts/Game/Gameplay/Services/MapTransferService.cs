@@ -9,7 +9,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 {
     public class MapTransferService
     {
-        public readonly ObservableList<MapTransferViewModel> _mapTransfers = new();
+        private readonly ObservableList<MapTransferViewModel> _mapTransfers = new();
         private readonly Dictionary<MapId, MapTransferViewModel> _mapTransfersMap = new();
 
         public IObservableCollection<MapTransferViewModel> MapTransfers => _mapTransfers;

@@ -10,6 +10,7 @@ using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Utils;
 using R3;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Root
@@ -24,9 +25,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var gameSettings = settingsProvider.GameSettings;
             var charactersSettings = gameSettings.CharactersSettings;
             var heroSettings = gameSettings.HeroSettings;
-
-            container.RegisterFactory(c => new GameplayInputManager()).AsSingle();
-            var inputManager = container.Resolve<GameplayInputManager>();
+            var coroutines = container.Resolve<Coroutines>(AppConstants.COROUTINES);
 
             container.RegisterInstance(AppConstants.EXIT_SCENE_REQUEST_TAG, new Subject<GameplayExitParams>());
 
@@ -42,9 +41,24 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 
             // регистрируем сервисы
 
+            container.RegisterFactory(c => new GameplayInputManager()).AsSingle();
+            var inputManager = container.Resolve<GameplayInputManager>();
+            
+            container.RegisterFactory(c => new CameraService(inputManager, coroutines)).AsSingle();
+            var cameraService = container.Resolve<CameraService>();
+
             container.RegisterFactory(c =>
                 new MoveHeroService(heroSettings, inputManager)).AsSingle();
-            container.RegisterFactory(c => new HeroService(container.Resolve<MoveHeroService>(), gameState, commandProcessor, enterParams)).AsSingle();
+            
+            container.RegisterFactory(c => new LookHeroService(inputManager, heroSettings)).AsSingle();
+            
+            container.RegisterFactory(c => new HeroService(
+                    container.Resolve<MoveHeroService>(),
+                    container.Resolve<LookHeroService>(),
+                    gameState,
+                    commandProcessor,
+                    enterParams))
+                .AsSingle();
 
             container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor)).AsSingle();
 

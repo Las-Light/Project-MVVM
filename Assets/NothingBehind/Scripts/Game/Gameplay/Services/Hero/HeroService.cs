@@ -14,13 +14,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.Hero
         public readonly ReactiveProperty<HeroViewModel> HeroViewModel = new();
 
         private readonly MoveHeroService _moveHeroService;
+        private readonly LookHeroService _lookHeroService;
         private readonly GameStateProxy _gameState;
         private readonly ICommandProcessor _cmd;
         private readonly SceneEnterParams _sceneEnterParams;
 
-        public HeroService(MoveHeroService moveHeroService, GameStateProxy gameState, ICommandProcessor cmd, SceneEnterParams sceneEnterParams)
+        public HeroService(MoveHeroService moveHeroService,
+            LookHeroService lookHeroService,
+            GameStateProxy gameState,
+            ICommandProcessor cmd,
+            SceneEnterParams sceneEnterParams)
         {
             _moveHeroService = moveHeroService;
+            _lookHeroService = lookHeroService;
             _gameState = gameState;
             _cmd = cmd;
             _sceneEnterParams = sceneEnterParams;
@@ -52,7 +58,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.Hero
 
         private void CreateHeroViewModel(HeroProxy heroProxy)
         {
-            var viewModel = new HeroViewModel(heroProxy,this, _moveHeroService);
+            var viewModel = new HeroViewModel(heroProxy,this, _moveHeroService, _lookHeroService);
 
             HeroViewModel.Value = viewModel;
         }

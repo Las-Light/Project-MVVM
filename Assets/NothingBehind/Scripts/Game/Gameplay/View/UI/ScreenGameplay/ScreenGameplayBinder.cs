@@ -32,7 +32,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI.ScreenGameplay
 
         private void OnPopupBButtonClicked()
         {
-            ViewModel.RequestOpenPopupB();
+            //ViewModel.RequestOpenPopupB();
+            gameObject.SetActive(false);
         }
 
         private void OnGoToMainMenuButtonClicked()

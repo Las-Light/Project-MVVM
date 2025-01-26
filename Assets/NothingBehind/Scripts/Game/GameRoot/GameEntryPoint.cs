@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Linq;
 using DI.Scripts;
+using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Root;
 using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.MainMenu.Root;
@@ -36,6 +37,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
         {
             _coroutines = new GameObject("[COROUTINES]").AddComponent<Coroutines>();
             Object.DontDestroyOnLoad(_coroutines.gameObject);
+            _rootContainer.RegisterInstance(AppConstants.COROUTINES, _coroutines);
 
             var prefabUIRoot = Resources.Load<UIRootView>("UIRoot");
             _uiRoot = Object.Instantiate(prefabUIRoot);

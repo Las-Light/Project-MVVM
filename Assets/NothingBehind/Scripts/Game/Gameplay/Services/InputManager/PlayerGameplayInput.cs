@@ -10,8 +10,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
         public event Action CrouchInputReceived;
         public event Action ReloadInputReceived;
         public event Action SwitchWeaponInputReceived;
-        public event Action CameraRotateRightInputReceived;
-        public event Action CameraRotateLeftInputReceived;
+        public event Action<bool> CameraRotateRightInputReceived;
+        public event Action<bool> CameraRotateLeftInputReceived;
         public event Action<bool> InteractInputReceived;
         public event Action<bool> AttackInputReceived;
         public event Action<bool> AimInputReceived;
@@ -89,12 +89,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
 
         private void OnRotateCameraRightPerformed(InputAction.CallbackContext context)
         {
-            CameraRotateRightInputReceived?.Invoke();
+            CameraRotateRightInputReceived?.Invoke(context.ReadValueAsButton());
         }
 
         private void OnRotateCameraLeftPerformed(InputAction.CallbackContext context)
         {
-            CameraRotateLeftInputReceived?.Invoke();
+            CameraRotateLeftInputReceived?.Invoke(context.ReadValueAsButton());
         }
 
         private void OnMove(InputAction.CallbackContext context)
@@ -118,7 +118,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.InputManager
             _inputController.Player.Reload.performed -= OnReloadPerformed;
             _inputController.Player.Sprint.performed -= OnSprintPerformed;
             _inputController.Player.SwitchWeapon.performed -= OnSwitchWeaponPerformed;
-            
+
             _inputController.Player.Disable();
         }
     }

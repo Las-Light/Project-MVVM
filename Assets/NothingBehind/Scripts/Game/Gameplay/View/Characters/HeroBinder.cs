@@ -1,11 +1,11 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
 {
+    [RequireComponent(typeof(CharacterController), typeof(PlayerInput))]
     public class HeroBinder : MonoBehaviour
     {
-        public CharacterController CharacterController;
-        private Camera _mainCamera;
         private HeroViewModel _viewModel;
 
         public void Bind(HeroViewModel viewModel)
@@ -13,13 +13,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
             _viewModel = viewModel; 
             var currentPosOnMap = viewModel.CurrentMap;
             transform.position = currentPosOnMap.CurrentValue.Position.Value;
-            CharacterController = GetComponent<CharacterController>();
-            viewModel.SetHeroView(this);
+            var mainCamera = Camera.main;
+            viewModel.SetHeroViewWithComponent(this, mainCamera);
         }
 
         private void Update()
         {
             _viewModel.Move();
+            _viewModel.Look();
         }
 
         public bool IsInteractiveActionPressed()

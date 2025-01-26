@@ -1,6 +1,7 @@
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
 using NothingBehind.Scripts.Game.Gameplay.Services.InputManager;
+using NothingBehind.Scripts.Game.Gameplay.View;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
 using NothingBehind.Scripts.Game.State;
@@ -18,8 +19,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly HeroService _heroService;
         private readonly ResourcesService _resourcesService;
         private readonly GameplayInputManager _gameplayInputManager;
-        
+        private readonly CameraService _cameraService;
+
         public readonly ReadOnlyReactiveProperty<HeroViewModel> Hero;
+        public readonly ReadOnlyReactiveProperty<CameraViewModel> CameraViewModel;
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
         public readonly IObservableCollection<MapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<EnemySpawnViewModel> AllSpawns;
@@ -29,16 +32,21 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             HeroService heroService,
             ResourcesService resourcesService,
             SpawnService spawnService,
-            MapTransferService mapService, GameplayInputManager gameplayInputManager)
+            MapTransferService mapService, 
+            GameplayInputManager gameplayInputManager,
+            CameraService cameraService)
         {
             _charactersService = charactersService;
             _gameStateProvider = gameStateProvider;
             _heroService = heroService;
             _resourcesService = resourcesService;
             _gameplayInputManager = gameplayInputManager;
+            _cameraService = cameraService;
+
+            CameraViewModel = cameraService.CameraViewModel; 
             Hero = heroService.HeroViewModel;
             AllCharacters = charactersService.AllCharacters;
-            AllMapTransfers = mapService._mapTransfers;
+            AllMapTransfers = mapService.MapTransfers;
             AllSpawns = spawnService.EnemySpawns;
 
             resourcesService.ObserveResource(ResourceType.SoftCurrency)
@@ -56,7 +64,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             
             var gameState = _gameStateProvider.GameState._gameState;
             
-            Debug.Log(_gameplayInputManager.Move);
 
             // foreach (var characterViewModel in AllCharacters)
             // {

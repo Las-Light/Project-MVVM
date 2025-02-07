@@ -1,6 +1,7 @@
+using NothingBehind.Scripts.Game.Gameplay.Logic;
+using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
-using NothingBehind.Scripts.Game.Gameplay.Services.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.View;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
@@ -19,7 +20,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly HeroService _heroService;
         private readonly ResourcesService _resourcesService;
         private readonly GameplayInputManager _gameplayInputManager;
-        private readonly CameraService _cameraService;
+        private readonly CameraManager _cameraManager;
 
         public readonly ReadOnlyReactiveProperty<HeroViewModel> Hero;
         public readonly ReadOnlyReactiveProperty<CameraViewModel> CameraViewModel;
@@ -34,16 +35,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             SpawnService spawnService,
             MapTransferService mapService, 
             GameplayInputManager gameplayInputManager,
-            CameraService cameraService)
+            CameraManager cameraManager)
         {
             _charactersService = charactersService;
             _gameStateProvider = gameStateProvider;
             _heroService = heroService;
             _resourcesService = resourcesService;
             _gameplayInputManager = gameplayInputManager;
-            _cameraService = cameraService;
+            _cameraManager = cameraManager;
 
-            CameraViewModel = cameraService.CameraViewModel; 
+            CameraViewModel = cameraManager.CameraViewModel; 
             Hero = heroService.HeroViewModel;
             AllCharacters = charactersService.AllCharacters;
             AllMapTransfers = mapService.MapTransfers;

@@ -1,3 +1,4 @@
+using NothingBehind.Scripts.Game.Settings.Gameplay;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace NothingBehind.Scripts.Game.Settings
     {
         public HeroSettings HeroSettings;
         public CharactersSettings CharactersSettings;
+        public GameplayCameraSettings GameplayCameraSettings;
         public MapsSettings MapsSettings;
     }
 }

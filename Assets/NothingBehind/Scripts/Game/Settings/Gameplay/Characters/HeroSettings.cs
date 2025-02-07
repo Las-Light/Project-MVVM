@@ -35,16 +35,16 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Characters
         public float SpeedChangeRate = 10.0f;
 
         [Header("CharacterController properties")] [Tooltip("Height Character Controller in crouch")] 
-        public float crouchHeight = 1.3f;
+        public float CrouchHeight = 1.3f;
 
         [Tooltip("Center Character Controller in crouch")]
         public Vector3 crouchCenter = new Vector3(0, 0.7f, 0);
 
         [Tooltip("Height Character Controller default")]
-        public float defaultHeight = 1.8f;
+        public float DefaultHeight = 1.8f;
 
         [Tooltip("Center Character Controller default")]
-        public Vector3 defaultCenter = new Vector3(0, 0.93f, 0);
+        public Vector3 DefaultCenter = new Vector3(0, 0.93f, 0);
 
         [Space(10)]
         [Header("Player Grounded")]

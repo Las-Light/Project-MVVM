@@ -1,3 +1,4 @@
+using NothingBehind.Scripts.Game.Gameplay.Logic;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using Unity.Cinemachine;
@@ -6,14 +7,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View
 {
     public class CameraViewModel
     {
-        private readonly CameraService _cameraService;
+        private readonly CameraManager _cameraManager;
         
         private CinemachineCamera _cinemachineCamera;
         private CameraBinder _cameraView;
 
-        public CameraViewModel(CameraService cameraService)
+        public CameraViewModel(CameraManager cameraManager)
         {
-            _cameraService = cameraService;
+            _cameraManager = cameraManager;
         }
 
         public void SetCameraViewWithComponent(CameraBinder cameraView, HeroBinder heroView)
@@ -21,9 +22,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.View
             _cameraView = cameraView;
             _cinemachineCamera = cameraView.GetComponent<CinemachineCamera>();
             var cinemachineFollow = cameraView.GetComponent<CinemachineFollow>();
-            _cameraService.BindCameraViewComponent(cameraView, _cinemachineCamera, cinemachineFollow);
+            _cameraManager.BindCameraViewComponent(cameraView, _cinemachineCamera, cinemachineFollow);
             
-            _cameraService.CameraFollow(heroView.transform);
+            _cameraManager.CameraFollow(heroView.transform);
         }
     }
 }

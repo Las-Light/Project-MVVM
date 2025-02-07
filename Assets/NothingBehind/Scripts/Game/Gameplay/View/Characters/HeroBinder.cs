@@ -22,6 +22,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
             _viewModel.Move();
             _viewModel.Look();
         }
+        
+        //этот метод для RootMotion, без него игрок не движется
+        private void OnAnimatorMove()
+        {
+        }
 
         public bool IsInteractiveActionPressed()
         {

@@ -1,3 +1,5 @@
+using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
+using NothingBehind.Scripts.Game.Gameplay.Logic.Hero;
 using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
 using NothingBehind.Scripts.Game.State.Entities.Hero;
 using ObservableCollections;
@@ -11,8 +13,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
     {
         private readonly HeroProxy _heroProxy;
         private readonly HeroService _heroService;
-        private readonly MoveHeroService _moveHeroService;
-        private readonly LookHeroService _lookHeroService;
+        private readonly HeroMovementManager _heroMovementManager;
+        private readonly HeroTurnManager _heroTurnManager;
         private HeroBinder _heroView;
         private CharacterController _heroCharacterController;
         private PlayerInput _playerInput;
@@ -23,8 +25,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
 
         public HeroViewModel(
             HeroProxy heroProxy, HeroService heroService, 
-            MoveHeroService moveHeroService,
-            LookHeroService lookHeroService)
+            HeroMovementManager heroMovementManager,
+            HeroTurnManager heroTurnManager)
         {
             CurrentMap = heroProxy.CurrentMap;
             Health = heroProxy.Health;
@@ -32,8 +34,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
             
             _heroProxy = heroProxy;
             _heroService = heroService;
-            _moveHeroService = moveHeroService;
-            _lookHeroService = lookHeroService;
+            _heroMovementManager = heroMovementManager;
+            _heroTurnManager = heroTurnManager;
         }
 
         public void SetHeroViewWithComponent(HeroBinder heroView, Camera camera)
@@ -41,25 +43,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
             _heroView = heroView;
             _heroCharacterController = heroView.GetComponent<CharacterController>();
             _playerInput = heroView.GetComponent<PlayerInput>();
-            _moveHeroService.BindHeroViewComponent(heroView, camera, _heroCharacterController);
-            _lookHeroService.BindHeroViewComponent(heroView, camera, _playerInput);
+            _heroMovementManager.BindHeroViewComponent(heroView, camera, _heroCharacterController);
+            _heroTurnManager.BindHeroViewComponent(heroView, camera, _playerInput);
         }
 
         public void Move()
         {
-            _moveHeroService.Move();
+            _heroMovementManager.Move();
             _heroService.UpdateHeroPosOnMap(_heroView.transform.position);
         }
 
         public void Look()
         {
-            _lookHeroService.LookGamepad();
-            _lookHeroService.LookMouse();
+            _heroTurnManager.LookGamepad();
+            _heroTurnManager.LookMouse();
         }
 
         public bool InteractiveActionPressed()
         {
-            return _moveHeroService.InteractiveActionPressed();
+            return _heroMovementManager.InteractiveActionPressed();
         }
     }
 }

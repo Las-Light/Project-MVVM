@@ -3,9 +3,12 @@ using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Hero;
+using NothingBehind.Scripts.Game.Gameplay.Logic;
+using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
+using NothingBehind.Scripts.Game.Gameplay.Logic.Hero;
+using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
-using NothingBehind.Scripts.Game.Gameplay.Services.InputManager;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
@@ -24,6 +27,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var settingsProvider = container.Resolve<ISettingsProvider>();
             var gameSettings = settingsProvider.GameSettings;
             var charactersSettings = gameSettings.CharactersSettings;
+            var gameplayCameraSettings = gameSettings.GameplayCameraSettings;
             var heroSettings = gameSettings.HeroSettings;
             var coroutines = container.Resolve<Coroutines>(AppConstants.COROUTINES);
 
@@ -39,22 +43,28 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             commandProcessor.RegisterHandler(new CmdUpdateHeroPosOnMapHandler(gameState));
             container.RegisterInstance<ICommandProcessor>(commandProcessor);
 
-            // регистрируем сервисы
+            // регистрируем менеджеры
 
             container.RegisterFactory(c => new GameplayInputManager()).AsSingle();
             var inputManager = container.Resolve<GameplayInputManager>();
             
-            container.RegisterFactory(c => new CameraService(inputManager, coroutines)).AsSingle();
-            var cameraService = container.Resolve<CameraService>();
+            container.RegisterFactory(c => new CameraManager(
+                inputManager,
+                coroutines,
+                gameplayCameraSettings)).AsSingle();
+            var cameraService = container.Resolve<CameraManager>();
 
             container.RegisterFactory(c =>
-                new MoveHeroService(heroSettings, inputManager)).AsSingle();
+                new HeroMovementManager(heroSettings, inputManager)).AsSingle();
             
-            container.RegisterFactory(c => new LookHeroService(inputManager, heroSettings)).AsSingle();
+            container.RegisterFactory(c => new HeroTurnManager(inputManager, heroSettings)).AsSingle();
+            
+            
+            // регистрируем сервисы
             
             container.RegisterFactory(c => new HeroService(
-                    container.Resolve<MoveHeroService>(),
-                    container.Resolve<LookHeroService>(),
+                    container.Resolve<HeroMovementManager>(),
+                    container.Resolve<HeroTurnManager>(),
                     gameState,
                     commandProcessor,
                     enterParams))

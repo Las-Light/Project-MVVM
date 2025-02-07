@@ -51,7 +51,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
         private void CreateCamera(CameraViewModel cameraViewModel, HeroBinder hero)
         {
-            var prefabCameraPath = "Prefabs/Gameplay/World/VirtualCamera";
+            var prefabCameraPath = "Prefabs/Gameplay/World/Camera/VirtualCamera";
             var cameraPrefab = Resources.Load<CameraBinder>(prefabCameraPath);
 
             var cameraBinder = Instantiate(cameraPrefab);
@@ -61,7 +61,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
         private void CreateHero(HeroViewModel heroViewModel)
         {
-            var prefabHeroPath = "Prefabs/Gameplay/World/Characters/Hero";
+            var prefabHeroPath = "Prefabs/Gameplay/World/Characters/Player";
             var heroPrefab = Resources.Load<HeroBinder>(prefabHeroPath);
 
             var heroBinder = Instantiate(heroPrefab);

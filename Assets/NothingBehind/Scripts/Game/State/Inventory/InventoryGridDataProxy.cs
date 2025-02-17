@@ -1,0 +1,62 @@
+using System.Linq;
+using ObservableCollections;
+using R3;
+using UnityEngine;
+
+namespace NothingBehind.Scripts.Game.State.Inventory
+{
+    public class InventoryGridDataProxy
+    {
+        public string GridTypeId { get; }
+        public InventoryGridData Origin { get; }
+        public ReactiveProperty<int> Width { get; }
+        public ReactiveProperty<int> Height { get; }
+        public ReactiveProperty<bool[]> Grid { get; } // Одномерный массив для сериализации
+        public ObservableList<ItemDataProxy> Items { get; } = new(); // Данные предметов
+        public ObservableList<Vector2Int> Positions { get; } = new(); // Позиции предметов
+
+        public InventoryGridDataProxy(InventoryGridData gridData)
+        {
+            Origin = gridData;
+            GridTypeId = gridData.GridTypeId;
+            Width = new ReactiveProperty<int>(gridData.Width);
+            Height = new ReactiveProperty<int>(gridData.Height);
+            Grid = new ReactiveProperty<bool[]>(gridData.Grid);
+            gridData.Items.ForEach(data => Items.Add(new ItemDataProxy(data)));
+            gridData.Positions.ForEach(Positions.Add);
+
+            Width.Subscribe(value => gridData.Width = value);
+            Height.Subscribe(value => gridData.Height = value);
+            Grid.Subscribe(value => gridData.Grid = value);
+
+            Items.ObserveAdd().Subscribe(e =>
+            {
+                var addedItemData = e.Value;
+                gridData.Items.Add(addedItemData.Origin);
+            });
+            Positions.ObserveAdd().Subscribe(e =>
+            {
+                var addedPosition = e.Value;
+                gridData.Positions.Add(addedPosition);
+            });
+            Items.ObserveRemove().Subscribe(e =>
+            {
+                var removedItemProxy = e.Value;
+                var removedItem = gridData.Items.FirstOrDefault(item => item.Id == removedItemProxy.Id);
+                gridData.Items.Remove(removedItem);
+            });
+            Positions.ObserveRemove().Subscribe(e =>
+            {
+                var removedPosition = e.Value;
+                gridData.Positions.Remove(removedPosition);
+            });
+            Positions.ObserveReplace().Subscribe(e =>
+            {
+                var oldPosition = e.OldValue;
+                var newValue = e.NewValue;
+                var indexPosition = gridData.Positions.IndexOf(oldPosition);
+                gridData.Positions[indexPosition] = newValue;
+            });
+        }
+    }
+}

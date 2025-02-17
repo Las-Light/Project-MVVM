@@ -6,6 +6,7 @@ using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 {
@@ -125,6 +126,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 _viewModel.HandleTestInput();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Tab))
+            {
+                _viewModel.HandleTestInputTab();
             }
         }
     }

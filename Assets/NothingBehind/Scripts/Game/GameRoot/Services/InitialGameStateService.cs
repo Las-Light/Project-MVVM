@@ -5,10 +5,12 @@ using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Entities.Hero;
 using NothingBehind.Scripts.Game.State.GameResources;
+using NothingBehind.Scripts.Game.State.Inventory;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawn;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using NothingBehind.Scripts.Game.State.Root;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.GameRoot.Services
 {
@@ -18,25 +20,12 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
         {
             var currentMapId = sceneEnterParams.TargetMapId;
             var currentMapSettings = gameSettings.MapsSettings.Maps.First(m => m.MapId == currentMapId);
-            
+
             var gameState = new GameState();
+            gameState.Inventories = new List<InventoryData>();
             gameState.Maps = CreateMaps(gameState, gameSettings);
             gameState.CurrentMapId = currentMapId;
-            gameState.Hero = new Hero()
-            {
-                CurrentMap = new PositionOnMap()
-                {
-                    MapId = currentMapId, Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition
-                },
-                PositionOnMaps = new List<PositionOnMap>()
-                {
-                    new()
-                    {
-                        MapId = currentMapId, Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition
-                    }
-                },
-                Health = gameSettings.HeroSettings.Health
-            };
+            gameState.Hero = CreateHero(gameState, gameSettings, currentMapId, currentMapSettings);
             gameState.Resources = new List<ResourceData>()
             {
                 new() { Amount = 0, ResourceType = ResourceType.SoftCurrency },
@@ -46,6 +35,33 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             return gameState;
         }
 
+        private Hero CreateHero(GameState gameState, GameSettings gameSettings, MapId currentMapId,
+            MapSettings currentMapSettings)
+        {
+            var hero = new Hero()
+            {
+                Id = gameState.CreateEntityId(),
+                TypeId = gameSettings.HeroSettings.TypeId,
+                CurrentMap = new PositionOnMap()
+                {
+                    MapId = currentMapId,
+                    Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition
+                },
+                PositionOnMaps = new List<PositionOnMap>()
+                {
+                    new()
+                    {
+                        MapId = currentMapId, 
+                        Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition
+                    }
+                },
+                Health = gameSettings.HeroSettings.Health
+            };
+            gameState.Inventories.Add(CreateInventories(gameSettings, hero.TypeId, hero.Id));
+
+            return hero;
+        }
+
         private List<MapState> CreateMaps(GameState gameState, GameSettings gameSettings)
         {
             var maps = new List<MapState>();
@@ -53,6 +69,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             {
                 maps.Add(CreateMapState(map.MapId, gameState, gameSettings));
             }
+
             return maps;
         }
 
@@ -60,13 +77,13 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
         {
             var newMapSettings = gameSettings.MapsSettings.Maps.First(m => m.MapId == mapId);
             var newMapInitialStateSettings = newMapSettings.InitialStateSettings;
-            
+
             var sceneName = newMapSettings.SceneName;
             var newMapState = new MapState
             {
                 Id = mapId,
                 SceneName = sceneName,
-                Characters = InitialCharacters(newMapInitialStateSettings, gameState),
+                Characters = InitialCharacters(gameSettings, newMapInitialStateSettings, gameState),
                 MapTransfers = InitialMapTransfers(newMapInitialStateSettings),
                 EnemySpawns = InitialEnemySpawns(newMapInitialStateSettings)
             };
@@ -100,9 +117,14 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             return initialMapTransfers;
         }
 
-        private List<CharacterEntity> InitialCharacters(MapInitialStateSettings newMapInitialStateSettings,
+        private List<CharacterEntity> InitialCharacters(GameSettings gameSettings,
+            MapInitialStateSettings newMapInitialStateSettings,
             GameState gameState)
         {
+            if (newMapInitialStateSettings.Characters.Count <= 0)
+            {
+                return new List<CharacterEntity>();
+            }
             var initialCharacters = new List<CharacterEntity>();
             foreach (var characterSettings in newMapInitialStateSettings.Characters)
             {
@@ -115,11 +137,39 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                     Level = characterLevelSettings.Level,
                     Health = characterLevelSettings.Health
                 };
-
+                gameState.Inventories.Add(CreateInventories(gameSettings, initialCharacter.TypeId, initialCharacter.Id));
                 initialCharacters.Add(initialCharacter);
             }
 
             return initialCharacters;
+        }
+
+        private InventoryData CreateInventories(GameSettings gameSettings, string ownerTypeId, int ownerId)
+        {
+            var inventorySettings =
+                gameSettings.InventoriesSettings.Inventories.First(settings => settings.OwnerTypeId == ownerTypeId);
+            var inventory = new InventoryData()
+            {
+                OwnerId = ownerId,
+                OwnerTypeId = ownerTypeId
+            };
+            var inventoryGrids = new List<InventoryGridData>();
+            foreach (var inventoryGrid in inventorySettings.InventoryGrids)
+            {
+                inventoryGrids.Add(new InventoryGridData()
+                {
+                    GridTypeId = inventoryGrid.GridTypeId,
+                    Width = inventoryGrid.Width,
+                    Height = inventoryGrid.Height,
+                    Grid = new bool[inventoryGrid.Width * inventoryGrid.Height],
+                    Items = new List<ItemData>(),
+                    Positions = new List<Vector2Int>()
+                });
+            }
+
+            inventory.Inventories = inventoryGrids;
+
+            return inventory;
         }
     }
 }

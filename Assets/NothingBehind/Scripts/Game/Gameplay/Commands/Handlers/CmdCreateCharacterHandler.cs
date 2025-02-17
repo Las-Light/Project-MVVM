@@ -1,5 +1,4 @@
 using System.Linq;
-using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
@@ -40,7 +39,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             };
 
             var newCharacterEntityProxy = new CharacterEntityProxy(newCharacterEntity);
-            
+            command.InventoryService.CreateInventory(command.CharacterTypeId, entityId);
             currentMap.Characters.Add(newCharacterEntityProxy);
 
             return true; // тут может быть валидация на создание сущности

@@ -1,6 +1,7 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.State.Entities.Hero;
 using NothingBehind.Scripts.Game.State.GameResources;
+using NothingBehind.Scripts.Game.State.Inventory;
 using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
@@ -14,6 +15,7 @@ namespace NothingBehind.Scripts.Game.State.Root
         public ReactiveProperty<HeroProxy> Hero { get; } = new();
         public ObservableList<Map> Maps { get; } = new();
         public ObservableList<Resource> Resources { get; } = new();
+        public ObservableList<InventoryDataProxy> Inventories { get; } = new();
 
         public GameStateProxy(GameState gameState)
         {
@@ -22,6 +24,7 @@ namespace NothingBehind.Scripts.Game.State.Root
 
             InitMaps(gameState);
             InitResources(gameState);
+            InitInventories(gameState);
             InitHero(gameState);
 
             CurrentMapId.Skip(1).Subscribe(newValue => gameState.CurrentMapId = newValue);
@@ -53,6 +56,25 @@ namespace NothingBehind.Scripts.Game.State.Root
                 var removedMapState =
                     gameState.Maps.FirstOrDefault(c => c.Id == removedMap.Id);
                 gameState.Maps.Remove(removedMapState);
+            });
+        }
+
+        private void InitInventories(GameState gameState)
+        {
+            gameState.Inventories.ForEach(inventoryOrigin => Inventories.Add(new InventoryDataProxy(inventoryOrigin)));
+
+            Inventories.ObserveAdd().Subscribe(e =>
+            {
+                var addedInventory = e.Value;
+                gameState.Inventories.Add(addedInventory.Origin);
+            });
+
+            Inventories.ObserveRemove().Subscribe(e =>
+            {
+                var removedInventory = e.Value;
+                var removedInventoryData = gameState.Inventories.FirstOrDefault(c =>
+                    c.OwnerId == removedInventory.OwnerId);
+                gameState.Inventories.Remove(removedInventoryData);
             });
         }
 

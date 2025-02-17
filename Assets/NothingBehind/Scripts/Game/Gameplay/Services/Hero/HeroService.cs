@@ -21,7 +21,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.Hero
         private readonly ICommandProcessor _cmd;
         private readonly SceneEnterParams _sceneEnterParams;
 
-        public HeroService(HeroMovementManager heroMovementManager,
+        public HeroService(InventoryService inventoryService,
+            HeroMovementManager heroMovementManager,
             HeroTurnManager heroTurnManager,
             GameStateProxy gameState,
             ICommandProcessor cmd,

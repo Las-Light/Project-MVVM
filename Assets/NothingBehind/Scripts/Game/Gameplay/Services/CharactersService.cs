@@ -15,6 +15,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 {
     public class CharactersService
     {
+        private readonly InventoryService _inventoryService;
         private readonly ICommandProcessor _commandProcessor;
         private readonly ObservableList<CharacterViewModel> _allCharacters = new();
         private readonly Dictionary<int, CharacterViewModel> _characterMap = new();
@@ -25,8 +26,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         public CharactersService(
             IObservableCollection<CharacterEntityProxy> characters,
             CharactersSettings charactersSettings,
+            InventoryService inventoryService,
             ICommandProcessor commandProcessor)
         {
+            _inventoryService = inventoryService;
             _commandProcessor = commandProcessor;
 
             foreach (var characterSettings in charactersSettings.AllCharacters)
@@ -52,7 +55,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         public bool CreateCharacter(string characterTypeId, int level, Vector3 position)
         {
-            var command = new CmdCreateCharacter(characterTypeId, level, position);
+            var command = new CmdCreateCharacter(characterTypeId, level, position, _inventoryService);
             var result = _commandProcessor.Process(command);
             
             return result;

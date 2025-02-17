@@ -22,7 +22,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                     c.Resolve<SpawnService>(),
                     c.Resolve<MapTransferService>(),
                     c.Resolve<GameplayInputManager>(),
-                    c.Resolve<CameraManager>()))
+                    c.Resolve<CameraManager>(),
+                    c.Resolve<InventoryService>()))
                 .AsSingle();
         }
     }

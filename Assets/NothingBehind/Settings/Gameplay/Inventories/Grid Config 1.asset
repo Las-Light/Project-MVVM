@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a9710a4cf954abbbc8e4725102c776c, type: 3}
-  m_Name: Grid Config
+  m_Name: Grid Config 1
   m_EditorClassIdentifier: 
-  GridTypeId: Backpack
-  Width: 3
-  Height: 3
+  GridTypeId: ChestRig
+  Width: 2
+  Height: 2

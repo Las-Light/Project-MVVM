@@ -1,8 +1,9 @@
+using System;
 using R3;
 
 namespace NothingBehind.Scripts.Utils
 {
-    public class ReactiveMatrix<T>
+    public class ReactiveMatrix<T> : IDisposable
     {
         private readonly T[,] _data;
         private readonly Subject<(int Row, int Col, T Value)> _onChange = new Subject<(int, int, T)>();
@@ -47,5 +48,9 @@ namespace NothingBehind.Scripts.Utils
         }
 
         public Observable<(int Row, int Col, T Value)> OnChange => _onChange.AsObservable();
+        public void Dispose()
+        {
+            _onChange.Dispose();
+        }
     }
 }

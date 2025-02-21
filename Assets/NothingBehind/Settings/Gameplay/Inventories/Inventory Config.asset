@@ -15,3 +15,4 @@ MonoBehaviour:
   OwnerTypeId: Hero
   InventoryGrids:
   - {fileID: 11400000, guid: 5bb6ffb417fe74b4cb1e987ed3c50762, type: 2}
+  - {fileID: 11400000, guid: 45ccfb3300188a44abe299529c515563, type: 2}

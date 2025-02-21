@@ -32,6 +32,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         public readonly IObservableCollection<InventoryViewModel> AllInventories;
         public readonly IObservableCollection<MapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<EnemySpawnViewModel> AllSpawns;
+        private ItemDataProxy itemProxy;
+        private ItemDataProxy itemProxy2;
 
         public WorldGameplayRootViewModel(CharactersService charactersService,
             IGameStateProvider gameStateProvider,
@@ -75,22 +77,30 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             var item = new ItemData()
             {
-                Id = "Sword",
-                Height = 1,
+                Id = "1",
+                ItemType = "Sword",
+                CurrentStack = 5,
+                MaxStackSize = 10,
+                IsStackable = true,
+                Height = 2,
                 Width = 1,
                 CanRotate = false,
                 IsRotated = false
             };
             var item2 = new ItemData()
             {
-                Id = "Gun",
-                Height = 1,
+                Id = "2",
+                ItemType = "Sword",
+                CurrentStack = 6,
+                MaxStackSize = 10,
+                IsStackable = true,
+                Height = 2,
                 Width = 1,
                 CanRotate = false,
                 IsRotated = false
             };
-            var itemProxy = new ItemDataProxy(item);
-            var itemProxy2 = new ItemDataProxy(item2);
+            itemProxy = new ItemDataProxy(item);
+            itemProxy2 = new ItemDataProxy(item2);
             foreach (var inventoryViewModel in _inventoryService.AllInventories)
             {
                 if (inventoryViewModel.OwnerTypeId != "Hero")
@@ -100,13 +110,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
                 foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
                 {
-                    inventoryGridViewModel.AddItem(itemProxy, Vector2Int.zero);
-                    inventoryGridViewModel.AddItem(itemProxy2);
+                    if (inventoryGridViewModel.GridTypeID == "Backpack")
+                    {
+                        Debug.Log(inventoryGridViewModel.AddItems(itemProxy, itemProxy.CurrentStack.Value).ItemsAddedAmount);
+                    }
+
+                    if (inventoryGridViewModel.GridTypeID == "ChestRig")
+                    {
+                        Debug.Log(inventoryGridViewModel.AddItems(itemProxy2, itemProxy2.CurrentStack.Value).ItemsAddedAmount);
+                    }
                 }
             }
 
             foreach (var inventory in gameState.Inventories)
             {
+                if (inventory.OwnerTypeId != "Hero")
+                {
+                    continue;
+                }
+
                 Debug.Log(inventory.OwnerTypeId + " " + inventory.OwnerId);
                 foreach (var grid in inventory.Inventories)
                 {
@@ -126,20 +148,23 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
                 foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
                 {
-                    if (inventoryGridViewModel.SwapItems(itemProxy, itemProxy2))
-                    {
-                        Debug.Log("SWAP");
-                    }
+                    //inventoryGridViewModel.TryMoveItem(itemProxy2, new Vector2Int(0, 1));
                 }
             }
 
             foreach (var inventory in gameState.Inventories)
             {
+                if (inventory.OwnerTypeId != "Hero")
+                {
+                    continue;
+                }
+
                 foreach (var grid in inventory.Inventories)
                 {
                     for (int i = 0; i < grid.Items.Count; i++)
                     {
-                        Debug.Log(grid.Items[i].Id + " " + grid.Positions[i]);
+                        Debug.Log(grid.Items[i].ItemType + grid.Items[i].Id + grid.Positions[i] + " Stack = " +
+                                  grid.Items[i].CurrentStack);
                     }
 
                     for (int i = 0; i < grid.Grid.Value.Length; i++)
@@ -161,24 +186,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
                 foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
                 {
-                    inventoryGridViewModel.AddItem(new ItemDataProxy(new ItemData()
+                    if (inventoryGridViewModel.GridTypeID == "Backpack")
                     {
-                        CanRotate = false,
-                        IsRotated = false,
-                        Height = 1,
-                        Width = 1,
-                        Id = "Pin"
-                    }));
-                    // for (int i = 0; i < inventoryGridViewModel.Grid.Value.GetLength(0); i++)
-                    // {
-                    //     for (int j = 0; j < inventoryGridViewModel.Grid.Value.GetLength(1); j++)
-                    //     {
-                    //         Debug.Log(inventoryGridViewModel.Grid.Value[i,j] +
-                    //                   $" Grid in {inventoryViewModel.OwnerTypeId} {inventoryViewModel.OwnerId}");
-                    //     }
-                    // }
+                        Debug.Log(inventoryGridViewModel.AddItems(itemProxy2, Vector2Int.zero, itemProxy2.CurrentStack.Value).ItemsAddedAmount);
+                    }
+
+                    if (inventoryGridViewModel.GridTypeID == "ChestRig")
+                    {
+                        var oldPos = inventoryGridViewModel.GetItemPosition(itemProxy2);
+                        if (oldPos != null)
+                        {
+                            Debug.Log(inventoryGridViewModel.TryMoveItem(itemProxy2, oldPos.Value, itemProxy2.CurrentStack.Value).ItemsAddedAmount);
+                        }
+                    }
                 }
             }
+
             var inventories = _gameStateProvider.GameState._gameState.Inventories;
 
             foreach (var data in inventories)
@@ -187,11 +210,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                 {
                     continue;
                 }
+
                 foreach (var gridDataProxy in data.Inventories)
                 {
-                    for (int i = 0; i < gridDataProxy.Grid.Length; i++)
+                    for (int i = 0; i < gridDataProxy.Items.Count; i++)
                     {
-                        Debug.Log(gridDataProxy.Grid[i]);
+                        Debug.Log(gridDataProxy.GridTypeId + ":");
+                        Debug.Log(gridDataProxy.Items[i].ItemType + " " + gridDataProxy.Items[i].CurrentStack + " " +
+                                  gridDataProxy.Positions[i]);
                     }
                 }
             }

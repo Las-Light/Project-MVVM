@@ -10,6 +10,7 @@ namespace NothingBehind.Scripts.Game.State.Root
 {
     public class GameStateProxy
     {
+        //TODO: сделать поле приватным
         public readonly GameState _gameState;
         public readonly ReactiveProperty<MapId> CurrentMapId = new();
         public ReactiveProperty<HeroProxy> Hero { get; } = new();

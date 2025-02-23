@@ -7,6 +7,7 @@ namespace NothingBehind.Scripts.Game.State.Inventory
     [Serializable]
     public class InventoryGridData
     {
+        public int OwnerId;
         public string GridTypeId;
         public int Width;
         public int Height;

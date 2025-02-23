@@ -34,6 +34,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
             
             var inventoryGrid = new InventoryGridData()
             {
+                OwnerId = command.OwnerId,
                 GridTypeId = inventoryGridSettings.GridTypeId,
                 Width = inventoryGridSettings.Width,
                 Height = inventoryGridSettings.Height,

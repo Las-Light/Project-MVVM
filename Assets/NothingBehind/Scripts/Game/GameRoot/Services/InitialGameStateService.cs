@@ -158,6 +158,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             {
                 inventoryGrids.Add(new InventoryGridData()
                 {
+                    OwnerId = ownerId,
                     GridTypeId = inventoryGrid.GridTypeId,
                     Width = inventoryGrid.Width,
                     Height = inventoryGrid.Height,

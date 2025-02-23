@@ -18,7 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI
             _exitSceneRequest = container.Resolve<Subject<GameplayExitParams>>(AppConstants.EXIT_SCENE_REQUEST_TAG);
         }
 
-        public ScreenGameplayViewModel OpeScreenGameplay()
+        public ScreenGameplayViewModel OpenScreenGameplay()
         {
             var viewModel = new ScreenGameplayViewModel(this, _exitSceneRequest);
             var rootUI = Container.Resolve<UIGameplayRootViewModel>();

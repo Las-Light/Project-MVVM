@@ -7,6 +7,7 @@ namespace NothingBehind.Scripts.Game.State.Inventory
 {
     public class InventoryGridDataProxy
     {
+        public int OwnerId { get; }
         public string GridTypeId { get; }
         public InventoryGridData Origin { get; }
         public ReactiveProperty<int> Width { get; }
@@ -18,6 +19,7 @@ namespace NothingBehind.Scripts.Game.State.Inventory
         public InventoryGridDataProxy(InventoryGridData gridData)
         {
             Origin = gridData;
+            OwnerId = gridData.OwnerId;
             GridTypeId = gridData.GridTypeId;
             Width = new ReactiveProperty<int>(gridData.Width);
             Height = new ReactiveProperty<int>(gridData.Height);

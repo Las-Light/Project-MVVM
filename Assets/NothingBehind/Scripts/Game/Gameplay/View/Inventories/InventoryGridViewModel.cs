@@ -12,20 +12,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 {
     public class InventoryGridViewModel
     {
-        public readonly string GridTypeID;
+        public int OwnerId { get; }
+        public string GridTypeID { get; }
         public ReactiveMatrix<bool> GridMatrix => _gridMatrix;
-
 
         private readonly InventoryGridDataProxy _gridDataProxy;
         private readonly InventoryGridSettings _gridSettings;
         private ReactiveMatrix<bool> _gridMatrix;
-        private readonly ObservableDictionary<ItemDataProxy, Vector2Int> _itemPositions = new();
+        public readonly ObservableDictionary<ItemDataProxy, Vector2Int> _itemPositions = new();
+
 
         public InventoryGridViewModel(InventoryGridDataProxy gridDataProxy,
             InventoryGridSettings gridSettings
         )
         {
             GridTypeID = gridDataProxy.GridTypeId;
+            OwnerId = gridDataProxy.OwnerId;
             _gridDataProxy = gridDataProxy;
             _gridSettings = gridSettings;
             // Подписываемся на изменения и сериализуем
@@ -72,6 +74,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         {
             var remainingAmount = amount;
             var anotherItemAtPosition = GetItemAtPosition(position);
+
             if (anotherItemAtPosition == null)
             {
                 // Проверяем, можно ли разместить предмет на новой позиции
@@ -83,11 +86,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 }
                 else
                 {
-                    // Если перемещение невозможно, возвращаем предмет на старую позицию
-                    PlaceItem(item, position, item.IsRotated.Value);
                     return new AddItemsToInventoryGridResult(item.ItemType,
                         amount,
-                        0, false); // Перемещение не удалось
+                        0, false); // Добавить предмет не удалось
                 }
             }
             else
@@ -97,14 +98,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 // Если предмет поместился без остатка то удаляем его
                 if (remainingAmount == 0)
                 {
-                    RemoveItem(item);
                     return new AddItemsToInventoryGridResult(item.ItemType, amount,
                         itemsAddedToSameItems, true);
                 }
                 else
                 {
-                    // Если все предметы не поместились, возвращаем предмет на старую позицию с остатком который не удалось переместить
-                    PlaceItem(item, position, item.IsRotated.Value);
+                    // Если все предметы не поместились
                     return new AddItemsToInventoryGridResult(item.ItemType, amount,
                         itemsAddedToSameItems, false); // Добавить все предметы не удалось
                 }
@@ -213,8 +212,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
                 if (remainingAmount == 0)
                 {
-                    // Если предмет поместился без остатка то удаляем его
-                    RemoveItem(item);
+                    // Если предмет поместился без остатка
                     return new AddItemsToInventoryGridResult(item.ItemType,
                         amount, itemsAddedToSameItems, true);
                 }
@@ -464,7 +462,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         }
 
 
-        // Десериализация
+        // Инициализация InventoryGridDataProxy в InventoryGridViewModel 
 
         private void InitializeGrid(InventoryGridDataProxy gridDataProxy)
         {

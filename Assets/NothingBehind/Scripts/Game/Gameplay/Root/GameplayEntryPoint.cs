@@ -50,7 +50,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             
             // Можно открывать окошки
             var uiManager = viewsContainer.Resolve<GameplayUIManager>();
-            uiManager.OpeScreenGameplay();
+            uiManager.OpenScreenGameplay();
         }
     }
 }

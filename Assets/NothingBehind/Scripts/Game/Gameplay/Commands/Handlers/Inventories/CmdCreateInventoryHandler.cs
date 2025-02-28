@@ -14,7 +14,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
         private readonly GameStateProxy _gameState;
         private readonly InventoriesSettings _inventoriesSettings;
 
-        public CmdCreateInventoryHandler(GameStateProxy gameState, InventoriesSettings inventoriesSettings)
+        public CmdCreateInventoryHandler(GameStateProxy gameState, 
+            InventoriesSettings inventoriesSettings)
         {
             _gameState = gameState;
             _inventoriesSettings = inventoriesSettings;

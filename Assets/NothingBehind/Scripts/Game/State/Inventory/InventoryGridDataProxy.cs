@@ -10,8 +10,8 @@ namespace NothingBehind.Scripts.Game.State.Inventory
         public int OwnerId { get; }
         public string GridTypeId { get; }
         public InventoryGridData Origin { get; }
-        public ReactiveProperty<int> Width { get; }
-        public ReactiveProperty<int> Height { get; }
+        public int Width { get; }
+        public int Height { get; }
         public ReactiveProperty<bool[]> Grid { get; } // Одномерный массив для сериализации
         public ObservableList<ItemDataProxy> Items { get; } = new(); // Данные предметов
         public ObservableList<Vector2Int> Positions { get; } = new(); // Позиции предметов
@@ -21,14 +21,12 @@ namespace NothingBehind.Scripts.Game.State.Inventory
             Origin = gridData;
             OwnerId = gridData.OwnerId;
             GridTypeId = gridData.GridTypeId;
-            Width = new ReactiveProperty<int>(gridData.Width);
-            Height = new ReactiveProperty<int>(gridData.Height);
+            Width = gridData.Width;
+            Height = gridData.Height;
             Grid = new ReactiveProperty<bool[]>(gridData.Grid);
             gridData.Items.ForEach(data => Items.Add(new ItemDataProxy(data)));
             gridData.Positions.ForEach(Positions.Add);
 
-            Width.Subscribe(value => gridData.Width = value);
-            Height.Subscribe(value => gridData.Height = value);
             Grid.Subscribe(value => gridData.Grid = value);
 
             Items.ObserveAdd().Subscribe(e =>

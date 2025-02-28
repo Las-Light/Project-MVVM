@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Grid Config 1
   m_EditorClassIdentifier: 
   GridTypeId: ChestRig
-  Width: 2
-  Height: 2
+  Width: 5
+  Height: 5

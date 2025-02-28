@@ -14,12 +14,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
     {
         public int OwnerId { get; }
         public string GridTypeID { get; }
+        public int Width { get; }
+        public int Height { get; }
         public ReactiveMatrix<bool> GridMatrix => _gridMatrix;
+        public IObservableCollection<ItemDataProxy> Items;
+
+        public readonly ObservableDictionary<ItemDataProxy, Vector2Int> ItemPositions = new();
 
         private readonly InventoryGridDataProxy _gridDataProxy;
         private readonly InventoryGridSettings _gridSettings;
         private ReactiveMatrix<bool> _gridMatrix;
-        public readonly ObservableDictionary<ItemDataProxy, Vector2Int> _itemPositions = new();
 
 
         public InventoryGridViewModel(InventoryGridDataProxy gridDataProxy,
@@ -28,14 +32,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         {
             GridTypeID = gridDataProxy.GridTypeId;
             OwnerId = gridDataProxy.OwnerId;
+            Height = gridDataProxy.Height;
+            Width = gridDataProxy.Width;
             _gridDataProxy = gridDataProxy;
             _gridSettings = gridSettings;
+            Items = gridDataProxy.Items;
             // Подписываемся на изменения и сериализуем
             InitializeGrid(gridDataProxy);
             _gridMatrix.OnChange.Subscribe(_ => SerializeGrid());
-            _itemPositions.ObserveAdd().Subscribe(e => { SerializeAddItemPosition(gridDataProxy, e); });
-            _itemPositions.ObserveRemove().Subscribe(e => { SerializeRemoveItemPosition(gridDataProxy, e); });
-            _itemPositions.ObserveReplace().Subscribe(e => { SerializeReplaceItemPosition(gridDataProxy, e); });
+            ItemPositions.ObserveAdd().Subscribe(e => { SerializeAddItemPosition(gridDataProxy, e); });
+            ItemPositions.ObserveRemove().Subscribe(e => { SerializeRemoveItemPosition(gridDataProxy, e); });
+            ItemPositions.ObserveReplace().Subscribe(e => { SerializeReplaceItemPosition(gridDataProxy, e); });
         }
 
 
@@ -113,7 +120,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         // Удаление предмета целиком без изменения количества
         public RemoveItemsFromInventoryGridResult RemoveItem(ItemDataProxy item)
         {
-            if (_itemPositions.TryGetValue(item, out var position))
+            if (ItemPositions.TryGetValue(item, out var position))
             {
                 int itemWidth = item.Width.Value;
                 int itemHeight = item.Height.Value;
@@ -126,7 +133,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                     }
                 }
 
-                _itemPositions.Remove(item);
+                ItemPositions.Remove(item);
 
                 return new RemoveItemsFromInventoryGridResult(item.ItemType,
                     item.CurrentStack.Value, true);
@@ -139,7 +146,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         //Удаление определенного количества предметов
         public RemoveItemsFromInventoryGridResult RemoveItemAmount(ItemDataProxy item, int amount)
         {
-            if (_itemPositions.TryGetValue(item, out var position))
+            if (ItemPositions.TryGetValue(item, out var position))
             {
                 if (!Has(item, amount))
                 {
@@ -162,7 +169,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                         }
                     }
 
-                    _itemPositions.Remove(item);
+                    ItemPositions.Remove(item);
                 }
 
                 return new RemoveItemsFromInventoryGridResult(item.ItemType,
@@ -177,11 +184,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public AddItemsToInventoryGridResult TryMoveItem(ItemDataProxy item, Vector2Int newPosition, int amount)
         {
             // Проверяем, что предмет существует в сетке
-            if (!_itemPositions.ContainsKey(item))
+            if (!ItemPositions.ContainsKey(item))
                 throw new Exception("Item not found in the grid.");
 
             // Получаем текущую позицию предмета
-            var oldPosition = _itemPositions[item];
+            var oldPosition = ItemPositions[item];
             var remainingAmount = amount;
             // Временно удаляем предмет из сетки
             RemoveItem(item);
@@ -226,10 +233,36 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
         }
 
+        internal bool CanPlaceItem(ItemDataProxy item, Vector2Int position, bool isRotated)
+        {
+            int itemWidth = isRotated ? item.Height.Value : item.Width.Value;
+            int itemHeight = isRotated ? item.Width.Value : item.Height.Value;
+
+            if (position.x < 0 || position.y < 0 || position.x + itemWidth > _gridMatrix.GetMatrix().GetLength(0) ||
+                position.y + itemHeight > _gridMatrix.GetMatrix().GetLength(1))
+                return false;
+
+            for (int i = position.x; i < position.x + itemWidth; i++)
+            {
+                for (int j = position.y; j < position.y + itemHeight; j++)
+                {
+                    if (_gridMatrix.GetValue(i, j))
+                    {
+                        if (GetItemAtPosition(new Vector2Int(i, j)) != item)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public void SortItems(Func<ItemDataProxy, object> sortBy)
         {
             // Временно удаляем все предметы из сетки
-            var items = _itemPositions.Select(kvp => kvp.Key).ToList();
+            var items = ItemPositions.Select(kvp => kvp.Key).ToList();
 
             foreach (var item in items)
             {
@@ -263,9 +296,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return false; // Невозможно повернуть
         }
 
-        public ItemDataProxy GetItemAtPosition(Vector2Int position)
+        public Vector2Int? GetItemPosition(ItemDataProxy item)
         {
-            foreach (var kvp in _itemPositions)
+            return ItemPositions.TryGetValue(item, out var position) ? position : null;
+        }
+
+        private ItemDataProxy GetItemAtPosition(Vector2Int position)
+        {
+            foreach (var kvp in ItemPositions)
             {
                 var item = kvp.Key;
                 var itemPosition = kvp.Value;
@@ -283,11 +321,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return null; // Позиция пуста
         }
 
-        public Vector2Int? FindFreePosition(ItemDataProxy item)
+        private Vector2Int? FindFreePosition(ItemDataProxy item)
         {
-            for (int y = 0; y < _gridDataProxy.Height.Value - item.Height.Value + 1; y++)
+            for (int y = 0; y < _gridDataProxy.Height - item.Height.Value + 1; y++)
             {
-                for (int x = 0; x < _gridDataProxy.Width.Value - item.Width.Value + 1; x++)
+                for (int x = 0; x < _gridDataProxy.Width - item.Width.Value + 1; x++)
                 {
                     if (CanPlaceItem(item, new Vector2Int(x, y), isRotated: false))
                     {
@@ -299,12 +337,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return null; // Нет свободного места
         }
 
-        public Vector2Int? GetItemPosition(ItemDataProxy item)
-        {
-            return _itemPositions.TryGetValue(item, out var position) ? position : null;
-        }
-
-        public bool Has(ItemDataProxy item, int amount)
+        private bool Has(ItemDataProxy item, int amount)
         {
             var amountExist = item.CurrentStack.Value;
             return amountExist >= amount;
@@ -327,27 +360,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 }
             }
 
-            _itemPositions[item] = position;
-        }
-
-        private bool CanPlaceItem(ItemDataProxy item, Vector2Int position, bool isRotated)
-        {
-            int itemWidth = isRotated ? item.Height.Value : item.Width.Value;
-            int itemHeight = isRotated ? item.Width.Value : item.Height.Value;
-
-            if (position.x < 0 || position.y < 0 || position.x + itemWidth > _gridMatrix.GetMatrix().GetLength(0) ||
-                position.y + itemHeight > _gridMatrix.GetMatrix().GetLength(1))
-                return false;
-
-            for (int i = position.x; i < position.x + itemWidth; i++)
-            {
-                for (int j = position.y; j < position.y + itemHeight; j++)
-                {
-                    if (_gridMatrix.GetValue(i, j)) return false;
-                }
-            }
-
-            return true;
+            ItemPositions[item] = position;
         }
 
 
@@ -398,7 +411,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
             var itemsAddedAmount = 0;
 
-            foreach (var kvp in _itemPositions)
+            foreach (var kvp in ItemPositions)
             {
                 if (kvp.Key.ItemType == item.ItemType && kvp.Key.CurrentStack.Value < kvp.Key.MaxStackSize)
                 {
@@ -466,31 +479,29 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
         private void InitializeGrid(InventoryGridDataProxy gridDataProxy)
         {
-            _gridMatrix = new ReactiveMatrix<bool>(gridDataProxy.Width.Value, gridDataProxy.Height.Value);
+            _gridMatrix = new ReactiveMatrix<bool>(gridDataProxy.Width, gridDataProxy.Height);
 
             // Восстанавливаем двумерный массив из одномерного
-            for (int i = 0; i < gridDataProxy.Width.Value; i++)
+            for (int i = 0; i < gridDataProxy.Width; i++)
             {
-                for (int j = 0; j < gridDataProxy.Height.Value; j++)
+                for (int j = 0; j < gridDataProxy.Height; j++)
                 {
-                    _gridMatrix.SetValue(i, j, gridDataProxy.Grid.Value[i * gridDataProxy.Height.Value + j]);
+                    _gridMatrix.SetValue(i, j, gridDataProxy.Grid.Value[i * gridDataProxy.Height + j]);
                 }
             }
 
             // Восстанавливаем предметы и их позиции
-            _itemPositions.Clear();
+            ItemPositions.Clear();
             for (int i = 0; i < gridDataProxy.Items.Count; i++)
             {
                 var item = gridDataProxy.Items[i];
-                _itemPositions[item] = gridDataProxy.Positions[i];
+                ItemPositions[item] = gridDataProxy.Positions[i];
             }
         }
 
         // Сериализуем предметы и их позиции
         private void SerializeGrid()
         {
-            _gridDataProxy.Width.Value = _gridMatrix.GetMatrix().GetLength(0);
-            _gridDataProxy.Height.Value = _gridMatrix.GetMatrix().GetLength(1);
             _gridDataProxy.Grid.OnNext(_gridMatrix.GetArray());
         }
 

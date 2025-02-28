@@ -18,6 +18,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI.ScreenGameplay
             _exitSceneRequest = exitSceneRequest;
         }
 
+        public void RequestOpenInventory(int ownerId)
+        {
+            _uiManager.OpenInventory(ownerId);
+        }
+
         public void RequestOpenPopupA()
         {
             _uiManager.OpenPopupA();

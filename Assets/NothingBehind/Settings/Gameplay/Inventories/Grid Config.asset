@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Grid Config
   m_EditorClassIdentifier: 
   GridTypeId: Backpack
-  Width: 3
-  Height: 3
+  Width: 10
+  Height: 10

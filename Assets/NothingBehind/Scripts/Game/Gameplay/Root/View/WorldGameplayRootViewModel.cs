@@ -113,13 +113,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                     if (inventoryGridViewModel.GridTypeID == "Backpack")
                     {
                         Debug.Log(inventoryGridViewModel.AddItems(itemProxy, Vector2Int.zero,  itemProxy.CurrentStack.Value).ItemsAddedAmount);
-                        Debug.Log(inventoryGridViewModel.AddItems(itemProxy2,  itemProxy2.CurrentStack.Value).ItemsAddedAmount);
                     }
 
-                    // if (inventoryGridViewModel.GridTypeID == "ChestRig")
-                    // {
-                    //     Debug.Log(inventoryGridViewModel.AddItems(itemProxy2, Vector2Int.zero,  itemProxy2.CurrentStack.Value).ItemsAddedAmount);
-                    // }
+                    if (inventoryGridViewModel.GridTypeID == "ChestRig")
+                    {
+                        Debug.Log(inventoryGridViewModel.AddItems(itemProxy2, Vector2Int.zero,  itemProxy2.CurrentStack.Value).ItemsAddedAmount);
+                    }
                 }
             }
 
@@ -149,7 +148,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
                 foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
                 {
-                    foreach (var kvp in inventoryGridViewModel._itemPositions)
+                    foreach (var kvp in inventoryGridViewModel.ItemPositions)
                     {
                         Debug.Log($"In dictionary {kvp.Key.ItemType} {kvp.Key.Id} in position {kvp.Value}");
                     }
@@ -181,16 +180,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
         public void HandleTestInputTab()
         {
-            foreach (var inventoryViewModel in _inventoryService.AllInventories)
-            {
-                if (inventoryViewModel.OwnerTypeId != "Hero")
-                {
-                    continue;
-                }
-
-                inventoryViewModel.TryMoveItemInGrid( "Backpack", itemProxy2, Vector2Int.zero, 
-                    itemProxy2.CurrentStack.Value);
-            }
+            // foreach (var inventoryViewModel in _inventoryService.AllInventories)
+            // {
+            //     if (inventoryViewModel.OwnerTypeId != "Hero")
+            //     {
+            //         continue;
+            //     }
+            //
+            //     inventoryViewModel.TryMoveItemInGrid( "Backpack", itemProxy2, Vector2Int.zero, 
+            //         itemProxy2.CurrentStack.Value);
+            // }
 
             var inventories = _gameStateProvider.GameState._gameState.Inventories;
 
@@ -206,10 +205,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                     for (int i = 0; i < gridDataProxy.Items.Count; i++)
                     {
                         Debug.Log(gridDataProxy.GridTypeId + ":");
-                        Debug.Log(gridDataProxy.Items[i].ItemType + " " + gridDataProxy.Items[i].CurrentStack + " " +
+                        Debug.Log(gridDataProxy.Items[i].ItemType + " ID:" + gridDataProxy.Items[i].Id + " stack:" + gridDataProxy.Items[i].CurrentStack + " " +
                                   gridDataProxy.Positions[i]);
                     }
                 }
+            }
+
+            foreach (var inventory in AllInventories)
+            {
+                Debug.Log(inventory.OwnerTypeId + inventory.OwnerId);
             }
             // foreach (var inventory in gameState.Inventories)
             // {

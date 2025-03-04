@@ -11,6 +11,7 @@ namespace NothingBehind.Scripts.Game.State.Root
     public class GameState
     {
         public int GlobalEntityId;
+        public int GlobalItemId;
         public MapId CurrentMapId;
         public Hero Hero;
         public List<MapState> Maps;
@@ -20,6 +21,11 @@ namespace NothingBehind.Scripts.Game.State.Root
         public int CreateEntityId()
         {
             return GlobalEntityId++;
+        }
+        
+        public int CreateItemId()
+        {
+            return GlobalItemId++;
         }
     }
 }

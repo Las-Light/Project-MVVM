@@ -75,17 +75,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         }
 
         public AddItemsToInventoryGridResult TryMoveToAnotherInventory(int inventoryOwnerIdAt, int inventoryOwnerIdTo,
-            ItemDataProxy item, string gridTypeIdAt, string gridTypeIdTo, int amount)
+            int itemId, string gridTypeIdAt, string gridTypeIdTo, int amount)
         {
             if (_inventoryMap.TryGetValue(inventoryOwnerIdAt, out var inventoryViewModelAt))
             {
                 var gridViewModelAt = inventoryViewModelAt.GetInventoryGridViewModel(gridTypeIdAt);
                 if (gridViewModelAt != null)
                 {
-                    var oldPosition = gridViewModelAt.GetItemPosition(item);
+                    var oldPosition = gridViewModelAt.GetItemPosition(itemId);
+                    if (!gridViewModelAt.ItemsMap.TryGetValue(itemId, out var item))
+                    {
+                        throw new Exception($"Item {itemId} not found in the grid {gridTypeIdAt}.");
+                    }
+                    
                     if (oldPosition != null)
                     {
-                        gridViewModelAt.RemoveItem(item);
+                        gridViewModelAt.RemoveItem(itemId);
                         if (_inventoryMap.TryGetValue(inventoryOwnerIdTo, out var inventoryViewModelTo))
                         {
                             var gridViewModelTo = inventoryViewModelTo.GetInventoryGridViewModel(gridTypeIdTo);
@@ -100,8 +105,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                                 {
                                     gridViewModelAt.AddItems(item, oldPosition.Value,
                                         addedResult.ItemsNotAddedAmount);
-                                    return new AddItemsToInventoryGridResult(item.Id, amount,
-                                        addedResult.ItemsAddedAmount, false);
+                                    return new AddItemsToInventoryGridResult(item.ItemType, itemId, amount, addedResult.ItemsAddedAmount, false, false);
                                 }
                             }
                             throw new Exception($"Grid {gridTypeIdTo} not found " +
@@ -111,7 +115,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                         throw new Exception($"Inventory Id " +
                                             $"{inventoryOwnerIdTo} not found in inventoryMap.");
                     }
-                    throw new Exception($"Item {item.Id} in {gridTypeIdAt} don't have " +
+                    throw new Exception($"Item {itemId} in {gridTypeIdAt} don't have " +
                                         $"position in the inventory owner " +
                                         $"{inventoryViewModelAt.OwnerTypeId} - {inventoryViewModelAt.OwnerId}.");
                 }
@@ -130,17 +134,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         }
 
         public AddItemsToInventoryGridResult TryMoveToAnotherInventory(int inventoryOwnerIdAt, int inventoryOwnerIdTo, 
-            ItemDataProxy item, string gridTypeIdAt, string gridTypeIdTo, Vector2Int position, int amount)
+            int itemId, string gridTypeIdAt, string gridTypeIdTo, Vector2Int position, int amount)
         {
             if (_inventoryMap.TryGetValue(inventoryOwnerIdAt, out var inventoryViewModelAt))
             {
                 var gridViewModelAt = inventoryViewModelAt.GetInventoryGridViewModel(gridTypeIdAt);
                 if (gridViewModelAt != null)
                 {
-                    var oldPosition = gridViewModelAt.GetItemPosition(item);
+                    var oldPosition = gridViewModelAt.GetItemPosition(itemId);
+                    if (!gridViewModelAt.ItemsMap.TryGetValue(itemId, out var item))
+                    {
+                        throw new Exception($"Item {itemId} not found in the grid {gridTypeIdAt}.");
+                    }
+                    
                     if (oldPosition != null)
                     {
-                        gridViewModelAt.RemoveItem(item);
+                        gridViewModelAt.RemoveItem(itemId);
                         if (_inventoryMap.TryGetValue(inventoryOwnerIdTo, out var inventoryViewModelTo))
                         {
                             var gridViewModelTo = inventoryViewModelTo.GetInventoryGridViewModel(gridTypeIdTo);
@@ -155,8 +164,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                                 {
                                     gridViewModelAt.AddItems(item, oldPosition.Value,
                                         addedResult.ItemsNotAddedAmount);
-                                    return new AddItemsToInventoryGridResult(item.Id, amount,
-                                        addedResult.ItemsAddedAmount, false);
+                                    return new AddItemsToInventoryGridResult(item.ItemType, itemId, amount, addedResult.ItemsAddedAmount, false, false);
                                 }
                             }
                             throw new Exception($"Grid {gridTypeIdTo} not found " +
@@ -166,7 +174,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                         throw new Exception($"Inventory Id " +
                                             $"{inventoryOwnerIdTo} not found in inventoryMap.");
                     }
-                    throw new Exception($"Item {item.Id} in {gridTypeIdAt} don't have " +
+                    throw new Exception($"Item {itemId} in {gridTypeIdAt} don't have " +
                                         $"position in the inventory owner " +
                                         $"{inventoryViewModelAt.OwnerTypeId} - {inventoryViewModelAt.OwnerId}.");
                 }

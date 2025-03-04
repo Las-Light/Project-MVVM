@@ -30,18 +30,32 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
                 OwnerId = command.OwnerId,
                 OwnerTypeId = command.OwnerTypeId
             };
+            
             var inventoryGrids = new List<InventoryGridData>();
-            foreach (var inventoryGrid in inventorySettings.InventoryGrids)
+            foreach (var inventoryGridSettings in inventorySettings.InventoryGrids)
             {
-                inventoryGrids.Add(new InventoryGridData()
+                var items = new List<ItemData>();
+
+                foreach (var itemSettings in inventoryGridSettings.Items)
                 {
-                    GridTypeId = inventoryGrid.GridTypeId,
-                    Width = inventoryGrid.Width,
-                    Height = inventoryGrid.Height,
-                    Grid = new bool[inventoryGrid.Width * inventoryGrid.Height],
-                    Items = new List<ItemData>(),
-                    Positions = new List<Vector2Int>()
-                });
+                    var item = new ItemData(_gameState.CreateItemId(),
+                        itemSettings.ItemType,
+                        itemSettings.Width,
+                        itemSettings.Height,
+                        itemSettings.Weight,
+                        itemSettings.CanRotate,
+                        itemSettings.IsRotated,
+                        itemSettings.IsStackable,
+                        itemSettings.MaxStackSize,
+                        itemSettings.CurrentStack);
+                    items.Add(item);
+                }
+                inventoryGrids.Add(new InventoryGridData(command.OwnerId,
+                    inventoryGridSettings.GridTypeId,
+                    inventoryGridSettings.Width,
+                    inventoryGridSettings.Height,
+                    inventoryGridSettings.CellSize,
+                    items));
             }
             inventory.Inventories = inventoryGrids;
 

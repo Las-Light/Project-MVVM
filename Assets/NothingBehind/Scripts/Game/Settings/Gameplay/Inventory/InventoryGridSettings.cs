@@ -10,5 +10,7 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Inventory
         public string GridTypeId;
         public int Width;
         public int Height;
+        public float CellSize;
+        public List<ItemSettings> Items;
     }
 }

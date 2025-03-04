@@ -32,8 +32,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         public readonly IObservableCollection<InventoryViewModel> AllInventories;
         public readonly IObservableCollection<MapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<EnemySpawnViewModel> AllSpawns;
-        private ItemDataProxy itemProxy;
-        private ItemDataProxy itemProxy2;
 
         public WorldGameplayRootViewModel(CharactersService charactersService,
             IGameStateProvider gameStateProvider,
@@ -75,53 +73,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             //
             var gameState = _gameStateProvider.GameState;
 
-            var item = new ItemData()
-            {
-                Id = "1",
-                ItemType = "Sword",
-                CurrentStack = 5,
-                MaxStackSize = 10,
-                IsStackable = true,
-                Height = 2,
-                Width = 1,
-                CanRotate = false,
-                IsRotated = false
-            };
-            var item2 = new ItemData()
-            {
-                Id = "2",
-                ItemType = "Sword",
-                CurrentStack = 6,
-                MaxStackSize = 10,
-                IsStackable = true,
-                Height = 2,
-                Width = 1,
-                CanRotate = false,
-                IsRotated = false
-            };
-            itemProxy = new ItemDataProxy(item);
-            itemProxy2 = new ItemDataProxy(item2);
-            foreach (var inventoryViewModel in _inventoryService.AllInventories)
-            {
-                if (inventoryViewModel.OwnerTypeId != "Hero")
-                {
-                    continue;
-                }
-
-                foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
-                {
-                    if (inventoryGridViewModel.GridTypeID == "Backpack")
-                    {
-                        Debug.Log(inventoryGridViewModel.AddItems(itemProxy, Vector2Int.zero,  itemProxy.CurrentStack.Value).ItemsAddedAmount);
-                    }
-
-                    if (inventoryGridViewModel.GridTypeID == "ChestRig")
-                    {
-                        Debug.Log(inventoryGridViewModel.AddItems(itemProxy2, Vector2Int.zero,  itemProxy2.CurrentStack.Value).ItemsAddedAmount);
-                    }
-                }
-            }
-
             foreach (var inventory in gameState.Inventories)
             {
                 if (inventory.OwnerTypeId != "Hero")
@@ -148,7 +99,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
                 foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
                 {
-                    foreach (var kvp in inventoryGridViewModel.ItemPositions)
+                    foreach (var kvp in inventoryGridViewModel.ItemsPositionsMap)
                     {
                         Debug.Log($"In dictionary {kvp.Key.ItemType} {kvp.Key.Id} in position {kvp.Value}");
                     }
@@ -166,8 +117,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                 {
                     for (int i = 0; i < grid.Items.Count; i++)
                     {
-                        Debug.Log(grid.Items[i].ItemType + grid.Items[i].Id + grid.Positions[i] + " Stack = " +
-                                  grid.Items[i].CurrentStack);
+                        Debug.Log($"{grid.Items[i].ItemType} {grid.Items[i].Id} {grid.Positions[i]} Stack = {grid.Items[i].CurrentStack.Value}");
                     }
 
                     for (int i = 0; i < grid.Grid.Value.Length; i++)

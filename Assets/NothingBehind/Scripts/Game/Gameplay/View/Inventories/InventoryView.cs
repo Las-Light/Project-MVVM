@@ -7,13 +7,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
     {
         [SerializeField] private GameObject _gridPrefab;
         [SerializeField] private RectTransform _gridContainer;
-        
+        public int OwnerId { get; set; }
+
         private InventoryViewModel _inventoryViewModel;
+
 
         protected override void OnBind(InventoryViewModel viewModel)
         {
             base.OnBind(viewModel);
             _inventoryViewModel = viewModel;
+            OwnerId = viewModel.OwnerId; 
             foreach (var inventoryGridViewModel in ViewModel.AllInventoryGrids)
             {
                 CreateInventorGridView(inventoryGridViewModel);

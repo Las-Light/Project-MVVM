@@ -36,6 +36,11 @@ namespace NothingBehind.Scripts.Game.State.Root
             return _gameState.CreateEntityId();
         }
 
+        public int CreateItemId()
+        {
+            return _gameState.CreateItemId();
+        }
+
         private void InitHero(GameState gameState)
         {
             Hero.Value = new HeroProxy(gameState.Hero);

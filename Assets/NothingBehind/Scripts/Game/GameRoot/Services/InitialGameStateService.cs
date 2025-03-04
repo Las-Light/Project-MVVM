@@ -57,7 +57,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                 },
                 Health = gameSettings.HeroSettings.Health
             };
-            gameState.Inventories.Add(CreateInventories(gameSettings, hero.TypeId, hero.Id));
+            gameState.Inventories.Add(CreateInventories(gameState, gameSettings, hero.TypeId, hero.Id));
 
             return hero;
         }
@@ -137,14 +137,15 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                     Level = characterLevelSettings.Level,
                     Health = characterLevelSettings.Health
                 };
-                gameState.Inventories.Add(CreateInventories(gameSettings, initialCharacter.TypeId, initialCharacter.Id));
+                gameState.Inventories.Add(CreateInventories(gameState, gameSettings, initialCharacter.TypeId, initialCharacter.Id));
                 initialCharacters.Add(initialCharacter);
             }
 
             return initialCharacters;
         }
 
-        private InventoryData CreateInventories(GameSettings gameSettings, string ownerTypeId, int ownerId)
+        private InventoryData CreateInventories(GameState gameState, GameSettings gameSettings, string ownerTypeId,
+            int ownerId)
         {
             var inventorySettings =
                 gameSettings.InventoriesSettings.Inventories.First(settings => settings.OwnerTypeId == ownerTypeId);
@@ -154,18 +155,31 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                 OwnerTypeId = ownerTypeId
             };
             var inventoryGrids = new List<InventoryGridData>();
-            foreach (var inventoryGrid in inventorySettings.InventoryGrids)
+            foreach (var inventoryGridSettings in inventorySettings.InventoryGrids)
             {
-                inventoryGrids.Add(new InventoryGridData()
+                var items = new List<ItemData>();
+
+                foreach (var itemSettings in inventoryGridSettings.Items)
                 {
-                    OwnerId = ownerId,
-                    GridTypeId = inventoryGrid.GridTypeId,
-                    Width = inventoryGrid.Width,
-                    Height = inventoryGrid.Height,
-                    Grid = new bool[inventoryGrid.Width * inventoryGrid.Height],
-                    Items = new List<ItemData>(),
-                    Positions = new List<Vector2Int>()
-                });
+                    var item = new ItemData(gameState.CreateItemId(),
+                        itemSettings.ItemType,
+                        itemSettings.Width,
+                        itemSettings.Height,
+                        itemSettings.Weight,
+                        itemSettings.CanRotate,
+                        itemSettings.IsRotated,
+                        itemSettings.IsStackable,
+                        itemSettings.MaxStackSize,
+                        itemSettings.CurrentStack);
+                    items.Add(item);
+                }
+                
+                inventoryGrids.Add(new InventoryGridData(ownerId,
+                    inventoryGridSettings.GridTypeId,
+                    inventoryGridSettings.Width,
+                    inventoryGridSettings.Height,
+                    inventoryGridSettings.CellSize,
+                    items));
             }
 
             inventory.Inventories = inventoryGrids;

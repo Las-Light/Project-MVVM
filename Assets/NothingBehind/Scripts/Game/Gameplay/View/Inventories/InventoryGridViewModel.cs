@@ -16,11 +16,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public string GridTypeID { get; }
         public int Width { get; }
         public int Height { get; }
+        public float CellSize { get; }
         public ReactiveMatrix<bool> GridMatrix => _gridMatrix;
         public IObservableCollection<ItemDataProxy> Items;
+        public IReadOnlyObservableDictionary<int, ItemDataProxy> ItemsMap => _itemsMap;
+        public IReadOnlyObservableDictionary<ItemDataProxy, Vector2Int> ItemsPositionsMap => _itemsPositionsMap;
 
-        public readonly ObservableDictionary<ItemDataProxy, Vector2Int> ItemPositions = new();
-
+        private readonly ObservableDictionary<ItemDataProxy, Vector2Int> _itemsPositionsMap = new();
+        private readonly ObservableDictionary<int, ItemDataProxy> _itemsMap = new();
         private readonly InventoryGridDataProxy _gridDataProxy;
         private readonly InventoryGridSettings _gridSettings;
         private ReactiveMatrix<bool> _gridMatrix;
@@ -34,15 +37,58 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             OwnerId = gridDataProxy.OwnerId;
             Height = gridDataProxy.Height;
             Width = gridDataProxy.Width;
+            CellSize = gridDataProxy.CellSize;
             _gridDataProxy = gridDataProxy;
             _gridSettings = gridSettings;
             Items = gridDataProxy.Items;
-            // Подписываемся на изменения и сериализуем
+
+            // Мэпим предметы по Id
+            foreach (var itemDataProxy in gridDataProxy.Items)
+            {
+                _itemsMap[itemDataProxy.Id] = itemDataProxy;
+            }
+
+            // Инициализация одномерного массива в кастомный двумерный
             InitializeGrid(gridDataProxy);
-            _gridMatrix.OnChange.Subscribe(_ => SerializeGrid());
-            ItemPositions.ObserveAdd().Subscribe(e => { SerializeAddItemPosition(gridDataProxy, e); });
-            ItemPositions.ObserveRemove().Subscribe(e => { SerializeRemoveItemPosition(gridDataProxy, e); });
-            ItemPositions.ObserveReplace().Subscribe(e => { SerializeReplaceItemPosition(gridDataProxy, e); });
+
+            // Мэпим предметы и их позиции
+            for (int i = 0; i < gridDataProxy.Items.Count; i++)
+            {
+                var item = gridDataProxy.Items[i];
+                _itemsPositionsMap[item] = gridDataProxy.Positions[i];
+            }
+
+            // Обновляем _itemMap
+            Items.ObserveAdd().Subscribe(e =>
+            {
+                var addedItem = e.Value;
+                _itemsMap[addedItem.Id] = addedItem;
+            });
+            Items.ObserveRemove().Subscribe(e =>
+            {
+                var removedItem = e.Value;
+                _itemsMap.Remove(removedItem.Id);
+            });
+
+            // Обновляем данные в GridDataProxy
+            _gridMatrix.OnChange.Subscribe(_ => gridDataProxy.Grid.OnNext(_gridMatrix.GetArray()));
+            _itemsPositionsMap.ObserveAdd().Subscribe(e =>
+            {
+                var addedItemAndPosition = e.Value;
+                gridDataProxy.Items.Add(addedItemAndPosition.Key);
+                gridDataProxy.Positions.Add(addedItemAndPosition.Value);
+            });
+            _itemsPositionsMap.ObserveRemove().Subscribe(e =>
+            {
+                var removedItemAndPosition = e.Value;
+                gridDataProxy.Items.Remove(removedItemAndPosition.Key);
+                gridDataProxy.Positions.Remove(removedItemAndPosition.Value);
+            });
+            // _itemsPositionsMap.ObserveReplace().Subscribe(e =>
+            // {
+            //     Debug.Log($"ObserveReplace");
+            //     gridDataProxy.Positions[gridDataProxy.Positions.IndexOf(e.OldValue.Value)] = e.NewValue.Value;
+            // });
         }
 
 
@@ -53,27 +99,29 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             var itemsAddedToSameItems =
                 AddToGridWithSameItems(item, remainingAmount, out remainingAmount);
 
+            //если поместился без остатка, то удаляем его
             if (remainingAmount <= 0)
             {
-                return new AddItemsToInventoryGridResult(item.ItemType,
-                    amount, itemsAddedToSameItems, true);
+                return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
+                    amount, itemsAddedToSameItems, true, true);
             }
 
             var itemsAddedToAvailableSlotsAmount =
                 AddToFirstAvailableGrid(item, remainingAmount, out remainingAmount);
             var totalAddedItemsAmount = itemsAddedToSameItems + itemsAddedToAvailableSlotsAmount;
 
+            //TODO: рассмотреть если не все предметы влезли в стек (totalAddedItemsAmount != amount)
             var position = FindFreePosition(item);
             if (position.HasValue)
             {
                 PlaceItem(item, position.Value, item.IsRotated.Value);
-                return new AddItemsToInventoryGridResult(item.ItemType,
+                return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
                     amount,
-                    totalAddedItemsAmount, true);
+                    totalAddedItemsAmount, false, true);
             }
 
-            return new AddItemsToInventoryGridResult(item.ItemType, amount,
-                totalAddedItemsAmount, false); // Нет свободного места
+            return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
+                totalAddedItemsAmount, false, false); // Нет свободного места
         }
 
         //Добавление предметов из другой сетки по координатам
@@ -88,14 +136,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 if (CanPlaceItem(item, position, item.IsRotated.Value))
                 {
                     PlaceItem(item, position, item.IsRotated.Value);
-                    return new AddItemsToInventoryGridResult(item.ItemType, amount,
-                        remainingAmount, true); // Перемещение успешно
+                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
+                        remainingAmount, false, true); // Перемещение успешно
                 }
                 else
                 {
-                    return new AddItemsToInventoryGridResult(item.ItemType,
+                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
                         amount,
-                        0, false); // Добавить предмет не удалось
+                        0, false, false); // Добавить предмет не удалось
                 }
             }
             else
@@ -105,22 +153,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 // Если предмет поместился без остатка то удаляем его
                 if (remainingAmount == 0)
                 {
-                    return new AddItemsToInventoryGridResult(item.ItemType, amount,
-                        itemsAddedToSameItems, true);
+                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
+                        itemsAddedToSameItems, true, true);
                 }
                 else
                 {
                     // Если все предметы не поместились
-                    return new AddItemsToInventoryGridResult(item.ItemType, amount,
-                        itemsAddedToSameItems, false); // Добавить все предметы не удалось
+                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
+                        itemsAddedToSameItems, false, false); // Добавить все предметы не удалось
                 }
             }
         }
 
         // Удаление предмета целиком без изменения количества
-        public RemoveItemsFromInventoryGridResult RemoveItem(ItemDataProxy item)
+        public RemoveItemsFromInventoryGridResult RemoveItem(int itemId)
         {
-            if (ItemPositions.TryGetValue(item, out var position))
+            if (!_itemsMap.TryGetValue(itemId, out var item))
+                throw new Exception("Item not found in the grid.");
+
+            if (_itemsPositionsMap.TryGetValue(item, out var position))
             {
                 int itemWidth = item.Width.Value;
                 int itemHeight = item.Height.Value;
@@ -133,24 +184,27 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                     }
                 }
 
-                ItemPositions.Remove(item);
+                _itemsPositionsMap.Remove(item);
 
-                return new RemoveItemsFromInventoryGridResult(item.ItemType,
+                return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
                     item.CurrentStack.Value, true);
             }
 
-            return new RemoveItemsFromInventoryGridResult(item.ItemType,
+            return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
                 item.CurrentStack.Value, false);
         }
 
         //Удаление определенного количества предметов
-        public RemoveItemsFromInventoryGridResult RemoveItemAmount(ItemDataProxy item, int amount)
+        public RemoveItemsFromInventoryGridResult RemoveItemAmount(int itemId, int amount)
         {
-            if (ItemPositions.TryGetValue(item, out var position))
+            if (!_itemsMap.TryGetValue(itemId, out var item))
+                throw new Exception("Item not found in the grid.");
+
+            if (_itemsPositionsMap.TryGetValue(item, out var position))
             {
                 if (!Has(item, amount))
                 {
-                    return new RemoveItemsFromInventoryGridResult(item.ItemType,
+                    return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
                         amount, false);
                 }
 
@@ -169,29 +223,32 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                         }
                     }
 
-                    ItemPositions.Remove(item);
+                    _itemsPositionsMap.Remove(item);
                 }
 
-                return new RemoveItemsFromInventoryGridResult(item.ItemType,
+                return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
                     amount, true);
             }
 
-            return new RemoveItemsFromInventoryGridResult(item.ItemType,
+            return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
                 amount, false);
         }
 
         // Перемещение в одной сетке
-        public AddItemsToInventoryGridResult TryMoveItem(ItemDataProxy item, Vector2Int newPosition, int amount)
+        public AddItemsToInventoryGridResult TryMoveItem(int itemId, Vector2Int newPosition, int amount)
         {
+            if (!_itemsMap.TryGetValue(itemId, out var item))
+                throw new Exception("Item not found in the grid.");
+
             // Проверяем, что предмет существует в сетке
-            if (!ItemPositions.ContainsKey(item))
+            if (!_itemsPositionsMap.ContainsKey(item))
                 throw new Exception("Item not found in the grid.");
 
             // Получаем текущую позицию предмета
-            var oldPosition = ItemPositions[item];
+            var oldPosition = _itemsPositionsMap[item];
             var remainingAmount = amount;
             // Временно удаляем предмет из сетки
-            RemoveItem(item);
+            RemoveItem(itemId);
             var anotherItemAtPosition = GetItemAtPosition(newPosition);
             if (anotherItemAtPosition == null)
             {
@@ -199,17 +256,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 if (CanPlaceItem(item, newPosition, item.IsRotated.Value))
                 {
                     PlaceItem(item, newPosition, item.IsRotated.Value);
-                    return new AddItemsToInventoryGridResult(item.ItemType,
+                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
                         amount,
-                        remainingAmount, true); // Перемещение успешно
+                        remainingAmount, false, true); // Перемещение успешно
                 }
                 else
                 {
                     // Если перемещение невозможно, возвращаем предмет на старую позицию
                     PlaceItem(item, oldPosition, item.IsRotated.Value);
-                    return new AddItemsToInventoryGridResult(item.ItemType,
-                        amount,
-                        0, false); // Перемещение не удалось
+                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
+                        amount, 0, false, false); // Перемещение не удалось
                 }
             }
             else
@@ -220,20 +276,35 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 if (remainingAmount == 0)
                 {
                     // Если предмет поместился без остатка
-                    return new AddItemsToInventoryGridResult(item.ItemType,
-                        amount, itemsAddedToSameItems, true);
+                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
+                        amount, itemsAddedToSameItems, true, true);
                 }
                 else
                 {
                     // Если все предметы не поместились, возвращаем предмет на старую позицию с остатком который не удалось переместить
                     PlaceItem(item, oldPosition, item.IsRotated.Value);
-                    return new AddItemsToInventoryGridResult(item.ItemType,
-                        amount, itemsAddedToSameItems, false); // Переместить все предметы не удалось
+                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
+                        amount, itemsAddedToSameItems, false, false); // Переместить все предметы не удалось
                 }
             }
         }
 
-        internal bool CanPlaceItem(ItemDataProxy item, Vector2Int position, bool isRotated)
+        public void SortByType()
+        {
+            SortItems(item => item.ItemType);
+        }
+
+        public void SortByQuantity()
+        {
+            SortItems(item => -item.CurrentStack.CurrentValue); // Сортировка по убыванию количества
+        }
+
+        public void SortByWeight()
+        {
+            SortItems(item => item.Weight);
+        }
+
+        private bool CanPlaceItem(ItemDataProxy item, Vector2Int position, bool isRotated)
         {
             int itemWidth = isRotated ? item.Height.Value : item.Width.Value;
             int itemHeight = isRotated ? item.Width.Value : item.Height.Value;
@@ -259,14 +330,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return true;
         }
 
-        public void SortItems(Func<ItemDataProxy, object> sortBy)
+        private void SortItems(Func<ItemDataProxy, object> sortBy)
         {
             // Временно удаляем все предметы из сетки
-            var items = ItemPositions.Select(kvp => kvp.Key).ToList();
+            var items = _itemsPositionsMap.Select(kvp => kvp.Key).ToList();
 
             foreach (var item in items)
             {
-                RemoveItem(item);
+                RemoveItem(item.Id);
             }
 
             // Сортируем предметы
@@ -283,27 +354,38 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
         }
 
-        public bool RotateItem(ItemDataProxy item)
+        public bool RotateItem(int itemId)
         {
-            var position = GetItemPosition(item);
-            if (position.HasValue && CanPlaceItem(item, position.Value, !item.IsRotated.Value))
+            if (!_itemsMap.TryGetValue(itemId, out var item))
+                throw new Exception("Item not found in the grid.");
+
+            if (item.CanRotate)
             {
-                RemoveItem(item);
-                PlaceItem(item, position.Value, !item.IsRotated.Value);
-                return true;
+                var position = GetItemPosition(itemId);
+                if (position.HasValue && CanPlaceItem(item, position.Value, !item.IsRotated.Value))
+                {
+                    RemoveItem(itemId);
+                    PlaceItem(item, position.Value, !item.IsRotated.Value);
+                    return true;
+                }
+
+                return false; // Невозможно повернуть
             }
 
             return false; // Невозможно повернуть
         }
 
-        public Vector2Int? GetItemPosition(ItemDataProxy item)
+        public Vector2Int? GetItemPosition(int itemId)
         {
-            return ItemPositions.TryGetValue(item, out var position) ? position : null;
+            if (!_itemsMap.TryGetValue(itemId, out var item))
+                throw new Exception("Item not found in the grid.");
+
+            return _itemsPositionsMap.TryGetValue(item, out var position) ? position : null;
         }
 
         private ItemDataProxy GetItemAtPosition(Vector2Int position)
         {
-            foreach (var kvp in ItemPositions)
+            foreach (var kvp in _itemsPositionsMap)
             {
                 var item = kvp.Key;
                 var itemPosition = kvp.Value;
@@ -360,7 +442,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 }
             }
 
-            ItemPositions[item] = position;
+            _itemsPositionsMap[item] = position;
         }
 
 
@@ -411,7 +493,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
             var itemsAddedAmount = 0;
 
-            foreach (var kvp in ItemPositions)
+            foreach (var kvp in _itemsPositionsMap)
             {
                 if (kvp.Key.ItemType == item.ItemType && kvp.Key.CurrentStack.Value < kvp.Key.MaxStackSize)
                 {
@@ -474,9 +556,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return itemsAddedAmount;
         }
 
-
-        // Инициализация InventoryGridDataProxy в InventoryGridViewModel 
-
+        // Инициализация одномерного массива в кастомный двумерный
         private void InitializeGrid(InventoryGridDataProxy gridDataProxy)
         {
             _gridMatrix = new ReactiveMatrix<bool>(gridDataProxy.Width, gridDataProxy.Height);
@@ -489,36 +569,28 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                     _gridMatrix.SetValue(i, j, gridDataProxy.Grid.Value[i * gridDataProxy.Height + j]);
                 }
             }
-
-            // Восстанавливаем предметы и их позиции
-            ItemPositions.Clear();
-            for (int i = 0; i < gridDataProxy.Items.Count; i++)
-            {
-                var item = gridDataProxy.Items[i];
-                ItemPositions[item] = gridDataProxy.Positions[i];
-            }
         }
 
         // Сериализуем предметы и их позиции
-        private void SerializeGrid()
+        private void UpdateDataGrid()
         {
             _gridDataProxy.Grid.OnNext(_gridMatrix.GetArray());
         }
 
-        private void SerializeReplaceItemPosition(InventoryGridDataProxy gridDataProxy,
+        private void UpdateDataWhenReplacePosition(InventoryGridDataProxy gridDataProxy,
             CollectionReplaceEvent<KeyValuePair<ItemDataProxy, Vector2Int>> e)
         {
             gridDataProxy.Positions[gridDataProxy.Positions.IndexOf(e.OldValue.Value)] = e.NewValue.Value;
         }
 
-        private static void SerializeAddItemPosition(InventoryGridDataProxy gridDataProxy,
+        private static void UpdateDataWhenAddItem(InventoryGridDataProxy gridDataProxy,
             CollectionAddEvent<KeyValuePair<ItemDataProxy, Vector2Int>> e)
         {
             gridDataProxy.Items.Add(e.Value.Key);
             gridDataProxy.Positions.Add(e.Value.Value);
         }
 
-        private void SerializeRemoveItemPosition(InventoryGridDataProxy gridDataProxy,
+        private void UpdateDataWhenRemoveItem(InventoryGridDataProxy gridDataProxy,
             CollectionRemoveEvent<KeyValuePair<ItemDataProxy, Vector2Int>> e)
         {
             gridDataProxy.Items.Remove(e.Value.Key);

@@ -5,8 +5,8 @@ namespace NothingBehind.Scripts.Game.State.Inventory
 {
     public class ItemDataProxy
     {
-        public string Id { get; }
-        public string ItemType { get; }
+        public int Id { get; }
+        public ItemType ItemType { get; }
         public ItemData Origin { get; }
         public ReactiveProperty<int> Width { get; }
         public ReactiveProperty<int> Height { get; }
@@ -15,7 +15,7 @@ namespace NothingBehind.Scripts.Game.State.Inventory
         public bool CanRotate { get; }
         public bool IsStackable { get; }
         public int MaxStackSize { get; }
-
+        public int Weight { get; }
 
         public ItemDataProxy(ItemData itemData)
         {
@@ -23,6 +23,7 @@ namespace NothingBehind.Scripts.Game.State.Inventory
             Id = itemData.Id;
             ItemType = itemData.ItemType;
             CanRotate = itemData.CanRotate;
+            Weight = itemData.Weight;
             IsStackable = itemData.IsStackable;
             MaxStackSize = itemData.MaxStackSize;
             IsRotated = new ReactiveProperty<bool>(itemData.IsRotated);

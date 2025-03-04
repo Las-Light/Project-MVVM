@@ -1,14 +1,18 @@
+using NothingBehind.Scripts.Game.State.Inventory;
+
 namespace NothingBehind.Scripts.Utils
 {
     public readonly struct RemoveItemsFromInventoryGridResult
     {
-        public readonly string ItemTypeId;
+        public readonly ItemType ItemTypeId;
+        public readonly int ItemId;
         public readonly int ItemsToRemoveAmount;
         public readonly bool Success;
 
-        public RemoveItemsFromInventoryGridResult(string itemTypeId, int itemsToRemoveAmount, bool success)
+        public RemoveItemsFromInventoryGridResult(ItemType itemTypeId, int itemId, int itemsToRemoveAmount, bool success)
         {
             ItemTypeId = itemTypeId;
+            ItemId = itemId;
             ItemsToRemoveAmount = itemsToRemoveAmount;
             Success = success;
         }

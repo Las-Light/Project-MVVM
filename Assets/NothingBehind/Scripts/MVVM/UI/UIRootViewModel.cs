@@ -55,8 +55,8 @@ namespace NothingBehind.Scripts.MVVM.UI
 
         public void ClosePopup(string popupId)
         {
-            var openedPopoupViewModel = _openedPopups.FirstOrDefault(p => p.Id == popupId);
-            ClosePopup(openedPopoupViewModel);
+            var openedPopupViewModel = _openedPopups.FirstOrDefault(p => p.Id == popupId);
+            ClosePopup(openedPopupViewModel);
         }
 
         public void CloseAllPopups()

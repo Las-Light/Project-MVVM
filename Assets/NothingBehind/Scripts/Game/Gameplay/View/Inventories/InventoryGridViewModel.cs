@@ -10,23 +10,25 @@ using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 {
-    public class InventoryGridViewModel
+    public class InventoryGridViewModel : IDisposable
     {
         public int OwnerId { get; }
         public string GridTypeID { get; }
         public int Width { get; }
         public int Height { get; }
         public float CellSize { get; }
-        public ReactiveMatrix<bool> GridMatrix => _gridMatrix;
+
         public IObservableCollection<ItemDataProxy> Items;
         public IReadOnlyObservableDictionary<int, ItemDataProxy> ItemsMap => _itemsMap;
         public IReadOnlyObservableDictionary<ItemDataProxy, Vector2Int> ItemsPositionsMap => _itemsPositionsMap;
 
         private readonly ObservableDictionary<ItemDataProxy, Vector2Int> _itemsPositionsMap = new();
         private readonly ObservableDictionary<int, ItemDataProxy> _itemsMap = new();
+
         private readonly InventoryGridDataProxy _gridDataProxy;
         private readonly InventoryGridSettings _gridSettings;
         private ReactiveMatrix<bool> _gridMatrix;
+        private readonly CompositeDisposable _disposables = new();
 
 
         public InventoryGridViewModel(InventoryGridDataProxy gridDataProxy,
@@ -59,36 +61,31 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
 
             // Обновляем _itemMap
-            Items.ObserveAdd().Subscribe(e =>
+            _disposables.Add(Items.ObserveAdd().Subscribe(e =>
             {
                 var addedItem = e.Value;
                 _itemsMap[addedItem.Id] = addedItem;
-            });
-            Items.ObserveRemove().Subscribe(e =>
+            }));
+            _disposables.Add(Items.ObserveRemove().Subscribe(e =>
             {
                 var removedItem = e.Value;
                 _itemsMap.Remove(removedItem.Id);
-            });
+            }));
 
             // Обновляем данные в GridDataProxy
-            _gridMatrix.OnChange.Subscribe(_ => gridDataProxy.Grid.OnNext(_gridMatrix.GetArray()));
-            _itemsPositionsMap.ObserveAdd().Subscribe(e =>
+            _disposables.Add(_gridMatrix.OnChange.Subscribe(_ => gridDataProxy.Grid.OnNext(_gridMatrix.GetArray())));
+            _disposables.Add(_itemsPositionsMap.ObserveAdd().Subscribe(e =>
             {
                 var addedItemAndPosition = e.Value;
                 gridDataProxy.Items.Add(addedItemAndPosition.Key);
                 gridDataProxy.Positions.Add(addedItemAndPosition.Value);
-            });
-            _itemsPositionsMap.ObserveRemove().Subscribe(e =>
+            }));
+            _disposables.Add(_itemsPositionsMap.ObserveRemove().Subscribe(e =>
             {
                 var removedItemAndPosition = e.Value;
                 gridDataProxy.Items.Remove(removedItemAndPosition.Key);
                 gridDataProxy.Positions.Remove(removedItemAndPosition.Value);
-            });
-            // _itemsPositionsMap.ObserveReplace().Subscribe(e =>
-            // {
-            //     Debug.Log($"ObserveReplace");
-            //     gridDataProxy.Positions[gridDataProxy.Positions.IndexOf(e.OldValue.Value)] = e.NewValue.Value;
-            // });
+            }));
         }
 
 
@@ -304,7 +301,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             SortItems(item => item.Weight);
         }
 
-        private bool CanPlaceItem(ItemDataProxy item, Vector2Int position, bool isRotated)
+        public bool CanPlaceItem(ItemDataProxy item, Vector2Int position, bool isRotated)
         {
             int itemWidth = isRotated ? item.Height.Value : item.Width.Value;
             int itemHeight = isRotated ? item.Width.Value : item.Height.Value;
@@ -571,30 +568,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
         }
 
-        // Сериализуем предметы и их позиции
-        private void UpdateDataGrid()
+        public void Dispose()
         {
-            _gridDataProxy.Grid.OnNext(_gridMatrix.GetArray());
-        }
-
-        private void UpdateDataWhenReplacePosition(InventoryGridDataProxy gridDataProxy,
-            CollectionReplaceEvent<KeyValuePair<ItemDataProxy, Vector2Int>> e)
-        {
-            gridDataProxy.Positions[gridDataProxy.Positions.IndexOf(e.OldValue.Value)] = e.NewValue.Value;
-        }
-
-        private static void UpdateDataWhenAddItem(InventoryGridDataProxy gridDataProxy,
-            CollectionAddEvent<KeyValuePair<ItemDataProxy, Vector2Int>> e)
-        {
-            gridDataProxy.Items.Add(e.Value.Key);
-            gridDataProxy.Positions.Add(e.Value.Value);
-        }
-
-        private void UpdateDataWhenRemoveItem(InventoryGridDataProxy gridDataProxy,
-            CollectionRemoveEvent<KeyValuePair<ItemDataProxy, Vector2Int>> e)
-        {
-            gridDataProxy.Items.Remove(e.Value.Key);
-            gridDataProxy.Positions.Remove(e.Value.Value);
+            _disposables?.Dispose();
         }
     }
 }

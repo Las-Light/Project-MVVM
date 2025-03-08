@@ -7,6 +7,7 @@ using NothingBehind.Scripts.Game.Gameplay.View;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
+using NothingBehind.Scripts.Game.Gameplay.View.UI;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventory;

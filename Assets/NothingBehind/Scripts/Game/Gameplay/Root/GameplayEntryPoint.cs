@@ -34,6 +34,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             //Добавить сюда инициализацию мира (статик дату, героя, спавнеры врагов)
             _worldRootBinder.Bind(
                 gameplayViewModelsContainer.Resolve<WorldGameplayRootViewModel>(),
+                gameplayViewModelsContainer.Resolve<GameplayUIManager>(),
                 exitSceneRequest);
         }
 

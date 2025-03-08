@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.View;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
+using NothingBehind.Scripts.Game.Gameplay.View.UI;
 using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
@@ -20,20 +21,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly CompositeDisposable _disposables = new();
         private WorldGameplayRootViewModel _viewModel;
 
-        public void Bind(WorldGameplayRootViewModel viewModel, Subject<GameplayExitParams> exitSceneSignalSubj)
+        public void Bind(WorldGameplayRootViewModel viewModel, 
+            GameplayUIManager gameplayUIManager,
+            Subject<GameplayExitParams> exitSceneSignalSubj)
         {
             _viewModel = viewModel;
 
-            viewModel.Hero.Subscribe(CreateHero);
+            viewModel.Hero.Subscribe(heroViewModel => CreateHero(heroViewModel, gameplayUIManager));
             viewModel.CameraViewModel.Subscribe(cvm => CreateCamera(cvm, _hero));
-            foreach (var characterViewModel in viewModel.AllCharacters) CreateCharacter(characterViewModel);
+            foreach (var characterViewModel in viewModel.AllCharacters) CreateCharacter(characterViewModel, gameplayUIManager);
             foreach (var mapTransferViewModel in viewModel.AllMapTransfers)
                 CreateMapTransfer(mapTransferViewModel, exitSceneSignalSubj);
             foreach (var enemySpawnViewModel in viewModel.AllSpawns) CreateSpawnTrigger(enemySpawnViewModel);
 
             _disposables.Add(viewModel.Hero);
             _disposables.Add(viewModel.AllCharacters.ObserveAdd()
-                .Subscribe(e => CreateCharacter(e.Value)));
+                .Subscribe(e => CreateCharacter(e.Value, gameplayUIManager)));
 
             _disposables.Add(viewModel.AllMapTransfers.ObserveAdd()
                 .Subscribe(e => CreateMapTransfer(e.Value, exitSceneSignalSubj)));
@@ -60,17 +63,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _camera = cameraBinder;
         }
 
-        private void CreateHero(HeroViewModel heroViewModel)
+        private void CreateHero(HeroViewModel heroViewModel, GameplayUIManager gameplayUIManager)
         {
             var prefabHeroPath = "Prefabs/Gameplay/World/Characters/Player";
             var heroPrefab = Resources.Load<HeroBinder>(prefabHeroPath);
 
             var heroBinder = Instantiate(heroPrefab);
-            heroBinder.Bind(heroViewModel);
+            heroBinder.Bind(heroViewModel, gameplayUIManager);
             _hero = heroBinder;
         }
 
-        private void CreateCharacter(CharacterViewModel characterViewModel)
+        private void CreateCharacter(CharacterViewModel characterViewModel, GameplayUIManager gameplayUIManager)
         {
             //создает CharacterView
             // для примера:
@@ -82,7 +85,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             var characterPrefab = Resources.Load<CharacterBinder>(prefabCharacterLevelPath);
 
             var createdCharacter = Instantiate(characterPrefab);
-            createdCharacter.Bind(characterViewModel);
+            createdCharacter.Bind(characterViewModel, gameplayUIManager);
 
             _createCharactersMap[characterViewModel.CharacterEntityId] = createdCharacter;
         }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
@@ -15,6 +14,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 {
     public class InventoryService
     {
+        public int HeroId { get; }
         private readonly ICommandProcessor _commandProcessor;
 
         private readonly ObservableList<InventoryViewModel> _allInventories = new();
@@ -28,8 +28,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         public InventoryService(IObservableCollection<InventoryDataProxy> inventories,
             InventoriesSettings inventoriesSettings,
-            ICommandProcessor commandProcessor)
+            ICommandProcessor commandProcessor, int heroId)
         {
+            HeroId = heroId;
             _commandProcessor = commandProcessor;
 
             foreach (var inventorySettings in inventoriesSettings.Inventories)
@@ -66,12 +67,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             var result = _commandProcessor.Process(command);
             
             return result;
-        }
-
-        [CanBeNull]
-        public InventoryDataProxy GetInventoryDataProxy(int ownerId)
-        {
-            return _inventoryDataMap.TryGetValue(ownerId, out var inventoryData) ? inventoryData : null;
         }
 
         public AddItemsToInventoryGridResult TryMoveToAnotherInventory(int inventoryOwnerIdAt, int inventoryOwnerIdTo,
@@ -192,17 +187,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             }
         }
 
-        public InventoryViewModel CreateInventoryViewModel(InventoryDataProxy inventoryDataProxy)
+        public InventoryViewModel CreateInventoryViewModel(int ownerId)
         {
-            var inventorySettings = _inventorySettingsMap[inventoryDataProxy.OwnerTypeId];
-            var inventoryViewModel = new InventoryViewModel(inventoryDataProxy,
-                inventorySettings,
-                _commandProcessor,
-                this);
+            if (_inventoryDataMap.TryGetValue(ownerId, out var inventoryDataProxy))
+            {
+                var inventorySettings = _inventorySettingsMap[inventoryDataProxy.OwnerTypeId];
+                var inventoryViewModel = new InventoryViewModel(inventoryDataProxy,
+                    inventorySettings,
+                    _commandProcessor,
+                    this);
 
-            _allInventories.Add(inventoryViewModel);
-            _inventoryMap[inventoryDataProxy.OwnerId] = inventoryViewModel;
-            return inventoryViewModel;
+                _allInventories.Add(inventoryViewModel);
+                _inventoryMap[inventoryDataProxy.OwnerId] = inventoryViewModel;
+                return inventoryViewModel;
+            }
+
+            return null;
         }
 
         public void RemoveInventoryViewModel(InventoryDataProxy inventoryDataProxy)
@@ -211,6 +211,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             {
                 _allInventories.Remove(inventoryViewModel);
                 _inventoryMap.Remove(inventoryDataProxy.OwnerId);
+                inventoryViewModel.Dispose();
             }
         }
     }

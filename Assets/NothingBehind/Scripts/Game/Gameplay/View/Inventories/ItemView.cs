@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.State.Inventory;
 using NothingBehind.Scripts.Utils;
@@ -14,6 +15,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         [SerializeField] private TMP_Text stackText;
         private ItemDataProxy _item;
         private float _cellSize;
+        private int _id;
+        private bool _isStackable;
         private RectTransform _rectTransform;
         private CanvasGroup _canvasGroup;
         private Image _itemImage;
@@ -25,20 +28,21 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         private InventoryGridView _startInventoryGridView;
         private InventoryView _startInventoryView;
         private InventoryGridView _currentGridView;
+        
         private ReadOnlyReactiveProperty<int> _currentStack;
         private ReadOnlyReactiveProperty<bool> _isRotated;
         private ReadOnlyReactiveProperty<int> _width;
         private ReadOnlyReactiveProperty<int> _height;
-        private int _id;
-        private bool _isStackable;
+        
+        private readonly CompositeDisposable _disposables = new();
 
         public void Initialize(ItemDataProxy item, float cellSize)
         {
             _item = item;
             _currentStack = item.CurrentStack;
-            _isRotated = item.IsRotated;
             _width = item.Width;
             _height = item.Height;
+            _isRotated = item.IsRotated;
             _id = item.Id;
             _isStackable = item.IsStackable;
             _cellSize = cellSize;
@@ -49,10 +53,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             _mainCanvas = GetComponentInParent<Canvas>();
             _canvasRectTransform = _mainCanvas.transform as RectTransform;
 
-            _currentStack.Skip(1).Subscribe(_ => UpdateStack());
-            _isRotated.Skip(1).Subscribe(_ => UpdateRotate());
+            _disposables.Add(_currentStack.Subscribe(_ => UpdateStack()));
+            _disposables.Add(_isRotated.Subscribe(_ => UpdateRotate()));
 
             InitializeVisuals();
+        }
+
+        private void OnDestroy()
+        {
+            _disposables?.Dispose();
         }
 
         public void OnBeginDrag(PointerEventData eventData)
@@ -64,6 +73,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             {
                 _startInventoryGridView = targetViews.Value.Item1;
                 _startInventoryView = targetViews.Value.Item2;
+                _currentGridView = targetViews.Value.Item1;
             }
             
             // Запоминаем начальную позицию и родителя
@@ -102,7 +112,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
             else
             {
-                _currentGridView.ClearHighlights();
+                _currentGridView?.ClearHighlights();
             }
         }
 
@@ -120,9 +130,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 var targetInventoryView = targetViews.Value.Item2;
                 _currentGridView = targetInventoryGridView;
 
-                var targetInventoryViewModel = targetInventoryView.GetInventoryViewModel();
-                var targetInventoryGridViewModel = targetInventoryGridView.GetGridViewModel();
-
                 // Преобразуем позицию курсора в координаты сетки целевого инвентаря
                 var gridPos = CalculateGridPosition(eventData.position, targetInventoryGridView);
 
@@ -130,30 +137,30 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
                 if (targetInventoryView != _startInventoryView)
                 {
-                    var startInventoryViewModel = _startInventoryView.GetInventoryViewModel();
-                    var startInventoryGridViewModel = _startInventoryGridView.GetGridViewModel();
-                    moveItemResult = targetInventoryViewModel.TryMoveItemToAnotherInventory(
-                        startInventoryViewModel.OwnerId,
-                        targetInventoryViewModel.OwnerId,
-                        startInventoryGridViewModel.GridTypeID, targetInventoryGridViewModel.GridTypeID, _id, gridPos,
-                        _item.CurrentStack.Value);
+                    moveItemResult = targetInventoryView.TryMoveItemToAnotherInventory(
+                        _startInventoryView.OwnerId,
+                        targetInventoryView.OwnerId,
+                        _startInventoryGridView.GridTypeId, 
+                        targetInventoryGridView.GridTypeId, 
+                        _id, 
+                        gridPos,
+                        _currentStack.CurrentValue);
                 }
                 else
                 {
                     if (targetInventoryGridView != _startInventoryGridView)
                     {
-                        var startGridViewModel = _startInventoryGridView.GetGridViewModel();
-                        moveItemResult = targetInventoryViewModel.TryMoveItemToAnotherGrid(
-                            startGridViewModel.GridTypeID,
-                            targetInventoryGridViewModel.GridTypeID,
-                            _id, gridPos, _item.CurrentStack.Value);
+                        moveItemResult = targetInventoryView.TryMoveItemToAnotherGrid(
+                            _startInventoryGridView.GridTypeId,
+                            targetInventoryGridView.GridTypeId,
+                            _id, gridPos, _currentStack.CurrentValue);
                     }
                     else
                     {
                         // Пытаемся передать предмет в целевой инвентарь
-                        moveItemResult = targetInventoryViewModel.TryMoveItemInGrid(
-                            targetInventoryGridViewModel.GridTypeID,
-                            _id, gridPos, _item.CurrentStack.Value);
+                        moveItemResult = targetInventoryView.TryMoveItemInGrid(
+                            targetInventoryGridView.GridTypeId,
+                            _id, gridPos, _currentStack.CurrentValue);
                     }
                 }
 
@@ -189,7 +196,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 // Если целевой инвентарь не найден, возвращаем предмет на исходную позицию
                 _rectTransform.SetParent(_startParent);
                 _rectTransform.anchoredPosition = _startPosition;
-                _currentGridView.ClearHighlights();
+                _currentGridView?.ClearHighlights();
             }
         }
 

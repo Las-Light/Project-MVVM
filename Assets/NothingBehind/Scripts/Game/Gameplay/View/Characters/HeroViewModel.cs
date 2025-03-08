@@ -24,7 +24,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
         private ObservableList<PositionOnMapProxy> _positionOnMaps { get; }
 
         public HeroViewModel(
-            HeroProxy heroProxy, HeroService heroService, 
+            HeroProxy heroProxy, 
+            HeroService heroService, 
             HeroMovementManager heroMovementManager,
             HeroTurnManager heroTurnManager)
         {

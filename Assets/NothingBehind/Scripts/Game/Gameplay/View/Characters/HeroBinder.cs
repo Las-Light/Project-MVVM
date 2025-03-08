@@ -1,3 +1,4 @@
+using NothingBehind.Scripts.Game.Gameplay.View.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -8,7 +9,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
     {
         private HeroViewModel _viewModel;
 
-        public void Bind(HeroViewModel viewModel)
+        public void Bind(HeroViewModel viewModel, GameplayUIManager gameplayUIManager)
         {
             _viewModel = viewModel; 
             var currentPosOnMap = viewModel.CurrentMap;

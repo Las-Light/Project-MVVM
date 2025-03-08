@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Commands;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
-using NothingBehind.Scripts.Game.State.Root;
 using ObservableCollections;
 using R3;
 using UnityEngine;

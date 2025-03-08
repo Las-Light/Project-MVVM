@@ -68,7 +68,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             // регистрируем сервисы
 
             container.RegisterFactory(c =>
-                new InventoryService(gameState.Inventories, inventoriesSettings, commandProcessor)).AsSingle();
+                new InventoryService(gameState.Inventories, 
+                    inventoriesSettings, 
+                    commandProcessor, 
+                    gameState.Hero.Value.Id))
+                .AsSingle();
             var inventoryService = container.Resolve<InventoryService>();
             container.RegisterFactory(c => new HeroService(
                     inventoryService,

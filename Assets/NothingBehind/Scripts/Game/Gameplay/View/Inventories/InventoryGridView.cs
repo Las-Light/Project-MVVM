@@ -20,14 +20,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public int Width { get; private set; }
         public int Height { get; private set; }
         public string GridTypeId { get; private set; }
+        private bool IsSubGrid { get; set; }
 
         private InventoryGridViewModel _viewModel;
-        
+
         private IReadOnlyObservableDictionary<ItemDataProxy, Vector2Int> _itemsPositionsMap;
         private readonly Dictionary<ItemDataProxy, GameObject> _itemsViewMap = new Dictionary<ItemDataProxy, GameObject>();
         private readonly CompositeDisposable _disposables = new ();
-        
+
         private GameObject[,] _cells;
+        private RectTransform _inventoryGridViewRectTransform;
+
 
         public void Bind(InventoryGridViewModel viewModel)
         {
@@ -36,6 +39,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             Width = viewModel.Width;
             Height = viewModel.Height;
             CellSize = viewModel.CellSize;
+            IsSubGrid = viewModel.IsSubGrid;
             _itemsPositionsMap = viewModel.ItemsPositionsMap;
 
             // Очистка сетки перед инициализацией
@@ -49,9 +53,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             GridContainer.sizeDelta = newGridSize;
 
             // Устанавливаем размер InventoryGridView в учетом с размера GridContainer
-            var viewSize = GetComponent<RectTransform>().sizeDelta;
-            viewSize += new Vector2(0, newGridSize.y);
-            GetComponent<RectTransform>().sizeDelta = viewSize;
+            _inventoryGridViewRectTransform = GetComponent<RectTransform>();
+            _inventoryGridViewRectTransform.sizeDelta = newGridSize; // TODO: Надо откорректировать на размер кнопок сортировки
+            // viewSize += new Vector2(0, newGridSize.y);
+            // GetComponent<RectTransform>().sizeDelta = viewSize;
 
             // Создаем ячейки сетки и создаем вьюхи на позициях ячеек
             for (int y = 0; y < Height; y++)
@@ -79,10 +84,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 itemView.transform.SetAsLastSibling();
             }
 
-            // Назначение обработчиков для кнопок сортировки
-            _sortByTypeButton.onClick.AddListener(viewModel.SortByType);
-            _sortByQuantityButton.onClick.AddListener(viewModel.SortByQuantity);
-            _sortByWeightButton.onClick.AddListener(viewModel.SortByWeight);
+            if (!viewModel.IsSubGrid)
+            {
+                // Назначение обработчиков для кнопок сортировки
+                _sortByTypeButton?.onClick.AddListener(viewModel.SortByType);
+                _sortByQuantityButton?.onClick.AddListener(viewModel.SortByQuantity);
+                _sortByWeightButton?.onClick.AddListener(viewModel.SortByWeight);
+            }
 
             // Подписываемся на добавление и удаление предметов для создания и удаления вьюх на сетке
             // И добавляем подписку в CompositeDispose для отписки при удалении вьюхи
@@ -102,9 +110,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
         private void OnDestroy()
         {
-            _sortByTypeButton.onClick.RemoveListener(_viewModel.SortByType);
-            _sortByQuantityButton.onClick.RemoveListener(_viewModel.SortByQuantity);
-            _sortByWeightButton.onClick.RemoveListener(_viewModel.SortByWeight);
+            if (!IsSubGrid)
+            {
+                _sortByTypeButton?.onClick.RemoveListener(_viewModel.SortByType);
+                _sortByQuantityButton?.onClick.RemoveListener(_viewModel.SortByQuantity);
+                _sortByWeightButton?.onClick.RemoveListener(_viewModel.SortByWeight);
+            }
             _disposables.Dispose();
         }
 

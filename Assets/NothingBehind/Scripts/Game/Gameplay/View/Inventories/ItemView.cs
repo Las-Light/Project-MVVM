@@ -52,6 +52,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             _itemImage = GetComponent<Image>();
             _mainCanvas = GetComponentInParent<Canvas>();
             _canvasRectTransform = _mainCanvas.transform as RectTransform;
+            _startInventoryView = GetComponentInParent<InventoryView>();
+            _startInventoryGridView = GetComponentInParent<InventoryGridView>();
 
             _disposables.Add(_currentStack.Subscribe(_ => UpdateStack()));
             _disposables.Add(_isRotated.Subscribe(_ => UpdateRotate()));
@@ -67,14 +69,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public void OnBeginDrag(PointerEventData eventData)
         {
             // Получаем целевой инвентарь (через Raycast)
-            var targetViews = GetTargetInventoryView(eventData);
-
-            if (targetViews?.Item1 != null && targetViews?.Item2 != null)
-            {
-                _startInventoryGridView = targetViews.Value.Item1;
-                _startInventoryView = targetViews.Value.Item2;
-                _currentGridView = targetViews.Value.Item1;
-            }
+            // var targetViews = GetTargetInventoryView(eventData);
+            // Debug.Log($"{targetViews?.Item1.GridTypeId}, {targetViews?.Item2.OwnerId}");
+            // if (targetViews?.Item1 != null && targetViews?.Item2 != null)
+            // {
+            //     _startInventoryGridView = targetViews.Value.Item1;
+            //     _startInventoryView = targetViews.Value.Item2;
+            //     _currentGridView = targetViews.Value.Item1;
+            // }
             
             // Запоминаем начальную позицию и родителя
             _startPosition = _rectTransform.anchoredPosition;
@@ -176,6 +178,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                          );
                          _rectTransform.anchoredPosition = cellPosition;
                          _rectTransform.SetAsLastSibling();
+                         _startInventoryView = targetInventoryView;
+                         _startInventoryGridView = targetInventoryGridView;
                     }
                     else
                     {

@@ -19,7 +19,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public readonly string OwnerTypeId;
 
         public IObservableCollection<InventoryGridViewModel> AllInventoryGrids => _allInventoryGrids;
-        
+
         private readonly ICommandProcessor _commandProcessor;
         private readonly InventoryService _inventoryService;
 
@@ -42,14 +42,32 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
             foreach (var inventoryGrid in inventorySettings.InventoryGrids)
             {
+                if (inventoryGrid.SubGrids.Count > 0)
+                {
+                    foreach (var subGrid in inventoryGrid.SubGrids)
+                    {
+                        _inventoryGridSettingsMap[subGrid.GridTypeId] = subGrid;
+                    }
+                }
                 _inventoryGridSettingsMap[inventoryGrid.GridTypeId] = inventoryGrid;
             }
 
             foreach (var inventoryGridDataProxy in inventoryDataProxy.Inventories)
+            {
+                if (inventoryGridDataProxy.SubGrids.Count > 0)
+                {
+                    foreach (var subGrid in inventoryGridDataProxy.SubGrids)
+                    {
+                        CreateInventoryGridViewModel(subGrid);
+                    }
+                }
                 CreateInventoryGridViewModel(inventoryGridDataProxy);
+            }
 
-            _disposables.Add(inventoryDataProxy.Inventories.ObserveAdd().Subscribe(e => CreateInventoryGridViewModel(e.Value)));
-            _disposables.Add(inventoryDataProxy.Inventories.ObserveRemove().Subscribe(e => { RemoveInventoryGridViewModel(e.Value); }));
+            _disposables.Add(inventoryDataProxy.Inventories.ObserveAdd()
+                .Subscribe(e => CreateInventoryGridViewModel(e.Value)));
+            _disposables.Add(inventoryDataProxy.Inventories.ObserveRemove()
+                .Subscribe(e => RemoveInventoryGridViewModel(e.Value)));
         }
 
         // Создает InventorGridDataProxy
@@ -70,13 +88,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return result;
         }
 
-        [CanBeNull] public InventoryGridViewModel GetInventoryGridViewModel(string gridTypeId)
+        [CanBeNull]
+        public InventoryGridViewModel GetInventoryGridViewModel(string gridTypeId)
         {
             return _inventoryGridMap.TryGetValue(gridTypeId, out var gridViewModel) ? gridViewModel : null;
         }
 
         // Перемещение предмета по позиции внутри одной сетки
-        public AddItemsToInventoryGridResult TryMoveItemInGrid(string gridTypeId, int itemId, 
+        public AddItemsToInventoryGridResult TryMoveItemInGrid(string gridTypeId, int itemId,
             Vector2Int position, int amount)
         {
             if (_inventoryGridMap.TryGetValue(gridTypeId, out var gridViewModel))
@@ -89,7 +108,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         }
 
         // Перемещение предмета по позиции в другую сетку внутри одного инвентарая 
-        public AddItemsToInventoryGridResult TryMoveItemToAnotherGrid(string gridTypeIdAt, string gridTypeIdTo, 
+        public AddItemsToInventoryGridResult TryMoveItemToAnotherGrid(string gridTypeIdAt, string gridTypeIdTo,
             int itemId, Vector2Int position, int amount)
         {
             if (_inventoryGridMap.TryGetValue(gridTypeIdAt, out var gridViewModelAt))
@@ -114,7 +133,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                         {
                             // возвращаем остаток на старую позицию
                             gridViewModelAt.AddItems(item, oldPosition.Value, addedResult.ItemsNotAddedAmount);
-                            return new AddItemsToInventoryGridResult(item.ItemType, itemId, amount, addedResult.ItemsAddedAmount, false, false);
+                            return new AddItemsToInventoryGridResult(item.ItemType, itemId, amount,
+                                addedResult.ItemsAddedAmount, false, false);
                         }
                     }
                     else
@@ -129,12 +149,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                                         $"position in the inventory owner {OwnerTypeId} - {OwnerId}.");
                 }
             }
+
             throw new Exception($"Grid {gridTypeIdAt} not found " +
                                 $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
         }
 
         // Автоперемещение предмета из одной сетки в ругую
-        public AddItemsToInventoryGridResult TryMoveItemToAnotherGrid(string gridTypeIdAt, string gridTypeIdTo, 
+        public AddItemsToInventoryGridResult TryMoveItemToAnotherGrid(string gridTypeIdAt, string gridTypeIdTo,
             int itemId, int amount)
         {
             if (_inventoryGridMap.TryGetValue(gridTypeIdAt, out var gridViewModelAt))
@@ -144,7 +165,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 {
                     throw new Exception($"Item {itemId} not found in the grid {gridTypeIdAt}.");
                 }
-                
+
                 if (oldPosition != null)
                 {
                     gridViewModelAt.RemoveItem(itemId);
@@ -158,7 +179,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                         else
                         {
                             gridViewModelAt.AddItems(item, oldPosition.Value, addedResult.ItemsNotAddedAmount);
-                            return new AddItemsToInventoryGridResult(item.ItemType, itemId, amount, addedResult.ItemsAddedAmount, false, false);
+                            return new AddItemsToInventoryGridResult(item.ItemType, itemId, amount,
+                                addedResult.ItemsAddedAmount, false, false);
                         }
                     }
                     else
@@ -173,6 +195,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                                         $"position in the inventory owner {OwnerTypeId} - {OwnerId}.");
                 }
             }
+
             throw new Exception($"Grid {gridTypeIdAt} not found " +
                                 $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
         }
@@ -181,7 +204,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public AddItemsToInventoryGridResult TryMoveItemToAnotherInventory(int ownerIdAt, int ownerIdTo,
             string gridTypeIdAt, string gridTypeIdTo, int itemId, Vector2Int position, int amount)
         {
-            return _inventoryService.TryMoveToAnotherInventory(ownerIdAt, ownerIdTo, itemId, 
+            return _inventoryService.TryMoveToAnotherInventory(ownerIdAt, ownerIdTo, itemId,
                 gridTypeIdAt, gridTypeIdTo, position, amount);
         }
 
@@ -189,7 +212,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public AddItemsToInventoryGridResult TryMoveItemToAnotherInventory(int ownerIdAt, int ownerIdTo,
             string gridTypeIdAt, string gridTypeIdTo, int itemId, int amount)
         {
-            return _inventoryService.TryMoveToAnotherInventory(ownerIdAt, ownerIdTo, itemId, 
+            return _inventoryService.TryMoveToAnotherInventory(ownerIdAt, ownerIdTo, itemId,
                 gridTypeIdAt, gridTypeIdTo, amount);
         }
 
@@ -200,10 +223,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             {
                 return gridViewModel.RemoveItem(itemId);
             }
+
             throw new Exception($"Grid {gridTypeId} not found " +
                                 $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
         }
-        
+
         // Полпытаться удалить некоторое количество из стека предмета
         public RemoveItemsFromInventoryGridResult TryRemoveItem(string gridTypeId, int itemId, int amount)
         {
@@ -211,6 +235,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             {
                 return gridViewModel.RemoveItemAmount(itemId, amount);
             }
+
             throw new Exception($"Grid {gridTypeId} not found " +
                                 $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
         }
@@ -222,6 +247,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             {
                 return gridViewModel.AddItems(item, position, amount);
             }
+
             throw new Exception($"Grid {gridTypeId} not found " +
                                 $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
         }
@@ -232,6 +258,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             {
                 return gridViewModel.AddItems(item, amount);
             }
+
             throw new Exception($"Grid {gridTypeId} not found " +
                                 $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
         }

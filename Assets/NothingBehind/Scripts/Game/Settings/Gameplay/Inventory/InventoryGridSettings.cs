@@ -11,6 +11,8 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Inventory
         public int Width;
         public int Height;
         public float CellSize;
+        public bool IsSubGrid;
+        public List<InventoryGridSettings> SubGrids;
         public List<ItemSettings> Items;
     }
 }

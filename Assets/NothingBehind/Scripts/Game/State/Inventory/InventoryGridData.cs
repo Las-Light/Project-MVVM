@@ -12,17 +12,28 @@ namespace NothingBehind.Scripts.Game.State.Inventory
         public int Width;
         public int Height;
         public float CellSize;
+        public bool IsSubGrid;
+        public List<InventoryGridData> SubGrids;
         public bool[] Grid; // Одномерный массив для сериализации
         public List<ItemData> Items; // Данные предметов
         public List<Vector2Int> Positions; // Позиции предметов
 
-        public InventoryGridData(int ownerId, string gridTypeId, int width, int height, float cellSize, List<ItemData> items)
+        public InventoryGridData(int ownerId,
+            string gridTypeId, 
+            int width, 
+            int height, 
+            float cellSize, 
+            bool isSubGrid,
+            List<InventoryGridData> subGrids,
+            List<ItemData> items)
         {
             OwnerId = ownerId;
             GridTypeId = gridTypeId;
             Width = width;
             Height = height;
             CellSize = cellSize;
+            IsSubGrid = isSubGrid;
+            SubGrids = subGrids;
             Positions = new List<Vector2Int>();
             Items = items;
             Grid = new bool[Height * Width];

@@ -34,27 +34,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
             var inventoryGrids = new List<InventoryGridData>();
             foreach (var inventoryGridSettings in inventorySettings.InventoryGrids)
             {
-                var items = new List<ItemData>();
+                var subGrids = CreateSubGrids(command.OwnerId, inventoryGridSettings.SubGrids);
+                var items = CreateItems(inventoryGridSettings.Items);
 
-                foreach (var itemSettings in inventoryGridSettings.Items)
-                {
-                    var item = new ItemData(_gameState.CreateItemId(),
-                        itemSettings.ItemType,
-                        itemSettings.Width,
-                        itemSettings.Height,
-                        itemSettings.Weight,
-                        itemSettings.CanRotate,
-                        itemSettings.IsRotated,
-                        itemSettings.IsStackable,
-                        itemSettings.MaxStackSize,
-                        itemSettings.CurrentStack);
-                    items.Add(item);
-                }
                 inventoryGrids.Add(new InventoryGridData(command.OwnerId,
                     inventoryGridSettings.GridTypeId,
                     inventoryGridSettings.Width,
                     inventoryGridSettings.Height,
                     inventoryGridSettings.CellSize,
+                    inventoryGridSettings.IsSubGrid,
+                    subGrids,
                     items));
             }
             inventory.Inventories = inventoryGrids;
@@ -63,6 +52,46 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
             _gameState.Inventories.Add(inventoryProxy);
 
             return true;
+        }
+        
+        private List<InventoryGridData> CreateSubGrids(int ownerId, List<InventoryGridSettings> subGrids)
+        {
+            var inventorySubGrids = new List<InventoryGridData>();
+            foreach (var subGridSettings in subGrids)
+            {
+                var subGridData = new InventoryGridData(ownerId,
+                    subGridSettings.GridTypeId,
+                    subGridSettings.Width,
+                    subGridSettings.Height,
+                    subGridSettings.CellSize,
+                    subGridSettings.IsSubGrid,
+                    new List<InventoryGridData>(),
+                    CreateItems(subGridSettings.Items));
+                inventorySubGrids.Add(subGridData);
+            }
+
+            return inventorySubGrids;
+        }
+
+        private List<ItemData> CreateItems(List<ItemSettings> itemsSettings)
+        {
+            var items = new List<ItemData>();
+            foreach (var itemSettings in itemsSettings)
+            {
+                var item = new ItemData(_gameState.CreateItemId(),
+                    itemSettings.ItemType,
+                    itemSettings.Width,
+                    itemSettings.Height,
+                    itemSettings.Weight,
+                    itemSettings.CanRotate,
+                    itemSettings.IsRotated,
+                    itemSettings.IsStackable,
+                    itemSettings.MaxStackSize,
+                    itemSettings.CurrentStack);
+                items.Add(item);
+            }
+
+            return items;
         }
     }
 }

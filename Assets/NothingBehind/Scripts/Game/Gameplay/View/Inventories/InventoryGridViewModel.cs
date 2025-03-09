@@ -17,7 +17,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public int Width { get; }
         public int Height { get; }
         public float CellSize { get; }
+        public bool IsSubGrid { get; }
 
+        public List<InventoryGridDataProxy> SubGrids { get; }
+        
         public IObservableCollection<ItemDataProxy> Items;
         public IReadOnlyObservableDictionary<int, ItemDataProxy> ItemsMap => _itemsMap;
         public IReadOnlyObservableDictionary<ItemDataProxy, Vector2Int> ItemsPositionsMap => _itemsPositionsMap;
@@ -40,6 +43,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             Height = gridDataProxy.Height;
             Width = gridDataProxy.Width;
             CellSize = gridDataProxy.CellSize;
+            IsSubGrid = gridDataProxy.IsSubGrid;
+            SubGrids = gridDataProxy.SubGrids;
             _gridDataProxy = gridDataProxy;
             _gridSettings = gridSettings;
             Items = gridDataProxy.Items;

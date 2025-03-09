@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using ObservableCollections;
 using R3;
@@ -13,9 +14,12 @@ namespace NothingBehind.Scripts.Game.State.Inventory
         public int Width { get; }
         public int Height { get; }
         public float CellSize { get; }
+        public bool IsSubGrid { get; }
+        public List<InventoryGridDataProxy> SubGrids { get; } = new();
         public ReactiveProperty<bool[]> Grid { get; } // Одномерный массив для сериализации
         public ObservableList<ItemDataProxy> Items { get; } = new(); // Данные предметов
         public ObservableList<Vector2Int> Positions { get; } = new(); // Позиции предметов
+
 
         public InventoryGridDataProxy(InventoryGridData gridData)
         {
@@ -25,7 +29,9 @@ namespace NothingBehind.Scripts.Game.State.Inventory
             Width = gridData.Width;
             Height = gridData.Height;
             CellSize = gridData.CellSize;
+            IsSubGrid = gridData.IsSubGrid;
             Grid = new ReactiveProperty<bool[]>(gridData.Grid);
+            gridData.SubGrids.ForEach(data => SubGrids.Add(new InventoryGridDataProxy(data)));
             gridData.Items.ForEach(data => Items.Add(new ItemDataProxy(data)));
             gridData.Positions.ForEach(Positions.Add);
 

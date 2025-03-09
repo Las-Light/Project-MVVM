@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8c6c25131224fc5b765d35dac387f07, type: 3}
-  m_Name: Item Config 3
+  m_Name: Item Config 2x1
   m_EditorClassIdentifier: 
   ItemType: 0
   Width: 2
-  Height: 2
+  Height: 1
   Weight: 1
   CanRotate: 1
   IsRotated: 0

@@ -82,7 +82,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                 }
 
                 Debug.Log(inventory.OwnerTypeId + " " + inventory.OwnerId);
-                foreach (var grid in inventory.Inventories)
+                foreach (var grid in inventory.InventoryGrids)
                 {
                     for (int i = 0; i < grid.Items.Count; i++)
                     {
@@ -114,7 +114,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                     continue;
                 }
 
-                foreach (var grid in inventory.Inventories)
+                foreach (var grid in inventory.InventoryGrids)
                 {
                     for (int i = 0; i < grid.Items.Count; i++)
                     {
@@ -151,7 +151,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                     continue;
                 }
 
-                foreach (var gridDataProxy in data.Inventories)
+                foreach (var gridDataProxy in data.InventoryGrids)
                 {
                     for (int i = 0; i < gridDataProxy.Items.Count; i++)
                     {

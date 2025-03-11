@@ -27,7 +27,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
             var inventoryGridSettings =
                 inventorySettings.InventoryGrids.First(settings => settings.GridTypeId == command.GridTypeId);
             var inventory = _gameState.Inventories.First(inventoryProxy => inventoryProxy.OwnerId == command.OwnerId);
-            if (inventory.Inventories.FirstOrDefault(grid => grid.GridTypeId == command.GridTypeId) != null)
+            if (inventory.InventoryGrids.FirstOrDefault(grid => grid.GridTypeId == command.GridTypeId) != null)
             {
                 Debug.LogError(
                     $"InventoryGrid with Type {inventoryGridSettings.GridTypeId} already exists in Inventory {inventory.OwnerTypeId}-{inventory.OwnerId}.");
@@ -47,7 +47,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
                 items);
 
             var inventoryGridProxy = new InventoryGridDataProxy(inventoryGrid);
-            inventory.Inventories.Add(inventoryGridProxy);
+            inventory.InventoryGrids.Add(inventoryGridProxy);
 
             return true;
         }

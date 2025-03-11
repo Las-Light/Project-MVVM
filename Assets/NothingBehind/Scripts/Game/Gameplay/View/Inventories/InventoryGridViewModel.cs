@@ -30,7 +30,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
         private readonly InventoryGridDataProxy _gridDataProxy;
         private readonly InventoryGridSettings _gridSettings;
-        private ReactiveMatrix<bool> _gridMatrix;
+        private readonly ReactiveMatrix<bool> _gridMatrix;
         private readonly CompositeDisposable _disposables = new();
 
 
@@ -56,7 +56,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
 
             // Инициализация одномерного массива в кастомный двумерный
-            InitializeGrid(gridDataProxy);
+            _gridMatrix = new ReactiveMatrix<bool>(gridDataProxy.Width, gridDataProxy.Height);
+
+            // Восстанавливаем двумерный массив из одномерного
+            for (int i = 0; i < gridDataProxy.Width; i++)
+            {
+                for (int j = 0; j < gridDataProxy.Height; j++)
+                {
+                    _gridMatrix.SetValue(i, j, gridDataProxy.Grid.Value[i * gridDataProxy.Height + j]);
+                }
+            }
 
             // Мэпим предметы и их позиции
             for (int i = 0; i < gridDataProxy.Items.Count; i++)
@@ -556,21 +565,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
 
             return itemsAddedAmount;
-        }
-
-        // Инициализация одномерного массива в кастомный двумерный
-        private void InitializeGrid(InventoryGridDataProxy gridDataProxy)
-        {
-            _gridMatrix = new ReactiveMatrix<bool>(gridDataProxy.Width, gridDataProxy.Height);
-
-            // Восстанавливаем двумерный массив из одномерного
-            for (int i = 0; i < gridDataProxy.Width; i++)
-            {
-                for (int j = 0; j < gridDataProxy.Height; j++)
-                {
-                    _gridMatrix.SetValue(i, j, gridDataProxy.Grid.Value[i * gridDataProxy.Height + j]);
-                }
-            }
         }
 
         public void Dispose()

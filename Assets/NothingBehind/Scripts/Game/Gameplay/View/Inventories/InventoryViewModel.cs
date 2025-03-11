@@ -52,7 +52,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 _inventoryGridSettingsMap[inventoryGrid.GridTypeId] = inventoryGrid;
             }
 
-            foreach (var inventoryGridDataProxy in inventoryDataProxy.Inventories)
+            foreach (var inventoryGridDataProxy in inventoryDataProxy.InventoryGrids)
             {
                 if (inventoryGridDataProxy.SubGrids.Count > 0)
                 {
@@ -64,9 +64,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 CreateInventoryGridViewModel(inventoryGridDataProxy);
             }
 
-            _disposables.Add(inventoryDataProxy.Inventories.ObserveAdd()
+            _disposables.Add(inventoryDataProxy.InventoryGrids.ObserveAdd()
                 .Subscribe(e => CreateInventoryGridViewModel(e.Value)));
-            _disposables.Add(inventoryDataProxy.Inventories.ObserveRemove()
+            _disposables.Add(inventoryDataProxy.InventoryGrids.ObserveRemove()
                 .Subscribe(e => RemoveInventoryGridViewModel(e.Value)));
         }
 

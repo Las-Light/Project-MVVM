@@ -17,7 +17,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
         public bool Handle(CmdRemoveGridInventory command)
         {
             var inventory = _gameState.Inventories.First(inventory => inventory.OwnerId == command.OwnerId);
-            var removedInventoryGrid = inventory.Inventories.FirstOrDefault(grid => grid.GridTypeId == command.GridTypeId);
+            var removedInventoryGrid = inventory.InventoryGrids.FirstOrDefault(grid => grid.GridTypeId == command.GridTypeId);
 
             if (removedInventoryGrid == null)
             {
@@ -25,7 +25,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
                 return false;
             }
             
-            inventory.Inventories.Remove(removedInventoryGrid);
+            inventory.InventoryGrids.Remove(removedInventoryGrid);
             return true;
         }
     }

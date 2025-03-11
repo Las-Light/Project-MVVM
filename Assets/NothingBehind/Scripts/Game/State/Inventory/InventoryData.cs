@@ -8,6 +8,6 @@ namespace NothingBehind.Scripts.Game.State.Inventory
     {
         public int OwnerId;
         public string OwnerTypeId;
-        public List<InventoryGridData> Inventories;
+        public List<InventoryGridData> InventoryGrids;
     }
 }

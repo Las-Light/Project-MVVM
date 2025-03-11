@@ -9,26 +9,26 @@ namespace NothingBehind.Scripts.Game.State.Inventory
         public int OwnerId { get; }
         public string OwnerTypeId { get; }
         public InventoryData Origin { get; }
-        public ObservableList<InventoryGridDataProxy> Inventories { get; } = new();
+        public ObservableList<InventoryGridDataProxy> InventoryGrids { get; } = new();
 
         public InventoryDataProxy(InventoryData inventoryData)
         {
             Origin = inventoryData;
             OwnerId = inventoryData.OwnerId;
             OwnerTypeId = inventoryData.OwnerTypeId;
-            inventoryData.Inventories.ForEach(gridData => Inventories.Add(new InventoryGridDataProxy(gridData)));
-
-            Inventories.ObserveAdd().Subscribe(e =>
+            inventoryData.InventoryGrids.ForEach(gridData => InventoryGrids.Add(new InventoryGridDataProxy(gridData)));
+            
+            InventoryGrids.ObserveAdd().Subscribe(e =>
             {
                 var addedInventorGridProxy = e.Value;
-                inventoryData.Inventories.Add(addedInventorGridProxy.Origin);
+                inventoryData.InventoryGrids.Add(addedInventorGridProxy.Origin);
             });
-            Inventories.ObserveRemove().Subscribe(e =>
+            InventoryGrids.ObserveRemove().Subscribe(e =>
             {
                 var removedGridProxy = e.Value;
                 var removedGrid =
-                    inventoryData.Inventories.FirstOrDefault(data => data.GridTypeId == removedGridProxy.GridTypeId);
-                inventoryData.Inventories.Remove(removedGrid);
+                    inventoryData.InventoryGrids.FirstOrDefault(data => data.GridTypeId == removedGridProxy.GridTypeId);
+                inventoryData.InventoryGrids.Remove(removedGrid);
             });
         }
     }

@@ -172,15 +172,15 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                     items));
             }
 
-            inventory.Inventories = inventoryGrids;
+            inventory.InventoryGrids = inventoryGrids;
 
             return inventory;
         }
 
-        private List<InventoryGridData> CreateSubGrids(GameState gameState, int ownerId, List<InventoryGridSettings> SubGrids)
+        private List<InventoryGridData> CreateSubGrids(GameState gameState, int ownerId, List<InventoryGridSettings> subGrids)
         {
             var inventorySubGrids = new List<InventoryGridData>();
-            foreach (var subGridSettings in SubGrids)
+            foreach (var subGridSettings in subGrids)
             {
                 var subGridData = new InventoryGridData(ownerId,
                     subGridSettings.GridTypeId,

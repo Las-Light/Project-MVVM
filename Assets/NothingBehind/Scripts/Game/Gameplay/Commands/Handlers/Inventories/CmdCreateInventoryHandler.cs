@@ -14,7 +14,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
         private readonly GameStateProxy _gameState;
         private readonly InventoriesSettings _inventoriesSettings;
 
-        public CmdCreateInventoryHandler(GameStateProxy gameState, 
+        public CmdCreateInventoryHandler(GameStateProxy gameState,
             InventoriesSettings inventoriesSettings)
         {
             _gameState = gameState;
@@ -30,7 +30,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
                 OwnerId = command.OwnerId,
                 OwnerTypeId = command.OwnerTypeId
             };
-            
+
             var inventoryGrids = new List<InventoryGridData>();
             foreach (var inventoryGridSettings in inventorySettings.InventoryGrids)
             {
@@ -46,14 +46,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
                     subGrids,
                     items));
             }
-            inventory.Inventories = inventoryGrids;
+
+            inventory.InventoryGrids = inventoryGrids;
 
             var inventoryProxy = new InventoryDataProxy(inventory);
             _gameState.Inventories.Add(inventoryProxy);
 
             return true;
         }
-        
+
         private List<InventoryGridData> CreateSubGrids(int ownerId, List<InventoryGridSettings> subGrids)
         {
             var inventorySubGrids = new List<InventoryGridData>();

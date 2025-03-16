@@ -19,59 +19,59 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public float CellSize { get; }
         public bool IsSubGrid { get; }
 
-        public List<InventoryGridDataProxy> SubGrids { get; }
+        public List<InventoryGrid> SubGrids { get; }
         
-        public IObservableCollection<ItemDataProxy> Items;
-        public IReadOnlyObservableDictionary<int, ItemDataProxy> ItemsMap => _itemsMap;
-        public IReadOnlyObservableDictionary<ItemDataProxy, Vector2Int> ItemsPositionsMap => _itemsPositionsMap;
+        public IObservableCollection<Item> Items;
+        public IReadOnlyObservableDictionary<int, Item> ItemsMap => _itemsMap;
+        public IReadOnlyObservableDictionary<Item, Vector2Int> ItemsPositionsMap => _itemsPositionsMap;
 
-        private readonly ObservableDictionary<ItemDataProxy, Vector2Int> _itemsPositionsMap = new();
-        private readonly ObservableDictionary<int, ItemDataProxy> _itemsMap = new();
+        private readonly ObservableDictionary<Item, Vector2Int> _itemsPositionsMap = new();
+        private readonly ObservableDictionary<int, Item> _itemsMap = new();
 
-        private readonly InventoryGridDataProxy _gridDataProxy;
+        private readonly InventoryGrid _inventoryGrid;
         private readonly InventoryGridSettings _gridSettings;
         private readonly ReactiveMatrix<bool> _gridMatrix;
         private readonly CompositeDisposable _disposables = new();
 
 
-        public InventoryGridViewModel(InventoryGridDataProxy gridDataProxy,
+        public InventoryGridViewModel(InventoryGrid inventoryGrid,
             InventoryGridSettings gridSettings
         )
         {
-            GridTypeID = gridDataProxy.GridTypeId;
-            OwnerId = gridDataProxy.OwnerId;
-            Height = gridDataProxy.Height;
-            Width = gridDataProxy.Width;
-            CellSize = gridDataProxy.CellSize;
-            IsSubGrid = gridDataProxy.IsSubGrid;
-            SubGrids = gridDataProxy.SubGrids;
-            _gridDataProxy = gridDataProxy;
+            GridTypeID = inventoryGrid.GridTypeId;
+            OwnerId = inventoryGrid.OwnerId;
+            Height = inventoryGrid.Height;
+            Width = inventoryGrid.Width;
+            CellSize = inventoryGrid.CellSize;
+            IsSubGrid = inventoryGrid.IsSubGrid;
+            SubGrids = inventoryGrid.SubGrids;
+            _inventoryGrid = inventoryGrid;
             _gridSettings = gridSettings;
-            Items = gridDataProxy.Items;
+            Items = inventoryGrid.Items;
 
             // Мэпим предметы по Id
-            foreach (var itemDataProxy in gridDataProxy.Items)
+            foreach (var itemDataProxy in inventoryGrid.Items)
             {
                 _itemsMap[itemDataProxy.Id] = itemDataProxy;
             }
 
             // Инициализация одномерного массива в кастомный двумерный
-            _gridMatrix = new ReactiveMatrix<bool>(gridDataProxy.Width, gridDataProxy.Height);
+            _gridMatrix = new ReactiveMatrix<bool>(inventoryGrid.Width, inventoryGrid.Height);
 
             // Восстанавливаем двумерный массив из одномерного
-            for (int i = 0; i < gridDataProxy.Width; i++)
+            for (int i = 0; i < inventoryGrid.Width; i++)
             {
-                for (int j = 0; j < gridDataProxy.Height; j++)
+                for (int j = 0; j < inventoryGrid.Height; j++)
                 {
-                    _gridMatrix.SetValue(i, j, gridDataProxy.Grid.Value[i * gridDataProxy.Height + j]);
+                    _gridMatrix.SetValue(i, j, inventoryGrid.Grid.Value[i * inventoryGrid.Height + j]);
                 }
             }
 
             // Мэпим предметы и их позиции
-            for (int i = 0; i < gridDataProxy.Items.Count; i++)
+            for (int i = 0; i < inventoryGrid.Items.Count; i++)
             {
-                var item = gridDataProxy.Items[i];
-                _itemsPositionsMap[item] = gridDataProxy.Positions[i];
+                var item = inventoryGrid.Items[i];
+                _itemsPositionsMap[item] = inventoryGrid.Positions[i];
             }
 
             // Обновляем _itemMap
@@ -87,24 +87,24 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }));
 
             // Обновляем данные в GridDataProxy
-            _disposables.Add(_gridMatrix.OnChange.Subscribe(_ => gridDataProxy.Grid.OnNext(_gridMatrix.GetArray())));
+            _disposables.Add(_gridMatrix.OnChange.Subscribe(_ => inventoryGrid.Grid.OnNext(_gridMatrix.GetArray())));
             _disposables.Add(_itemsPositionsMap.ObserveAdd().Subscribe(e =>
             {
                 var addedItemAndPosition = e.Value;
-                gridDataProxy.Items.Add(addedItemAndPosition.Key);
-                gridDataProxy.Positions.Add(addedItemAndPosition.Value);
+                inventoryGrid.Items.Add(addedItemAndPosition.Key);
+                inventoryGrid.Positions.Add(addedItemAndPosition.Value);
             }));
             _disposables.Add(_itemsPositionsMap.ObserveRemove().Subscribe(e =>
             {
                 var removedItemAndPosition = e.Value;
-                gridDataProxy.Items.Remove(removedItemAndPosition.Key);
-                gridDataProxy.Positions.Remove(removedItemAndPosition.Value);
+                inventoryGrid.Items.Remove(removedItemAndPosition.Key);
+                inventoryGrid.Positions.Remove(removedItemAndPosition.Value);
             }));
         }
 
 
         // Автодобавление из другой сетки на свободные позиции или добавление количества предметов к уже существующим
-        public AddItemsToInventoryGridResult AddItems(ItemDataProxy item, int amount)
+        public AddItemsToInventoryGridResult AddItems(Item item, int amount)
         {
             var remainingAmount = amount;
             var itemsAddedToSameItems =
@@ -136,7 +136,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         }
 
         //Добавление предметов из другой сетки по координатам
-        public AddItemsToInventoryGridResult AddItems(ItemDataProxy item, Vector2Int position, int amount)
+        public AddItemsToInventoryGridResult AddItems(Item item, Vector2Int position, int amount)
         {
             var remainingAmount = amount;
             var anotherItemAtPosition = GetItemAtPosition(position);
@@ -315,7 +315,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             SortItems(item => item.Weight);
         }
 
-        public bool CanPlaceItem(ItemDataProxy item, Vector2Int position, bool isRotated)
+        public bool CanPlaceItem(Item item, Vector2Int position, bool isRotated)
         {
             int itemWidth = isRotated ? item.Height.Value : item.Width.Value;
             int itemHeight = isRotated ? item.Width.Value : item.Height.Value;
@@ -341,7 +341,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return true;
         }
 
-        private void SortItems(Func<ItemDataProxy, object> sortBy)
+        private void SortItems(Func<Item, object> sortBy)
         {
             // Временно удаляем все предметы из сетки
             var items = _itemsPositionsMap.Select(kvp => kvp.Key).ToList();
@@ -394,7 +394,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return _itemsPositionsMap.TryGetValue(item, out var position) ? position : null;
         }
 
-        private ItemDataProxy GetItemAtPosition(Vector2Int position)
+        private Item GetItemAtPosition(Vector2Int position)
         {
             foreach (var kvp in _itemsPositionsMap)
             {
@@ -414,11 +414,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return null; // Позиция пуста
         }
 
-        private Vector2Int? FindFreePosition(ItemDataProxy item)
+        private Vector2Int? FindFreePosition(Item item)
         {
-            for (int y = 0; y < _gridDataProxy.Height - item.Height.Value + 1; y++)
+            for (int y = 0; y < _inventoryGrid.Height - item.Height.Value + 1; y++)
             {
-                for (int x = 0; x < _gridDataProxy.Width - item.Width.Value + 1; x++)
+                for (int x = 0; x < _inventoryGrid.Width - item.Width.Value + 1; x++)
                 {
                     if (CanPlaceItem(item, new Vector2Int(x, y), isRotated: false))
                     {
@@ -430,14 +430,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return null; // Нет свободного места
         }
 
-        private bool Has(ItemDataProxy item, int amount)
+        private bool Has(Item item, int amount)
         {
             var amountExist = item.CurrentStack.Value;
             return amountExist >= amount;
         }
 
 
-        private void PlaceItem(ItemDataProxy item, Vector2Int position, bool isRotated)
+        private void PlaceItem(Item item, Vector2Int position, bool isRotated)
         {
             if (!CanPlaceItem(item, position, isRotated))
                 return;
@@ -457,7 +457,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         }
 
 
-        private int AddToSameItem(ItemDataProxy item, ItemDataProxy anotherItemAtPosition, out int remainingAmount)
+        private int AddToSameItem(Item item, Item anotherItemAtPosition, out int remainingAmount)
         {
             remainingAmount = item.CurrentStack.Value;
             var itemsAddedAmount = 0;
@@ -494,7 +494,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return itemsAddedAmount;
         }
 
-        private int AddToGridWithSameItems(ItemDataProxy item, int amount, out int remainingAmount)
+        private int AddToGridWithSameItems(Item item, int amount, out int remainingAmount)
         {
             remainingAmount = amount;
             if (!item.IsStackable)
@@ -536,7 +536,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return itemsAddedAmount;
         }
 
-        private int AddToFirstAvailableGrid(ItemDataProxy item, int amount, out int remainingAmount)
+        private int AddToFirstAvailableGrid(Item item, int amount, out int remainingAmount)
         {
             remainingAmount = amount;
             if (!item.IsStackable)

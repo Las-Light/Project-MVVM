@@ -4,7 +4,7 @@ using NothingBehind.Scripts.Game.State.Root;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Hero
 {
-    public class CmdUpdateHeroPosOnMapHandler : ICommandHandler<CmdUpdateHeroPosOnMap>
+    public class CmdUpdateHeroPosOnMapHandler : ICommandHandler<CmdUpdatePlayerPosOnMap>
     {
         private readonly GameStateProxy _gameState;
 
@@ -12,7 +12,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Hero
         {
             _gameState = gameState;
         }
-        public bool Handle(CmdUpdateHeroPosOnMap command)
+        public bool Handle(CmdUpdatePlayerPosOnMap command)
         {
             _gameState.Hero.Value.CurrentMap.Value.Position.Value = command.Position;
 

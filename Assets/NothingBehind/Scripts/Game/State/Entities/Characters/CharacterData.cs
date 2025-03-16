@@ -4,7 +4,7 @@ using UnityEngine;
 namespace NothingBehind.Scripts.Game.State.Entities.Characters
 {
     [Serializable]
-    public class CharacterEntity : Entity
+    public class CharacterData : Entity
     {
         public string TypeId;
         public int Level;

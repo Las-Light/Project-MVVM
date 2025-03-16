@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Inventory
 {
-    public class InventoryGridDataProxy
+    public class InventoryGrid
     {
         public int OwnerId { get; }
         public string GridTypeId { get; }
@@ -15,13 +15,13 @@ namespace NothingBehind.Scripts.Game.State.Inventory
         public int Height { get; }
         public float CellSize { get; }
         public bool IsSubGrid { get; }
-        public List<InventoryGridDataProxy> SubGrids { get; } = new();
+        public List<InventoryGrid> SubGrids { get; } = new();
         public ReactiveProperty<bool[]> Grid { get; } // Одномерный массив для сериализации
-        public ObservableList<ItemDataProxy> Items { get; } = new(); // Данные предметов
+        public ObservableList<Item> Items { get; } = new(); // Данные предметов
         public ObservableList<Vector2Int> Positions { get; } = new(); // Позиции предметов
 
 
-        public InventoryGridDataProxy(InventoryGridData gridData)
+        public InventoryGrid(InventoryGridData gridData)
         {
             Origin = gridData;
             OwnerId = gridData.OwnerId;
@@ -31,8 +31,8 @@ namespace NothingBehind.Scripts.Game.State.Inventory
             CellSize = gridData.CellSize;
             IsSubGrid = gridData.IsSubGrid;
             Grid = new ReactiveProperty<bool[]>(gridData.Grid);
-            gridData.SubGrids.ForEach(data => SubGrids.Add(new InventoryGridDataProxy(data)));
-            gridData.Items.ForEach(data => Items.Add(new ItemDataProxy(data)));
+            gridData.SubGrids.ForEach(data => SubGrids.Add(new InventoryGrid(data)));
+            gridData.Items.ForEach(data => Items.Add(new Item(data)));
             gridData.Positions.ForEach(Positions.Add);
 
             Grid.Subscribe(value => gridData.Grid = value);

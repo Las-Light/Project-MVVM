@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Entities.Hero;
-using NothingBehind.Scripts.Game.State.Maps.EnemySpawn;
+using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 
 namespace NothingBehind.Scripts.Game.State.Maps
 {
     [Serializable]
-    public class MapState
+    public class MapData
     {
         public MapId Id;
         public string SceneName;
-        public List<CharacterEntity> Characters;
+        public List<CharacterData> Characters;
         public List<MapTransferData> MapTransfers;
         public List<EnemySpawnData> EnemySpawns;
     }

@@ -16,7 +16,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly Dictionary<int, CharacterBinder> _createCharactersMap = new();
         private readonly Dictionary<MapId, MapTransferBinder> _createMapTransfersMap = new();
         private readonly Dictionary<string, EnemySpawnBinder> _createSpawns = new();
-        private HeroBinder _hero;
+        private PlayerView _hero;
         private CameraBinder _camera;
         private readonly CompositeDisposable _disposables = new();
         private WorldGameplayRootViewModel _viewModel;
@@ -53,7 +53,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _disposables.Dispose();
         }
 
-        private void CreateCamera(CameraViewModel cameraViewModel, HeroBinder hero)
+        private void CreateCamera(CameraViewModel cameraViewModel, PlayerView hero)
         {
             var prefabCameraPath = "Prefabs/Gameplay/World/Camera/VirtualCamera";
             var cameraPrefab = Resources.Load<CameraBinder>(prefabCameraPath);
@@ -63,13 +63,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _camera = cameraBinder;
         }
 
-        private void CreateHero(HeroViewModel heroViewModel, GameplayUIManager gameplayUIManager)
+        private void CreateHero(PlayerViewModel playerViewModel, GameplayUIManager gameplayUIManager)
         {
             var prefabHeroPath = "Prefabs/Gameplay/World/Characters/Player";
-            var heroPrefab = Resources.Load<HeroBinder>(prefabHeroPath);
+            var heroPrefab = Resources.Load<PlayerView>(prefabHeroPath);
 
             var heroBinder = Instantiate(heroPrefab);
-            heroBinder.Bind(heroViewModel, gameplayUIManager);
+            heroBinder.Bind(playerViewModel, gameplayUIManager);
             _hero = heroBinder;
         }
 

@@ -49,7 +49,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
 
             inventory.InventoryGrids = inventoryGrids;
 
-            var inventoryProxy = new InventoryDataProxy(inventory);
+            var inventoryProxy = new Inventory(inventory);
             _gameState.Inventories.Add(inventoryProxy);
 
             return true;

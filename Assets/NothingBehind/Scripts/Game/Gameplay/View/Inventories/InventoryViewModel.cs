@@ -30,13 +30,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         private readonly CompositeDisposable _disposables = new();
 
 
-        public InventoryViewModel(InventoryDataProxy inventoryDataProxy,
+        public InventoryViewModel(Inventory inventory,
             InventorySettings inventorySettings,
             ICommandProcessor commandProcessor,
             InventoryService inventoryService)
         {
-            OwnerId = inventoryDataProxy.OwnerId;
-            OwnerTypeId = inventoryDataProxy.OwnerTypeId;
+            OwnerId = inventory.OwnerId;
+            OwnerTypeId = inventory.OwnerTypeId;
             _commandProcessor = commandProcessor;
             _inventoryService = inventoryService;
 
@@ -52,21 +52,21 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 _inventoryGridSettingsMap[inventoryGrid.GridTypeId] = inventoryGrid;
             }
 
-            foreach (var inventoryGridDataProxy in inventoryDataProxy.InventoryGrids)
+            foreach (var inventoryGrid in inventory.InventoryGrids)
             {
-                if (inventoryGridDataProxy.SubGrids.Count > 0)
+                if (inventoryGrid.SubGrids.Count > 0)
                 {
-                    foreach (var subGrid in inventoryGridDataProxy.SubGrids)
+                    foreach (var subGrid in inventoryGrid.SubGrids)
                     {
                         CreateInventoryGridViewModel(subGrid);
                     }
                 }
-                CreateInventoryGridViewModel(inventoryGridDataProxy);
+                CreateInventoryGridViewModel(inventoryGrid);
             }
 
-            _disposables.Add(inventoryDataProxy.InventoryGrids.ObserveAdd()
+            _disposables.Add(inventory.InventoryGrids.ObserveAdd()
                 .Subscribe(e => CreateInventoryGridViewModel(e.Value)));
-            _disposables.Add(inventoryDataProxy.InventoryGrids.ObserveRemove()
+            _disposables.Add(inventory.InventoryGrids.ObserveRemove()
                 .Subscribe(e => RemoveInventoryGridViewModel(e.Value)));
         }
 
@@ -240,7 +240,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                                 $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
         }
 
-        public AddItemsToInventoryGridResult TryAddToGrid(string gridTypeId, ItemDataProxy item, Vector2Int position,
+        public AddItemsToInventoryGridResult TryAddToGrid(string gridTypeId, Item item, Vector2Int position,
             int amount)
         {
             if (_inventoryGridMap.TryGetValue(gridTypeId, out var gridViewModel))
@@ -252,7 +252,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                                 $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
         }
 
-        public AddItemsToInventoryGridResult TryAddToGrid(string gridTypeId, ItemDataProxy item, int amount)
+        public AddItemsToInventoryGridResult TryAddToGrid(string gridTypeId, Item item, int amount)
         {
             if (_inventoryGridMap.TryGetValue(gridTypeId, out var gridViewModel))
             {
@@ -263,7 +263,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                                 $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
         }
 
-        private void CreateInventoryGridViewModel(InventoryGridDataProxy inventoryGridDataProxy)
+        private void CreateInventoryGridViewModel(InventoryGrid inventoryGridDataProxy)
         {
             var gridSettings = _inventoryGridSettingsMap[inventoryGridDataProxy.GridTypeId];
             var gridViewModel = new InventoryGridViewModel(inventoryGridDataProxy,
@@ -273,7 +273,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             _inventoryGridMap[inventoryGridDataProxy.GridTypeId] = gridViewModel;
         }
 
-        private void RemoveInventoryGridViewModel(InventoryGridDataProxy inventoryGridDataProxy)
+        private void RemoveInventoryGridViewModel(InventoryGrid inventoryGridDataProxy)
         {
             if (_inventoryGridMap.TryGetValue(inventoryGridDataProxy.GridTypeId, out var gridViewModel))
             {

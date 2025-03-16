@@ -8,7 +8,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View
     {
         private CameraViewModel _cameraViewModel;
         private CinemachineCamera _camera;
-        public void Bind(CameraViewModel cameraViewModel, HeroBinder hero)
+        public void Bind(CameraViewModel cameraViewModel, PlayerView hero)
         {
             _cameraViewModel = cameraViewModel;
             _camera = GetComponent<CinemachineCamera>();

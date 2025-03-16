@@ -8,7 +8,7 @@ using NothingBehind.Scripts.Game.State.Entities.Hero;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventory;
 using NothingBehind.Scripts.Game.State.Maps;
-using NothingBehind.Scripts.Game.State.Maps.EnemySpawn;
+using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using NothingBehind.Scripts.Game.State.Root;
 using UnityEngine;
@@ -26,7 +26,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             gameState.Inventories = new List<InventoryData>();
             gameState.Maps = CreateMaps(gameState, gameSettings);
             gameState.CurrentMapId = currentMapId;
-            gameState.Hero = CreateHero(gameState, gameSettings, currentMapId, currentMapSettings);
+            gameState.playerData = CreatePlayer(gameState, gameSettings, currentMapId, currentMapSettings);
             gameState.Resources = new List<ResourceData>()
             {
                 new() { Amount = 0, ResourceType = ResourceType.SoftCurrency },
@@ -36,13 +36,13 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             return gameState;
         }
 
-        private Hero CreateHero(GameState gameState, GameSettings gameSettings, MapId currentMapId,
+        private PlayerData CreatePlayer(GameState gameState, GameSettings gameSettings, MapId currentMapId,
             MapSettings currentMapSettings)
         {
-            var hero = new Hero()
+            var hero = new PlayerData()
             {
-                Id = gameState.CreateEntityId(),
-                TypeId = gameSettings.HeroSettings.TypeId,
+                UniqueId = gameState.CreateEntityId(),
+                TypeId = gameSettings.playerSettings.TypeId,
                 CurrentMap = new PositionOnMap()
                 {
                     MapId = currentMapId,
@@ -56,16 +56,16 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                         Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition
                     }
                 },
-                Health = gameSettings.HeroSettings.Health
+                Health = gameSettings.playerSettings.Health
             };
-            gameState.Inventories.Add(CreateInventories(gameState, gameSettings, hero.TypeId, hero.Id));
+            gameState.Inventories.Add(CreateInventories(gameState, gameSettings, hero.TypeId, hero.UniqueId));
 
             return hero;
         }
 
-        private List<MapState> CreateMaps(GameState gameState, GameSettings gameSettings)
+        private List<MapData> CreateMaps(GameState gameState, GameSettings gameSettings)
         {
-            var maps = new List<MapState>();
+            var maps = new List<MapData>();
             foreach (var map in gameSettings.MapsSettings.Maps)
             {
                 maps.Add(CreateMapState(map.MapId, gameState, gameSettings));
@@ -74,13 +74,13 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             return maps;
         }
 
-        private MapState CreateMapState(MapId mapId, GameState gameState, GameSettings gameSettings)
+        private MapData CreateMapState(MapId mapId, GameState gameState, GameSettings gameSettings)
         {
             var newMapSettings = gameSettings.MapsSettings.Maps.First(m => m.MapId == mapId);
             var newMapInitialStateSettings = newMapSettings.InitialStateSettings;
 
             var sceneName = newMapSettings.SceneName;
-            var newMapState = new MapState
+            var newMapState = new MapData
             {
                 Id = mapId,
                 SceneName = sceneName,
@@ -118,27 +118,27 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             return initialMapTransfers;
         }
 
-        private List<CharacterEntity> InitialCharacters(GameSettings gameSettings,
+        private List<CharacterData> InitialCharacters(GameSettings gameSettings,
             MapInitialStateSettings newMapInitialStateSettings,
             GameState gameState)
         {
             if (newMapInitialStateSettings.Characters.Count <= 0)
             {
-                return new List<CharacterEntity>();
+                return new List<CharacterData>();
             }
-            var initialCharacters = new List<CharacterEntity>();
+            var initialCharacters = new List<CharacterData>();
             foreach (var characterSettings in newMapInitialStateSettings.Characters)
             {
                 var characterLevelSettings = characterSettings.LevelSettings;
-                var initialCharacter = new CharacterEntity
+                var initialCharacter = new CharacterData
                 {
-                    Id = gameState.CreateEntityId(),
+                    UniqueId = gameState.CreateEntityId(),
                     TypeId = characterSettings.TypeId,
                     Position = characterSettings.Position,
                     Level = characterLevelSettings.Level,
                     Health = characterLevelSettings.Health
                 };
-                gameState.Inventories.Add(CreateInventories(gameState, gameSettings, initialCharacter.TypeId, initialCharacter.Id));
+                gameState.Inventories.Add(CreateInventories(gameState, gameSettings, initialCharacter.TypeId, initialCharacter.UniqueId));
                 initialCharacters.Add(initialCharacter);
             }
 

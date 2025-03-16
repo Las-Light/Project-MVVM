@@ -28,7 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var gameSettings = settingsProvider.GameSettings;
             var charactersSettings = gameSettings.CharactersSettings;
             var gameplayCameraSettings = gameSettings.GameplayCameraSettings;
-            var heroSettings = gameSettings.HeroSettings;
+            var heroSettings = gameSettings.playerSettings;
             var inventoriesSettings = gameSettings.InventoriesSettings;
             var coroutines = container.Resolve<Coroutines>(AppConstants.COROUTINES);
 

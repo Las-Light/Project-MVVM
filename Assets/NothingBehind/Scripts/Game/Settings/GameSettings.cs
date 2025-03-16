@@ -9,7 +9,7 @@ namespace NothingBehind.Scripts.Game.Settings
     [CreateAssetMenu(fileName = "GameSettings", menuName = "Game Settings/New Game Settings")]
     public class GameSettings : ScriptableObject
     {
-        public HeroSettings HeroSettings;
+        public PlayerSettings playerSettings;
         public CharactersSettings CharactersSettings;
         public InventoriesSettings InventoriesSettings;
         public GameplayCameraSettings GameplayCameraSettings;

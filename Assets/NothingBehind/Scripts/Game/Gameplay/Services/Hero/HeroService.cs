@@ -13,7 +13,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.Hero
 {
     public class HeroService
     {
-        public readonly ReactiveProperty<HeroViewModel> HeroViewModel = new();
+        public readonly ReactiveProperty<PlayerViewModel> HeroViewModel = new();
 
         private readonly HeroMovementManager _heroMovementManager;
         private readonly HeroTurnManager _heroTurnManager;
@@ -39,7 +39,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.Hero
 
         public bool UpdateHeroPosOnMap(Vector3 position)
         {
-            var command = new CmdUpdateHeroPosOnMap(position);
+            var command = new CmdUpdatePlayerPosOnMap(position);
             var result = _cmd.Process(command);
             return result;
         }
@@ -53,15 +53,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services.Hero
 
         private bool InitialPosOnMap()
         {
-            var command = new CmdInitHeroPosOnMap(_sceneEnterParams.TargetMapId);
+            var command = new CmdInitPlayerPosOnMap(_sceneEnterParams.TargetMapId);
             var result = _cmd.Process(command);
 
             return result;
         }
 
-        private void CreateHeroViewModel(HeroProxy heroProxy)
+        private void CreateHeroViewModel(Player player)
         {
-            var viewModel = new HeroViewModel(heroProxy,this, _heroMovementManager, _heroTurnManager);
+            var viewModel = new PlayerViewModel(player,this, _heroMovementManager, _heroTurnManager);
 
             HeroViewModel.Value = viewModel;
         }

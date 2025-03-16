@@ -3,20 +3,20 @@ using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Entities.Characters
 {
-    public class CharacterEntityProxy
+    public class Character
     {
         public int Id { get; }
         public string TypeId { get; }
-        public CharacterEntity Origin { get; }
+        public CharacterData Origin { get; }
         
         public ReactiveProperty<Vector3> Position { get; }
         public ReactiveProperty<int> Level { get; }
         public ReactiveProperty<float> Health { get; }
 
-        public CharacterEntityProxy(CharacterEntity characterEntity)
+        public Character(CharacterData characterEntity)
         {
             Origin = characterEntity;
-            Id = characterEntity.Id;
+            Id = characterEntity.UniqueId;
             TypeId = characterEntity.TypeId;
             Position = new ReactiveProperty<Vector3>(characterEntity.Position);
             Level = new ReactiveProperty<int>(characterEntity.Level);

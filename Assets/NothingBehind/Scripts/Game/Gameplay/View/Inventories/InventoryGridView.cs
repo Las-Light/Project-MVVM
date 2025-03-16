@@ -24,8 +24,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
         private InventoryGridViewModel _viewModel;
 
-        private IReadOnlyObservableDictionary<ItemDataProxy, Vector2Int> _itemsPositionsMap;
-        private readonly Dictionary<ItemDataProxy, GameObject> _itemsViewMap = new Dictionary<ItemDataProxy, GameObject>();
+        private IReadOnlyObservableDictionary<Item, Vector2Int> _itemsPositionsMap;
+        private readonly Dictionary<Item, GameObject> _itemsViewMap = new Dictionary<Item, GameObject>();
         private readonly CompositeDisposable _disposables = new ();
 
         private GameObject[,] _cells;
@@ -119,7 +119,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             _disposables.Dispose();
         }
 
-        public void UpdateHighlights(ItemDataProxy item, Vector2Int position)
+        public void UpdateHighlights(Item item, Vector2Int position)
         {
             // Сбрасываем подсветку всех ячеек
             ClearHighlights();
@@ -155,7 +155,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         }
 
         // Добавление предмета в UI
-        private void AddItemView(ItemDataProxy itemData, Vector2 cellPosition)
+        private void AddItemView(Item itemData, Vector2 cellPosition)
         {
             var itemView = Instantiate(_itemPrefab, GridContainer.transform);
             itemView.GetComponent<RectTransform>().anchoredPosition = cellPosition;

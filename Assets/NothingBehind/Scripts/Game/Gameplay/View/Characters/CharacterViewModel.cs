@@ -9,7 +9,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
 {
     public class CharacterViewModel
     {
-        private readonly CharacterEntityProxy _characterEntityProxy;
+        private readonly Character _character;
         private readonly CharacterSettings _characterSettings;
         private readonly CharactersService _charactersService;
         private readonly Dictionary<int, CharacterLevelSettings> _levelSettingsMap = new();
@@ -21,16 +21,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
         public readonly string TypeId;
 
         public CharacterViewModel(
-            CharacterEntityProxy characterEntityProxy, 
+            Character character, 
             CharacterSettings characterSettings, 
             CharactersService charactersService)
         {
-            TypeId = characterEntityProxy.TypeId;
-            CharacterEntityId = characterEntityProxy.Id;
-            Level = characterEntityProxy.Level;
-            Health = characterEntityProxy.Health;
+            TypeId = character.TypeId;
+            CharacterEntityId = character.Id;
+            Level = character.Level;
+            Health = character.Health;
             
-            _characterEntityProxy = characterEntityProxy;
+            _character = character;
             _characterSettings = characterSettings;
             _charactersService = charactersService;
 
@@ -39,7 +39,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
                 _levelSettingsMap[characterLevelSettings.Level] = characterLevelSettings;
             }
 
-            Position = characterEntityProxy.Position;
+            Position = character.Position;
         }
 
         public CharacterLevelSettings GetLevelSettings(int level)

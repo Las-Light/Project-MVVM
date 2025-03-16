@@ -24,7 +24,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Maps
         {
             if (_triggered)
                 return;
-            other.TryGetComponent<HeroBinder>(out var heroView);
+            other.TryGetComponent<PlayerView>(out var heroView);
             if (heroView!=null)
             {
                 if (heroView.IsInteractiveActionPressed())

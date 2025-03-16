@@ -9,7 +9,7 @@ using NothingBehind.Scripts.Game.State.Root;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Hero
 {
-    public class CmdInitHeroPosOnMapHandler : ICommandHandler<CmdInitHeroPosOnMap>
+    public class CmdInitHeroPosOnMapHandler : ICommandHandler<CmdInitPlayerPosOnMap>
     {
         private readonly GameStateProxy _gameState;
         private readonly GameSettings _gameSettings;
@@ -19,13 +19,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Hero
             _gameState = gameState;
             _gameSettings = gameSettings;
         }
-        public bool Handle(CmdInitHeroPosOnMap command)
+        public bool Handle(CmdInitPlayerPosOnMap command)
         {
             InitialHeroPosition(command);
             return true;
         }
         
-        private void InitialHeroPosition(CmdInitHeroPosOnMap command)
+        private void InitialHeroPosition(CmdInitPlayerPosOnMap command)
         {
             var requiredMap = command.CurrentMapId;
             var requiredPosOnMap = _gameState.Hero.Value.PositionOnMaps.FirstOrDefault(

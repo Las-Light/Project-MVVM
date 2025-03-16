@@ -4,19 +4,19 @@ using ObservableCollections;
 
 namespace NothingBehind.Scripts.Game.State.Inventory
 {
-    public class InventoryDataProxy
+    public class Inventory
     {
         public int OwnerId { get; }
         public string OwnerTypeId { get; }
         public InventoryData Origin { get; }
-        public ObservableList<InventoryGridDataProxy> InventoryGrids { get; } = new();
+        public ObservableList<InventoryGrid> InventoryGrids { get; } = new();
 
-        public InventoryDataProxy(InventoryData inventoryData)
+        public Inventory(InventoryData inventoryData)
         {
             Origin = inventoryData;
             OwnerId = inventoryData.OwnerId;
             OwnerTypeId = inventoryData.OwnerTypeId;
-            inventoryData.InventoryGrids.ForEach(gridData => InventoryGrids.Add(new InventoryGridDataProxy(gridData)));
+            inventoryData.InventoryGrids.ForEach(gridData => InventoryGrids.Add(new InventoryGrid(gridData)));
             
             InventoryGrids.ObserveAdd().Subscribe(e =>
             {

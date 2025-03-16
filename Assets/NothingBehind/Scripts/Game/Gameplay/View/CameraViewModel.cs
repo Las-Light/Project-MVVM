@@ -17,7 +17,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View
             _cameraManager = cameraManager;
         }
 
-        public void SetCameraViewWithComponent(CameraBinder cameraView, HeroBinder heroView)
+        public void SetCameraViewWithComponent(CameraBinder cameraView, PlayerView heroView)
         {
             _cameraView = cameraView;
             _cinemachineCamera = cameraView.GetComponent<CinemachineCamera>();

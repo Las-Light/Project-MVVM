@@ -9,7 +9,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
 {
     public class HeroMovementManager
     {
-        private readonly HeroSettings _heroSettings;
+        private readonly PlayerSettings _playerSettings;
         private readonly GameplayInputManager _inputManager;
 
         private CharacterController _heroCharacterController;
@@ -28,16 +28,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
         private bool _grounded;
         private bool _isCrouch;
 
-        public HeroMovementManager(HeroSettings heroSettings,
+        public HeroMovementManager(PlayerSettings playerSettings,
             GameplayInputManager inputManager)
         {
             _inputManager = inputManager;
-            _heroSettings = heroSettings;
+            _playerSettings = playerSettings;
 
             _inputManager.IsCrouch.Skip(1).Subscribe(_ => Crouch());
         }
 
-        public void BindHeroViewComponent(HeroBinder heroView, Camera mainCamera, CharacterController controller)
+        public void BindHeroViewComponent(PlayerView heroView, Camera mainCamera, CharacterController controller)
         {
             _heroCharacterController = controller;
             _mainCameraTransform = mainCamera.transform;
@@ -96,16 +96,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                 //pointToCheckClip.localPosition = new Vector3(0.2f, 0.95f, 0);
                 //TargetPointForAim.localPosition = new Vector3(0, 0.9f, 0);
                 _animatorManager.Crouch(_isCrouch);
-                _heroCharacterController.height = _heroSettings.CrouchHeight;
-                _heroCharacterController.center = _heroSettings.crouchCenter;
+                _heroCharacterController.height = _playerSettings.CrouchHeight;
+                _heroCharacterController.center = _playerSettings.crouchCenter;
             }
             else
             {
                 //pointToCheckClip.localPosition = new Vector3(0.2f, 1.6f, 0);
                 //TargetPointForAim.localPosition = new Vector3(0, 1.4f, 0);
                 _animatorManager.Crouch(_isCrouch);
-                _heroCharacterController.height = _heroSettings.DefaultHeight;
-                _heroCharacterController.center = _heroSettings.DefaultCenter;
+                _heroCharacterController.height = _playerSettings.DefaultHeight;
+                _heroCharacterController.center = _playerSettings.DefaultCenter;
             }
         }
 
@@ -126,8 +126,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
 
             Vector3 relativeVector = _heroTransform.InverseTransformDirection(moveDirectional);
 
-            _speedBlendX = Mathf.Lerp(_speedBlendX, relativeVector.x, Time.deltaTime * _heroSettings.SpeedBlendAim);
-            _speedBlendY = Mathf.Lerp(_speedBlendY, relativeVector.z, Time.deltaTime * _heroSettings.SpeedBlendAim);
+            _speedBlendX = Mathf.Lerp(_speedBlendX, relativeVector.x, Time.deltaTime * _playerSettings.SpeedBlendAim);
+            _speedBlendY = Mathf.Lerp(_speedBlendY, relativeVector.z, Time.deltaTime * _playerSettings.SpeedBlendAim);
 
             _animatorManager.AimMove(_speedBlendX, _speedBlendY);
         }
@@ -137,7 +137,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
         private void MoveForwardDirection()
         {
             float rotation = Mathf.SmoothDampAngle(_heroTransform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
-                _heroSettings.RotationSmoothTime);
+                _playerSettings.RotationSmoothTime);
 
             // повернуться лицом в соответствии с заданым направлением левым стиком относительно камеры,
             // если в данный момент не нажата кнопка "прицелиться"
@@ -177,22 +177,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
 
             if (_inputManager.IsAim.CurrentValue)
             {
-                targetSpeed = _heroSettings.AimSpeed;
+                targetSpeed = _playerSettings.AimSpeed;
             }
             else if (_inputManager.IsSprint.CurrentValue)
             {
-                targetSpeed = _heroSettings.SprintSpeed;
+                targetSpeed = _playerSettings.SprintSpeed;
                 _isCrouch = false;
                 //TODO: т.к. Crouch не в Update игрок не встает если нажать кропку спринт
                 _animatorManager.Crouch(_isCrouch);
             }
             else if (_isCrouch)
             {
-                targetSpeed = _heroSettings.CrouchSpeed;
+                targetSpeed = _playerSettings.CrouchSpeed;
             }
             else
             {
-                targetSpeed = _heroSettings.MoveSpeed;
+                targetSpeed = _playerSettings.MoveSpeed;
             }
 
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
@@ -215,7 +215,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                 // creates curved result rather than a linear one giving a more organic speed change
                 // note T in Lerp is clamped, so we don't need to clamp our speed
                 _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed,
-                    Time.deltaTime * _heroSettings.SpeedChangeRate);
+                    Time.deltaTime * _playerSettings.SpeedChangeRate);
 
                 // round speed to 3 decimal places
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
@@ -225,7 +225,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                 _speed = targetSpeed;
             }
 
-            _speedBlend = Mathf.Lerp(_speedBlend, targetSpeed, Time.deltaTime * _heroSettings.SpeedChangeRate);
+            _speedBlend = Mathf.Lerp(_speedBlend, targetSpeed, Time.deltaTime * _playerSettings.SpeedChangeRate);
             if (_speedBlend < 0.01f) _speedBlend = 0f;
         }
 
@@ -235,7 +235,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
             if (_grounded)
             {
                 // reset the fall timeout timer
-                _fallTimeoutDelta = _heroSettings.FallTimeout;
+                _fallTimeoutDelta = _playerSettings.FallTimeout;
 
                 // stop our velocity dropping infinitely when grounded
                 if (_verticalVelocity < 0.0f)
@@ -261,9 +261,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
-            if (_verticalVelocity < _heroSettings.TerminalVelocity)
+            if (_verticalVelocity < _playerSettings.TerminalVelocity)
             {
-                _verticalVelocity += _heroSettings.Gravity * Time.deltaTime;
+                _verticalVelocity += _playerSettings.Gravity * Time.deltaTime;
             }
         }
 
@@ -273,11 +273,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
             // set sphere position, with offset
             var position = _heroTransform.position;
             Vector3 spherePosition = new Vector3(position.x,
-                position.y - _heroSettings.GroundedOffset,
+                position.y - _playerSettings.GroundedOffset,
                 position.z);
             _grounded = Physics.CheckSphere(spherePosition,
-                _heroSettings.GroundedRadius,
-                _heroSettings.GroundLayers,
+                _playerSettings.GroundedRadius,
+                _playerSettings.GroundLayers,
                 QueryTriggerInteraction.Ignore);
 
             // update animator if using character

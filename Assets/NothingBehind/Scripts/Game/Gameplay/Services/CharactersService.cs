@@ -22,7 +22,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         public IObservableCollection<CharacterViewModel> AllCharacters => _allCharacters;
 
         public CharactersService(
-            IObservableCollection<CharacterEntityProxy> characters,
+            IObservableCollection<Character> characters,
             CharactersSettings charactersSettings,
             InventoryService inventoryService,
             ICommandProcessor commandProcessor)
@@ -64,7 +64,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             throw new NotImplementedException();
         }
 
-        private void CreateCharacterViewModel(CharacterEntityProxy characterEntityProxy)
+        private void CreateCharacterViewModel(Character characterEntityProxy)
         {
             var characterSettings = _characterSettingsMap[characterEntityProxy.TypeId];
             var characterViewModel = new CharacterViewModel(characterEntityProxy, characterSettings, this);
@@ -73,7 +73,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             _characterMap[characterEntityProxy.Id] = characterViewModel;
         }
 
-        private void RemoveCharacterViewModel(CharacterEntityProxy characterEntityProxy)
+        private void RemoveCharacterViewModel(Character characterEntityProxy)
         {
             if (_characterMap.TryGetValue(characterEntityProxy.Id, out var characterViewModel))
             {

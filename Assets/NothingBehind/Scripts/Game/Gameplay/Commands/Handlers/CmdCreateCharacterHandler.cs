@@ -29,16 +29,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             var entityId = _gameState.CreateEntityId();
             var characterSettings = _charactersSettings.AllCharacters.First(c=>c.TypeId == command.CharacterTypeId);
             var characterLevel = characterSettings.LevelSettings.First(l => l.Level == command.Level);
-            var newCharacterEntity = new CharacterEntity
+            var characterData = new CharacterData
             {
-                Id = entityId,
+                UniqueId = entityId,
                 Position = command.Position,
                 Level = command.Level,
                 Health = characterLevel.Health,
                 TypeId = command.CharacterTypeId
             };
 
-            var newCharacterEntityProxy = new CharacterEntityProxy(newCharacterEntity);
+            var newCharacterEntityProxy = new Character(characterData);
             command.InventoryService.CreateInventory(command.CharacterTypeId, entityId);
             currentMap.Characters.Add(newCharacterEntityProxy);
 

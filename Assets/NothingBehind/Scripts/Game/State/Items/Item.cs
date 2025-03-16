@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Inventory
 {
-    public class ItemDataProxy
+    public partial class Item
     {
         public int Id { get; }
         public ItemType ItemType { get; }
@@ -17,7 +17,7 @@ namespace NothingBehind.Scripts.Game.State.Inventory
         public int MaxStackSize { get; }
         public int Weight { get; }
 
-        public ItemDataProxy(ItemData itemData)
+        public Item(ItemData itemData)
         {
             Origin = itemData;
             Id = itemData.Id;

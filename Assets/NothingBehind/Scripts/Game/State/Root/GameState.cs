@@ -13,8 +13,8 @@ namespace NothingBehind.Scripts.Game.State.Root
         public int GlobalEntityId;
         public int GlobalItemId;
         public MapId CurrentMapId;
-        public Hero Hero;
-        public List<MapState> Maps;
+        public PlayerData playerData;
+        public List<MapData> Maps;
         public List<ResourceData> Resources;
         public List<InventoryData> Inventories;
 

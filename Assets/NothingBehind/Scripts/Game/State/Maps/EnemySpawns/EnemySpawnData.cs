@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.State.Maps.EnemySpawn
+namespace NothingBehind.Scripts.Game.State.Maps.EnemySpawns
 {
     [Serializable]
     public class EnemySpawnData

@@ -9,49 +9,49 @@ using UnityEngine.InputSystem;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
 {
-    public class HeroViewModel
+    public class PlayerViewModel
     {
-        private readonly HeroProxy _heroProxy;
+        private readonly Player _player;
         private readonly HeroService _heroService;
         private readonly HeroMovementManager _heroMovementManager;
         private readonly HeroTurnManager _heroTurnManager;
-        private HeroBinder _heroView;
-        private CharacterController _heroCharacterController;
+        private PlayerView _playerView;
+        private CharacterController _playerCharacterController;
         private PlayerInput _playerInput;
         public IObservableCollection<PositionOnMapProxy> PositionOnMaps => _positionOnMaps;
         public ReadOnlyReactiveProperty<PositionOnMapProxy> CurrentMap { get; }
         public ReadOnlyReactiveProperty<float> Health { get; }
         private ObservableList<PositionOnMapProxy> _positionOnMaps { get; }
 
-        public HeroViewModel(
-            HeroProxy heroProxy, 
+        public PlayerViewModel(
+            Player player, 
             HeroService heroService, 
             HeroMovementManager heroMovementManager,
             HeroTurnManager heroTurnManager)
         {
-            CurrentMap = heroProxy.CurrentMap;
-            Health = heroProxy.Health;
-            _positionOnMaps = heroProxy.PositionOnMaps;
+            CurrentMap = player.CurrentMap;
+            Health = player.Health;
+            _positionOnMaps = player.PositionOnMaps;
             
-            _heroProxy = heroProxy;
+            _player = player;
             _heroService = heroService;
             _heroMovementManager = heroMovementManager;
             _heroTurnManager = heroTurnManager;
         }
 
-        public void SetHeroViewWithComponent(HeroBinder heroView, Camera camera)
+        public void SetHeroViewWithComponent(PlayerView playerView, Camera camera)
         {
-            _heroView = heroView;
-            _heroCharacterController = heroView.GetComponent<CharacterController>();
-            _playerInput = heroView.GetComponent<PlayerInput>();
-            _heroMovementManager.BindHeroViewComponent(heroView, camera, _heroCharacterController);
-            _heroTurnManager.BindHeroViewComponent(heroView, camera, _playerInput);
+            _playerView = playerView;
+            _playerCharacterController = playerView.GetComponent<CharacterController>();
+            _playerInput = playerView.GetComponent<PlayerInput>();
+            _heroMovementManager.BindHeroViewComponent(playerView, camera, _playerCharacterController);
+            _heroTurnManager.BindHeroViewComponent(playerView, camera, _playerInput);
         }
 
         public void Move()
         {
             _heroMovementManager.Move();
-            _heroService.UpdateHeroPosOnMap(_heroView.transform.position);
+            _heroService.UpdateHeroPosOnMap(_playerView.transform.position);
         }
 
         public void Look()

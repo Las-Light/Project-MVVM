@@ -1,7 +1,6 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
-using NothingBehind.Scripts.Game.State.Entities.Hero;
-using NothingBehind.Scripts.Game.State.Maps.EnemySpawn;
+using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using ObservableCollections;
 using R3;
@@ -12,22 +11,22 @@ namespace NothingBehind.Scripts.Game.State.Maps
     {
         public MapId Id => Origin.Id;
         public string SceneName => Origin.SceneName;
-        public ObservableList<CharacterEntityProxy> Characters { get; } = new();
+        public ObservableList<Character> Characters { get; } = new();
         public ObservableList<MapTransferData> MapTransfers { get; } = new();
-        public ObservableList<EnemySpawnProxy> EnemySpawns { get; } = new();
-        public MapState Origin { get; }
+        public ObservableList<EnemySpawn> EnemySpawns { get; } = new();
+        public MapData Origin { get; }
 
-        public Map(MapState mapState)
+        public Map(MapData mapState)
         {
             Origin = mapState;
             mapState.Characters.ForEach(characterOrigin =>
-                Characters.Add(new CharacterEntityProxy(characterOrigin)));
+                Characters.Add(new Character(characterOrigin)));
             mapState.MapTransfers.ForEach(mapTransferData =>
                 MapTransfers.Add(new MapTransferData(
                     mapTransferData.TargetMapId,
                     mapTransferData.Position)));
             mapState.EnemySpawns.ForEach(enemySpawnData =>
-                EnemySpawns.Add(new EnemySpawnProxy(enemySpawnData)));
+                EnemySpawns.Add(new EnemySpawn(enemySpawnData)));
 
             Characters.ObserveAdd().Subscribe(e =>
             {
@@ -39,7 +38,7 @@ namespace NothingBehind.Scripts.Game.State.Maps
             {
                 var removedCharacterEntityProxy = e.Value;
                 var removedCharacterEntity =
-                    mapState.Characters.FirstOrDefault(c => c.Id == removedCharacterEntityProxy.Id);
+                    mapState.Characters.FirstOrDefault(c => c.UniqueId == removedCharacterEntityProxy.Id);
                 mapState.Characters.Remove(removedCharacterEntity);
             });
         }

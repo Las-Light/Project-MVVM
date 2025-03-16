@@ -13,7 +13,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
     public class ItemView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         [SerializeField] private TMP_Text stackText;
-        private ItemDataProxy _item;
+        private Item _item;
         private float _cellSize;
         private int _id;
         private bool _isStackable;
@@ -36,7 +36,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         
         private readonly CompositeDisposable _disposables = new();
 
-        public void Initialize(ItemDataProxy item, float cellSize)
+        public void Initialize(Item item, float cellSize)
         {
             _item = item;
             _currentStack = item.CurrentStack;

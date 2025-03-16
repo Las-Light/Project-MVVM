@@ -13,10 +13,10 @@ namespace NothingBehind.Scripts.Game.State.Root
         //TODO: сделать поле приватным
         public readonly GameState _gameState;
         public readonly ReactiveProperty<MapId> CurrentMapId = new();
-        public ReactiveProperty<HeroProxy> Hero { get; } = new();
+        public ReactiveProperty<Player> Hero { get; } = new();
         public ObservableList<Map> Maps { get; } = new();
         public ObservableList<Resource> Resources { get; } = new();
-        public ObservableList<InventoryDataProxy> Inventories { get; } = new();
+        public ObservableList<Inventory.Inventory> Inventories { get; } = new();
 
         public GameStateProxy(GameState gameState)
         {
@@ -43,7 +43,7 @@ namespace NothingBehind.Scripts.Game.State.Root
 
         private void InitHero(GameState gameState)
         {
-            Hero.Value = new HeroProxy(gameState.Hero);
+            Hero.Value = new Player(gameState.playerData);
         }
 
         private void InitMaps(GameState gameState)
@@ -67,7 +67,7 @@ namespace NothingBehind.Scripts.Game.State.Root
 
         private void InitInventories(GameState gameState)
         {
-            gameState.Inventories.ForEach(inventoryOrigin => Inventories.Add(new InventoryDataProxy(inventoryOrigin)));
+            gameState.Inventories.ForEach(inventoryOrigin => Inventories.Add(new Inventory.Inventory(inventoryOrigin)));
 
             Inventories.ObserveAdd().Subscribe(e =>
             {

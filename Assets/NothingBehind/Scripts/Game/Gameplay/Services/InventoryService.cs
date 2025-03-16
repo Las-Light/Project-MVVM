@@ -19,14 +19,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         private readonly ObservableList<InventoryViewModel> _allInventories = new();
         private readonly Dictionary<int, InventoryViewModel> _inventoryMap = new();
-        private readonly Dictionary<int, InventoryDataProxy> _inventoryDataMap = new();
+        private readonly Dictionary<int, Inventory> _inventoryDataMap = new();
         private readonly Dictionary<string, InventorySettings> _inventorySettingsMap = new();
 
         public IObservableCollection<InventoryViewModel> AllInventories => _allInventories;
 
         public Dictionary<int, InventoryViewModel> InventoryMap => _inventoryMap;
 
-        public InventoryService(IObservableCollection<InventoryDataProxy> inventories,
+        public InventoryService(IObservableCollection<Inventory> inventories,
             InventoriesSettings inventoriesSettings,
             ICommandProcessor commandProcessor, int heroId)
         {
@@ -205,12 +205,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             return null;
         }
 
-        public void RemoveInventoryViewModel(InventoryDataProxy inventoryDataProxy)
+        public void RemoveInventoryViewModel(Inventory inventory)
         {
-            if (_inventoryMap.TryGetValue(inventoryDataProxy.OwnerId, out var inventoryViewModel))
+            if (_inventoryMap.TryGetValue(inventory.OwnerId, out var inventoryViewModel))
             {
                 _allInventories.Remove(inventoryViewModel);
-                _inventoryMap.Remove(inventoryDataProxy.OwnerId);
+                _inventoryMap.Remove(inventory.OwnerId);
                 inventoryViewModel.Dispose();
             }
         }

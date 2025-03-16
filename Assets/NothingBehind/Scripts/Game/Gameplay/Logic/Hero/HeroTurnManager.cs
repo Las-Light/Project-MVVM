@@ -12,9 +12,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
     public class HeroTurnManager
     {
         private readonly GameplayInputManager _inputManager;
-        private readonly HeroSettings _heroSettings;
+        private readonly PlayerSettings _playerSettings;
 
-        private HeroBinder _heroView;
+        private PlayerView _heroView;
         private Camera _mainCamera;
         private PlayerInput _playerInput;
         private AnimatorManager _animatorManager;
@@ -23,13 +23,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
         private float _turnRotation;
 
         public HeroTurnManager(GameplayInputManager inputManager,
-            HeroSettings heroSettings)
+            PlayerSettings playerSettings)
         {
             _inputManager = inputManager;
-            _heroSettings = heroSettings;
+            _playerSettings = playerSettings;
         }
 
-        public void BindHeroViewComponent(HeroBinder heroView, Camera mainCamera, PlayerInput playerInput)
+        public void BindHeroViewComponent(PlayerView heroView, Camera mainCamera, PlayerInput playerInput)
         {
             _heroView = heroView;
             _mainCamera = mainCamera;
@@ -50,7 +50,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                 _mouseWorldPosition = Vector3.zero;
 
                 Ray ray = _mainCamera.ScreenPointToRay(_inputManager.LookMouse.CurrentValue);
-                if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, _heroSettings.AimColliderLayerMask))
+                if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, _playerSettings.AimColliderLayerMask))
                 {
                     _mouseWorldPosition =
                         CalculateAimMousePosition(raycastHit.point, _inputManager.LookMouse.CurrentValue);
@@ -66,7 +66,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                     //если мышь не активна, то персонаж не поворачивается в её сторону
                     transform.rotation = Quaternion.RotateTowards(transform.rotation,
                         Quaternion.LookRotation(aimDirection),
-                        _heroSettings.MouseRotationSpeed * Time.deltaTime);
+                        _playerSettings.MouseRotationSpeed * Time.deltaTime);
                     //_aimController.AimPointTargetMouse(raycastHit, _mouseWorldPosition, _weaponController.ActiveGun);
                 }
 
@@ -116,7 +116,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
 
                 transform.rotation = Quaternion.RotateTowards(transform.rotation,
                     destinationRotation,
-                    _heroSettings.GamepadRotationSpeed * Time.deltaTime);
+                    _playerSettings.GamepadRotationSpeed * Time.deltaTime);
                 //StartCoroutine(RotationToSkewedInput(skewedInput));
 
                 //_aimController.AimPointTargetGamepad(_weaponController.ActiveGun);
@@ -124,9 +124,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                 // выбор скорости вращения игрока стиком с учетом на какрй угол происходит поворот
                 // чем меньше угол тем плавнее поворачивается игрок
                 if (turnRotAbs < 60)
-                    _heroSettings.GamepadRotationSpeed = 50;
+                    _playerSettings.GamepadRotationSpeed = 50;
                 else
-                    _heroSettings.GamepadRotationSpeed = 90;
+                    _playerSettings.GamepadRotationSpeed = 90;
 
                 // анимация поворота на месте 
                 if (_inputManager.Move.CurrentValue == Vector2.zero && turnRotAbs >= 45)
@@ -142,7 +142,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
         {
             Vector3 mouseScreenToWorld = _mainCamera.ScreenToWorldPoint(mousePos);
             var yTotal = Math.Round(hit.y - mouseScreenToWorld.y, 6);
-            var newY = Math.Round(yTotal - (hit.y - (hit.y + _heroSettings.WeaponHeightOffset.y)), 6);
+            var newY = Math.Round(yTotal - (hit.y - (hit.y + _playerSettings.WeaponHeightOffset.y)), 6);
             var factor = (float)Math.Round(newY / yTotal, 6);
             Vector3 targetPos = mouseScreenToWorld + ((hit - mouseScreenToWorld) * factor);
             return targetPos;

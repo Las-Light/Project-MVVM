@@ -21,7 +21,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
         {
             if (_triggered)
                 return;
-            other.TryGetComponent<HeroBinder>(out var heroView);
+            other.TryGetComponent<PlayerView>(out var heroView);
             if (heroView!=null)
             {
                 if (heroView.IsInteractiveActionPressed())

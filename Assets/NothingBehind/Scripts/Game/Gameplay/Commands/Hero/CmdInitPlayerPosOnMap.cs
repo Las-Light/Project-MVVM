@@ -3,11 +3,11 @@ using NothingBehind.Scripts.Game.State.Maps;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Hero
 {
-    public class CmdInitHeroPosOnMap : ICommand
+    public class CmdInitPlayerPosOnMap : ICommand
     {
         public MapId CurrentMapId;
 
-        public CmdInitHeroPosOnMap(MapId currentMapId)
+        public CmdInitPlayerPosOnMap(MapId currentMapId)
         {
             CurrentMapId = currentMapId;
         }

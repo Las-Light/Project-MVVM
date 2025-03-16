@@ -3,9 +3,9 @@ using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using R3;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.State.Maps.EnemySpawn
+namespace NothingBehind.Scripts.Game.State.Maps.EnemySpawns
 {
-    public class EnemySpawnProxy
+    public class EnemySpawn
     {
         public string Id => Origin.Id;
         public List<CharacterInitialStateSettings> Characters { get; } = new();
@@ -13,7 +13,7 @@ namespace NothingBehind.Scripts.Game.State.Maps.EnemySpawn
         public readonly ReactiveProperty<bool> Triggered;
         public readonly EnemySpawnData Origin;
 
-        public EnemySpawnProxy(EnemySpawnData spawnData)
+        public EnemySpawn(EnemySpawnData spawnData)
         {
             Origin = spawnData;
             spawnData.Characters.ForEach(Characters.Add);

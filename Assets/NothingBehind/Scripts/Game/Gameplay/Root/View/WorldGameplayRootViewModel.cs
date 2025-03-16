@@ -27,7 +27,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly CameraManager _cameraManager;
         private readonly InventoryService _inventoryService;
 
-        public readonly ReadOnlyReactiveProperty<HeroViewModel> Hero;
+        public readonly ReadOnlyReactiveProperty<PlayerViewModel> Hero;
         public readonly ReadOnlyReactiveProperty<CameraViewModel> CameraViewModel;
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
         public readonly IObservableCollection<InventoryViewModel> AllInventories;

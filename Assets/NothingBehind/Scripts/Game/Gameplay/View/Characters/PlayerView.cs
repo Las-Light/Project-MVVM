@@ -5,11 +5,11 @@ using UnityEngine.InputSystem;
 namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
 {
     [RequireComponent(typeof(CharacterController), typeof(PlayerInput))]
-    public class HeroBinder : MonoBehaviour
+    public class PlayerView : MonoBehaviour
     {
-        private HeroViewModel _viewModel;
+        private PlayerViewModel _viewModel;
 
-        public void Bind(HeroViewModel viewModel, GameplayUIManager gameplayUIManager)
+        public void Bind(PlayerViewModel viewModel, GameplayUIManager gameplayUIManager)
         {
             _viewModel = viewModel; 
             var currentPosOnMap = viewModel.CurrentMap;

@@ -1,16 +1,17 @@
 using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Game.State.Entities;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Inventories
 {
     public class CmdCreateGridInventory : ICommand
     {
-        public readonly string OwnerTypeId;
+        public readonly EntityType OwnerType;
         public readonly int OwnerId;
         public readonly string GridTypeId;
 
-        public CmdCreateGridInventory(string ownerTypeId, int ownerId, string gridTypeId)
+        public CmdCreateGridInventory(EntityType ownerType, int ownerId, string gridTypeId)
         {
-            OwnerTypeId = ownerTypeId;
+            OwnerType = ownerType;
             OwnerId = ownerId;
             GridTypeId = gridTypeId;
         }

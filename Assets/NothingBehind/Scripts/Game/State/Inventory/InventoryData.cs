@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.State.Entities;
 
 namespace NothingBehind.Scripts.Game.State.Inventory
 {
@@ -7,7 +8,7 @@ namespace NothingBehind.Scripts.Game.State.Inventory
     public class InventoryData
     {
         public int OwnerId;
-        public string OwnerTypeId;
+        public EntityType OwnerType;
         public List<InventoryGridData> InventoryGrids;
     }
 }

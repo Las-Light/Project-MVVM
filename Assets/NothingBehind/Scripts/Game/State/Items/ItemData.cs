@@ -1,6 +1,6 @@
 using System;
 
-namespace NothingBehind.Scripts.Game.State.Inventory
+namespace NothingBehind.Scripts.Game.State.Items
 {
     [Serializable]
     public class ItemData

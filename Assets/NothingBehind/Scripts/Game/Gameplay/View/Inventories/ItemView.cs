@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Utils;
 using R3;
 using TMPro;

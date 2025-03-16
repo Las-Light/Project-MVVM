@@ -4,6 +4,7 @@ using NothingBehind.Scripts.Game.Gameplay.Commands.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Inventory;
 using NothingBehind.Scripts.Utils;
 using ObservableCollections;
@@ -14,13 +15,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 {
     public class InventoryService
     {
-        public int HeroId { get; }
+        public int PlayerId { get; }
         private readonly ICommandProcessor _commandProcessor;
 
         private readonly ObservableList<InventoryViewModel> _allInventories = new();
         private readonly Dictionary<int, InventoryViewModel> _inventoryMap = new();
         private readonly Dictionary<int, Inventory> _inventoryDataMap = new();
-        private readonly Dictionary<string, InventorySettings> _inventorySettingsMap = new();
+        private readonly Dictionary<EntityType, InventorySettings> _inventorySettingsMap = new();
 
         public IObservableCollection<InventoryViewModel> AllInventories => _allInventories;
 
@@ -28,14 +29,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         public InventoryService(IObservableCollection<Inventory> inventories,
             InventoriesSettings inventoriesSettings,
-            ICommandProcessor commandProcessor, int heroId)
+            ICommandProcessor commandProcessor, int playerId)
         {
-            HeroId = heroId;
+            PlayerId = playerId;
             _commandProcessor = commandProcessor;
 
             foreach (var inventorySettings in inventoriesSettings.Inventories)
             {
-                _inventorySettingsMap[inventorySettings.OwnerTypeId] = inventorySettings;
+                _inventorySettingsMap[inventorySettings.OwnerType] = inventorySettings;
             }
 
             foreach (var inventoryDataProxy in inventories)
@@ -53,9 +54,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             });
         }
 
-        public bool CreateInventory(string ownerTypeId, int ownerId)
+        public bool CreateInventory(EntityType ownerType, int ownerId)
         {
-            var command = new CmdCreateInventory(ownerTypeId, ownerId);
+            var command = new CmdCreateInventory(ownerType, ownerId);
             var result = _commandProcessor.Process(command);
             
             return result;
@@ -104,7 +105,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                                 }
                             }
                             throw new Exception($"Grid {gridTypeIdTo} not found " +
-                                                $"in the inventory owner {inventoryViewModelTo.OwnerTypeId} " +
+                                                $"in the inventory owner {inventoryViewModelTo.OwnerType} " +
                                                 $"{inventoryOwnerIdTo}.");
                         }
                         throw new Exception($"Inventory Id " +
@@ -112,12 +113,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                     }
                     throw new Exception($"Item {itemId} in {gridTypeIdAt} don't have " +
                                         $"position in the inventory owner " +
-                                        $"{inventoryViewModelAt.OwnerTypeId} - {inventoryViewModelAt.OwnerId}.");
+                                        $"{inventoryViewModelAt.OwnerType} - {inventoryViewModelAt.OwnerId}.");
                 }
                 else
                 {
                     throw new Exception($"Grid {gridTypeIdAt} not found " +
-                                        $"in the inventory owner {inventoryViewModelAt.OwnerTypeId} " +
+                                        $"in the inventory owner {inventoryViewModelAt.OwnerType} " +
                                         $"{inventoryOwnerIdAt}.");
                 }
             }
@@ -163,7 +164,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                                 }
                             }
                             throw new Exception($"Grid {gridTypeIdTo} not found " +
-                                                $"in the inventory owner {inventoryViewModelTo.OwnerTypeId} " +
+                                                $"in the inventory owner {inventoryViewModelTo.OwnerType} " +
                                                 $"{inventoryOwnerIdTo}.");
                         }
                         throw new Exception($"Inventory Id " +
@@ -171,12 +172,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                     }
                     throw new Exception($"Item {itemId} in {gridTypeIdAt} don't have " +
                                         $"position in the inventory owner " +
-                                        $"{inventoryViewModelAt.OwnerTypeId} - {inventoryViewModelAt.OwnerId}.");
+                                        $"{inventoryViewModelAt.OwnerType} - {inventoryViewModelAt.OwnerId}.");
                 }
                 else
                 {
                     throw new Exception($"Grid {gridTypeIdAt} not found " +
-                                        $"in the inventory owner {inventoryViewModelAt.OwnerTypeId} " +
+                                        $"in the inventory owner {inventoryViewModelAt.OwnerType} " +
                                         $"{inventoryOwnerIdAt}.");
                 }
             }
@@ -191,7 +192,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         {
             if (_inventoryDataMap.TryGetValue(ownerId, out var inventoryDataProxy))
             {
-                var inventorySettings = _inventorySettingsMap[inventoryDataProxy.OwnerTypeId];
+                var inventorySettings = _inventorySettingsMap[inventoryDataProxy.OwnerType];
                 var inventoryViewModel = new InventoryViewModel(inventoryDataProxy,
                     inventorySettings,
                     _commandProcessor,

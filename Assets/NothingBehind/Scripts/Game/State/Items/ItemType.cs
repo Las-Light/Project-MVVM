@@ -1,4 +1,4 @@
-namespace NothingBehind.Scripts.Game.State.Inventory
+namespace NothingBehind.Scripts.Game.State.Items
 {
     public enum ItemType
     {

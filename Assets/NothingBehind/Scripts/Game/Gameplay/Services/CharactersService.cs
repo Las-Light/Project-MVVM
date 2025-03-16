@@ -4,6 +4,7 @@ using NothingBehind.Scripts.Game.Gameplay.Commands;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using ObservableCollections;
 using R3;
@@ -17,7 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         private readonly ICommandProcessor _commandProcessor;
         private readonly ObservableList<CharacterViewModel> _allCharacters = new();
         private readonly Dictionary<int, CharacterViewModel> _characterMap = new();
-        private readonly Dictionary<string, CharacterSettings> _characterSettingsMap = new();
+        private readonly Dictionary<EntityType, CharacterSettings> _characterSettingsMap = new();
 
         public IObservableCollection<CharacterViewModel> AllCharacters => _allCharacters;
 
@@ -32,7 +33,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
             foreach (var characterSettings in charactersSettings.AllCharacters)
             {
-                _characterSettingsMap[characterSettings.TypeId] = characterSettings;
+                _characterSettingsMap[characterSettings.EntityType] = characterSettings;
             }
 
             foreach (var characterEntity in characters)
@@ -51,9 +52,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             });
         }
 
-        public bool CreateCharacter(string characterTypeId, int level, Vector3 position)
+        public bool CreateCharacter(EntityType characterType, int level, Vector3 position)
         {
-            var command = new CmdCreateCharacter(characterTypeId, level, position, _inventoryService);
+            var command = new CmdCreateCharacter(characterType, level, position, _inventoryService);
             var result = _commandProcessor.Process(command);
             
             return result;
@@ -66,7 +67,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         private void CreateCharacterViewModel(Character characterEntityProxy)
         {
-            var characterSettings = _characterSettingsMap[characterEntityProxy.TypeId];
+            var characterSettings = _characterSettingsMap[characterEntityProxy.EntityType];
             var characterViewModel = new CharacterViewModel(characterEntityProxy, characterSettings, this);
             
             _allCharacters.Add(characterViewModel);

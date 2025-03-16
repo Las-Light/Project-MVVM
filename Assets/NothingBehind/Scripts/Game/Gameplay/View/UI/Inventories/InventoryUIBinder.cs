@@ -7,26 +7,26 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI.Inventories
     public class InventoryUIBinder : PopupBinder<InventoryUIViewModel>
     {
         [SerializeField] private GameObject _inventoryPrefab;
-        [SerializeField] private RectTransform _heroInventoryContainer;
+        [SerializeField] private RectTransform _playerInventoryContainer;
         [SerializeField] private RectTransform _lootInventoryContainer;
 
         protected override void OnBind(InventoryUIViewModel viewModel)
         {
             base.OnBind(viewModel);
-            if (viewModel.HeroId == viewModel.TargetOwnerId)
+            if (viewModel.PlayerId == viewModel.TargetOwnerId)
             {
-                CreateHeroInventoryView(viewModel.GetInventoryViewModel(viewModel.HeroId));
+                CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.PlayerId));
             }
             else
             {
-                CreateHeroInventoryView(viewModel.GetInventoryViewModel(viewModel.HeroId));
+                CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.PlayerId));
                 CreateLootInventoryView(viewModel.GetInventoryViewModel(viewModel.TargetOwnerId));
             }
         }
 
-        private void CreateHeroInventoryView(InventoryViewModel inventoryView)
+        private void CreatePlayerInventoryView(InventoryViewModel inventoryView)
         {
-            var itemView = Instantiate(_inventoryPrefab, _heroInventoryContainer);
+            var itemView = Instantiate(_inventoryPrefab, _playerInventoryContainer);
             itemView.GetComponent<InventoryView>().Bind(inventoryView);
         }
 

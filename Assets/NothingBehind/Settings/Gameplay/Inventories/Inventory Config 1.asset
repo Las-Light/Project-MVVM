@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 509199e3d08d423f834507a901e02b43, type: 3}
   m_Name: Inventory Config 1
   m_EditorClassIdentifier: 
-  OwnerTypeId: Dummy
+  OwnerType: 2
   InventoryGrids:
   - {fileID: 11400000, guid: 45ccfb3300188a44abe299529c515563, type: 2}

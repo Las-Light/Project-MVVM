@@ -6,7 +6,7 @@ namespace NothingBehind.Scripts.Game.State.Entities.Characters
     public class Character
     {
         public int Id { get; }
-        public string TypeId { get; }
+        public EntityType EntityType { get; }
         public CharacterData Origin { get; }
         
         public ReactiveProperty<Vector3> Position { get; }
@@ -17,7 +17,7 @@ namespace NothingBehind.Scripts.Game.State.Entities.Characters
         {
             Origin = characterEntity;
             Id = characterEntity.UniqueId;
-            TypeId = characterEntity.TypeId;
+            EntityType = characterEntity.EntityType;
             Position = new ReactiveProperty<Vector3>(characterEntity.Position);
             Level = new ReactiveProperty<int>(characterEntity.Level);
             Health = new ReactiveProperty<float>(characterEntity.Health);

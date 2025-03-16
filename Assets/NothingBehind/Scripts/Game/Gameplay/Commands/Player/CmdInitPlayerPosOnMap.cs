@@ -1,7 +1,7 @@
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Maps;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Commands.Hero
+namespace NothingBehind.Scripts.Game.Gameplay.Commands.Player
 {
     public class CmdInitPlayerPosOnMap : ICommand
     {

@@ -1,4 +1,5 @@
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
+using NothingBehind.Scripts.Game.State.Entities;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Settings.Gameplay.Characters
@@ -6,7 +7,7 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Characters
     [CreateAssetMenu(fileName = "HeroSettings", menuName = "Game Settings/Characters/New Hero Settings")]
     public class PlayerSettings : ScriptableObject
     {
-        public string TypeId;
+        public EntityType EntityType;
         
         public float Health;
         

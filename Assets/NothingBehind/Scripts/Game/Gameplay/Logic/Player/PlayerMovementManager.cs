@@ -5,16 +5,16 @@ using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using R3;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 {
-    public class HeroMovementManager
+    public class PlayerMovementManager
     {
         private readonly PlayerSettings _playerSettings;
         private readonly GameplayInputManager _inputManager;
 
-        private CharacterController _heroCharacterController;
+        private CharacterController _playerCharacterController;
         private Transform _mainCameraTransform;
-        private Transform _heroTransform;
+        private Transform _playerTransform;
         private AnimatorManager _animatorManager;
 
         private float _speed;
@@ -28,7 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
         private bool _grounded;
         private bool _isCrouch;
 
-        public HeroMovementManager(PlayerSettings playerSettings,
+        public PlayerMovementManager(PlayerSettings playerSettings,
             GameplayInputManager inputManager)
         {
             _inputManager = inputManager;
@@ -37,11 +37,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
             _inputManager.IsCrouch.Skip(1).Subscribe(_ => Crouch());
         }
 
-        public void BindHeroViewComponent(PlayerView heroView, Camera mainCamera, CharacterController controller)
+        public void BindPlayerViewComponent(PlayerView heroView, Camera mainCamera, CharacterController controller)
         {
-            _heroCharacterController = controller;
+            _playerCharacterController = controller;
             _mainCameraTransform = mainCamera.transform;
-            _heroTransform = heroView.transform;
+            _playerTransform = heroView.transform;
             _animatorManager = heroView.GetComponent<AnimatorManager>();
         }
 
@@ -96,16 +96,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                 //pointToCheckClip.localPosition = new Vector3(0.2f, 0.95f, 0);
                 //TargetPointForAim.localPosition = new Vector3(0, 0.9f, 0);
                 _animatorManager.Crouch(_isCrouch);
-                _heroCharacterController.height = _playerSettings.CrouchHeight;
-                _heroCharacterController.center = _playerSettings.crouchCenter;
+                _playerCharacterController.height = _playerSettings.CrouchHeight;
+                _playerCharacterController.center = _playerSettings.crouchCenter;
             }
             else
             {
                 //pointToCheckClip.localPosition = new Vector3(0.2f, 1.6f, 0);
                 //TargetPointForAim.localPosition = new Vector3(0, 1.4f, 0);
                 _animatorManager.Crouch(_isCrouch);
-                _heroCharacterController.height = _playerSettings.DefaultHeight;
-                _heroCharacterController.center = _playerSettings.DefaultCenter;
+                _playerCharacterController.height = _playerSettings.DefaultHeight;
+                _playerCharacterController.center = _playerSettings.DefaultCenter;
             }
         }
 
@@ -124,7 +124,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                 cameraF.normalized * movementDirection.y + cameraR.normalized * movementDirection.x;
             moveDirectional = Vector3.ClampMagnitude(moveDirectional, 1);
 
-            Vector3 relativeVector = _heroTransform.InverseTransformDirection(moveDirectional);
+            Vector3 relativeVector = _playerTransform.InverseTransformDirection(moveDirectional);
 
             _speedBlendX = Mathf.Lerp(_speedBlendX, relativeVector.x, Time.deltaTime * _playerSettings.SpeedBlendAim);
             _speedBlendY = Mathf.Lerp(_speedBlendY, relativeVector.z, Time.deltaTime * _playerSettings.SpeedBlendAim);
@@ -136,12 +136,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
 
         private void MoveForwardDirection()
         {
-            float rotation = Mathf.SmoothDampAngle(_heroTransform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+            float rotation = Mathf.SmoothDampAngle(_playerTransform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                 _playerSettings.RotationSmoothTime);
 
             // повернуться лицом в соответствии с заданым направлением левым стиком относительно камеры,
             // если в данный момент не нажата кнопка "прицелиться"
-            _heroTransform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            _playerTransform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 
             // update animator if using character
             _animatorManager.Move(_speedBlend);
@@ -165,7 +165,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                 Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
                 // move direction the player
-                _heroCharacterController.Move(targetDirection * (_speed * Time.deltaTime) +
+                _playerCharacterController.Move(targetDirection * (_speed * Time.deltaTime) +
                                               new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
             }
         }
@@ -202,7 +202,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
             if (movementDir == Vector2.zero) targetSpeed = 0.0f;
 
             // a reference to the players current horizontal velocity
-            var velocity = _heroCharacterController.velocity;
+            var velocity = _playerCharacterController.velocity;
             float currentHorizontalSpeed =
                 new Vector3(velocity.x, 0.0f, velocity.z).magnitude;
 
@@ -271,7 +271,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
         private void GroundedCheck()
         {
             // set sphere position, with offset
-            var position = _heroTransform.position;
+            var position = _playerTransform.position;
             Vector3 spherePosition = new Vector3(position.x,
                 position.y - _playerSettings.GroundedOffset,
                 position.z);

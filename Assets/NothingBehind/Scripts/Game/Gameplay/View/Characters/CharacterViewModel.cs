@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using R3;
 using UnityEngine;
@@ -18,14 +19,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
         public ReadOnlyReactiveProperty<Vector3> Position { get; }
         public ReadOnlyReactiveProperty<int> Level { get; }
         public ReadOnlyReactiveProperty<float> Health { get; }
-        public readonly string TypeId;
+        public readonly EntityType Type;
 
         public CharacterViewModel(
             Character character, 
             CharacterSettings characterSettings, 
             CharactersService charactersService)
         {
-            TypeId = character.TypeId;
+            Type = character.EntityType;
             CharacterEntityId = character.Id;
             Level = character.Level;
             Health = character.Health;

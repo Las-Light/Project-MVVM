@@ -2,7 +2,6 @@ using DI.Scripts;
 using NothingBehind.Scripts.Game.Gameplay.Logic;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Services;
-using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
 using NothingBehind.Scripts.Game.Gameplay.View.UI;
 using NothingBehind.Scripts.Game.State;
 
@@ -17,7 +16,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             container.RegisterFactory(c => new WorldGameplayRootViewModel(
                     c.Resolve<CharactersService>(),
                     c.Resolve<IGameStateProvider>(),
-                    c.Resolve<HeroService>(),
+                    c.Resolve<PlayerService>(),
                     c.Resolve<ResourcesService>(),
                     c.Resolve<SpawnService>(),
                     c.Resolve<MapTransferService>(),

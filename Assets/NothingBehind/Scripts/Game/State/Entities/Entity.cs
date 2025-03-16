@@ -6,5 +6,6 @@ namespace NothingBehind.Scripts.Game.State.Entities
     public class Entity
     {
         public int UniqueId;
+        public EntityType EntityType;
     }
 }

@@ -7,14 +7,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Math = System.Math;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 {
-    public class HeroTurnManager
+    public class PlayerTurnManager
     {
         private readonly GameplayInputManager _inputManager;
         private readonly PlayerSettings _playerSettings;
 
-        private PlayerView _heroView;
+        private PlayerView _playerView;
         private Camera _mainCamera;
         private PlayerInput _playerInput;
         private AnimatorManager _animatorManager;
@@ -22,16 +22,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
         private Vector3 _mouseWorldPosition;
         private float _turnRotation;
 
-        public HeroTurnManager(GameplayInputManager inputManager,
+        public PlayerTurnManager(GameplayInputManager inputManager,
             PlayerSettings playerSettings)
         {
             _inputManager = inputManager;
             _playerSettings = playerSettings;
         }
 
-        public void BindHeroViewComponent(PlayerView heroView, Camera mainCamera, PlayerInput playerInput)
+        public void BindPlayerViewComponent(PlayerView heroView, Camera mainCamera, PlayerInput playerInput)
         {
-            _heroView = heroView;
+            _playerView = heroView;
             _mainCamera = mainCamera;
             _playerInput = playerInput;
             _animatorManager = heroView.GetComponent<AnimatorManager>();
@@ -56,7 +56,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
                         CalculateAimMousePosition(raycastHit.point, _inputManager.LookMouse.CurrentValue);
 
                     Vector3 worldAimTarget = _mouseWorldPosition;
-                    var transform = _heroView.transform;
+                    var transform = _playerView.transform;
                     worldAimTarget.y = transform.position.y;
                     Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
 
@@ -106,7 +106,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Hero
 
 
                 // поворот на месте на 180 градусов (без анимации)
-                var transform = _heroView.transform;
+                var transform = _playerView.transform;
                 _turnRotation = Vector3.SignedAngle(skewedInput.normalized, transform.forward, transform.up);
                 float turnRotAbs = Mathf.Abs(_turnRotation);
 

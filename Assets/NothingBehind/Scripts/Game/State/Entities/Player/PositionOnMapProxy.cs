@@ -2,7 +2,7 @@ using NothingBehind.Scripts.Game.State.Maps;
 using R3;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.State.Entities.Hero
+namespace NothingBehind.Scripts.Game.State.Entities.Player
 {
     public class PositionOnMapProxy
     {

@@ -1,5 +1,5 @@
 using System.Linq;
-using NothingBehind.Scripts.Game.State.Entities.Hero;
+using NothingBehind.Scripts.Game.State.Entities.Player;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventory;
 using NothingBehind.Scripts.Game.State.Maps;
@@ -13,7 +13,7 @@ namespace NothingBehind.Scripts.Game.State.Root
         //TODO: сделать поле приватным
         public readonly GameState _gameState;
         public readonly ReactiveProperty<MapId> CurrentMapId = new();
-        public ReactiveProperty<Player> Hero { get; } = new();
+        public ReactiveProperty<Player> Player { get; } = new();
         public ObservableList<Map> Maps { get; } = new();
         public ObservableList<Resource> Resources { get; } = new();
         public ObservableList<Inventory.Inventory> Inventories { get; } = new();
@@ -26,7 +26,7 @@ namespace NothingBehind.Scripts.Game.State.Root
             InitMaps(gameState);
             InitResources(gameState);
             InitInventories(gameState);
-            InitHero(gameState);
+            InitPlayer(gameState);
 
             CurrentMapId.Skip(1).Subscribe(newValue => gameState.CurrentMapId = newValue);
         }
@@ -41,9 +41,9 @@ namespace NothingBehind.Scripts.Game.State.Root
             return _gameState.CreateItemId();
         }
 
-        private void InitHero(GameState gameState)
+        private void InitPlayer(GameState gameState)
         {
-            Hero.Value = new Player(gameState.playerData);
+            Player.Value = new Player(gameState.PlayerData);
         }
 
         private void InitMaps(GameState gameState)

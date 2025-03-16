@@ -4,6 +4,7 @@ using NothingBehind.Scripts.Game.Gameplay.Commands.Inventories;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Root;
 using UnityEngine;
 
@@ -24,11 +25,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories
         public bool Handle(CmdCreateInventory command)
         {
             var inventorySettings =
-                _inventoriesSettings.Inventories.First(settings => settings.OwnerTypeId == command.OwnerTypeId);
+                _inventoriesSettings.Inventories.First(settings => settings.OwnerType == command.OwnerType);
             var inventory = new InventoryData()
             {
                 OwnerId = command.OwnerId,
-                OwnerTypeId = command.OwnerTypeId
+                OwnerType = command.OwnerType
             };
 
             var inventoryGrids = new List<InventoryGridData>();

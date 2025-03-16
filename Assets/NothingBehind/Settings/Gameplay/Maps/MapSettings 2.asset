@@ -23,13 +23,13 @@ MonoBehaviour:
     EnemySpawns:
     - Id: SpawnMarker
       Characters:
-      - TypeId: Dummy
+      - EntityType: 2
         LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
         Position: {x: 13.6, y: 0.0000038146973, z: 12.8}
-      - TypeId: Dummy
+      - EntityType: 2
         LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
         Position: {x: -10.4, y: 0.0000038146973, z: 12.4}
-      - TypeId: Dummy
+      - EntityType: 2
         LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
         Position: {x: -34.2, y: 0.0000038146973, z: 12.4}
       Position: {x: -10.954521, y: -0.0000038146973, z: 26.492702}

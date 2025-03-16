@@ -1,5 +1,3 @@
-using NothingBehind.Scripts.Game.Gameplay.Logic.Hero;
-
 namespace NothingBehind.Scripts.Game.Gameplay.Logic.Animation
 {
     public interface IAnimationStateReader

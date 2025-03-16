@@ -27,7 +27,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
                 return false;
             }
             var entityId = _gameState.CreateEntityId();
-            var characterSettings = _charactersSettings.AllCharacters.First(c=>c.TypeId == command.CharacterTypeId);
+            var characterSettings = _charactersSettings.AllCharacters.First(c=>c.EntityType == command.CharacterType);
             var characterLevel = characterSettings.LevelSettings.First(l => l.Level == command.Level);
             var characterData = new CharacterData
             {
@@ -35,11 +35,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
                 Position = command.Position,
                 Level = command.Level,
                 Health = characterLevel.Health,
-                TypeId = command.CharacterTypeId
+                EntityType = command.CharacterType
             };
 
             var newCharacterEntityProxy = new Character(characterData);
-            command.InventoryService.CreateInventory(command.CharacterTypeId, entityId);
+            command.InventoryService.CreateInventory(command.CharacterType, entityId);
             currentMap.Characters.Add(newCharacterEntityProxy);
 
             return true; // тут может быть валидация на создание сущности

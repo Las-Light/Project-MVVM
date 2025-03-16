@@ -33,7 +33,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Maps
         {
             foreach (var character in Characters)
             {
-                _charactersService.CreateCharacter(character.TypeId, character.LevelSettings.Level, character.Position);
+                _charactersService.CreateCharacter(character.EntityType, character.LevelSettings.Level, character.Position);
             }
         }
 

@@ -3,10 +3,12 @@ using System.Linq;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
-using NothingBehind.Scripts.Game.State.Entities.Hero;
+using NothingBehind.Scripts.Game.State.Entities.Player;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
@@ -26,7 +28,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             gameState.Inventories = new List<InventoryData>();
             gameState.Maps = CreateMaps(gameState, gameSettings);
             gameState.CurrentMapId = currentMapId;
-            gameState.playerData = CreatePlayer(gameState, gameSettings, currentMapId, currentMapSettings);
+            gameState.PlayerData = CreatePlayer(gameState, gameSettings, currentMapId, currentMapSettings);
             gameState.Resources = new List<ResourceData>()
             {
                 new() { Amount = 0, ResourceType = ResourceType.SoftCurrency },
@@ -42,12 +44,8 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             var hero = new PlayerData()
             {
                 UniqueId = gameState.CreateEntityId(),
-                TypeId = gameSettings.playerSettings.TypeId,
-                CurrentMap = new PositionOnMap()
-                {
-                    MapId = currentMapId,
-                    Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition
-                },
+                EntityType = gameSettings.PlayerSettings.EntityType,
+                CurrentMap = currentMapId,
                 PositionOnMaps = new List<PositionOnMap>()
                 {
                     new()
@@ -56,9 +54,9 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                         Position = currentMapSettings.InitialStateSettings.PlayerInitialPosition
                     }
                 },
-                Health = gameSettings.playerSettings.Health
+                Health = gameSettings.PlayerSettings.Health
             };
-            gameState.Inventories.Add(CreateInventories(gameState, gameSettings, hero.TypeId, hero.UniqueId));
+            gameState.Inventories.Add(CreateInventories(gameState, gameSettings, hero.EntityType, hero.UniqueId));
 
             return hero;
         }
@@ -133,27 +131,27 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                 var initialCharacter = new CharacterData
                 {
                     UniqueId = gameState.CreateEntityId(),
-                    TypeId = characterSettings.TypeId,
+                    EntityType = characterSettings.EntityType,
                     Position = characterSettings.Position,
                     Level = characterLevelSettings.Level,
                     Health = characterLevelSettings.Health
                 };
-                gameState.Inventories.Add(CreateInventories(gameState, gameSettings, initialCharacter.TypeId, initialCharacter.UniqueId));
+                gameState.Inventories.Add(CreateInventories(gameState, gameSettings, initialCharacter.EntityType, initialCharacter.UniqueId));
                 initialCharacters.Add(initialCharacter);
             }
 
             return initialCharacters;
         }
 
-        private InventoryData CreateInventories(GameState gameState, GameSettings gameSettings, string ownerTypeId,
+        private InventoryData CreateInventories(GameState gameState, GameSettings gameSettings, EntityType ownerType,
             int ownerId)
         {
             var inventorySettings =
-                gameSettings.InventoriesSettings.Inventories.First(settings => settings.OwnerTypeId == ownerTypeId);
+                gameSettings.InventoriesSettings.Inventories.First(settings => settings.OwnerType == ownerType);
             var inventory = new InventoryData()
             {
                 OwnerId = ownerId,
-                OwnerTypeId = ownerTypeId
+                OwnerType = ownerType
             };
             var inventoryGrids = new List<InventoryGridData>();
             foreach (var inventoryGridSettings in inventorySettings.InventoryGrids)

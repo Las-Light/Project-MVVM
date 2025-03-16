@@ -23,7 +23,7 @@ namespace NothingBehind.Scripts.Editor
                 spawnMarker.Characters =
                     FindObjectsByType<CharacterMarker>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
                         .Select(x => new CharacterInitialStateSettings(
-                            x.Character.TypeId,
+                            x.Character.EntityType,
                             x.Character.LevelSettings,
                             x.transform.position
                         )).ToList();

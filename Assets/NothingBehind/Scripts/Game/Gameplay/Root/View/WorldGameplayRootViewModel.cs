@@ -2,13 +2,13 @@ using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Logic;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Services;
-using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
 using NothingBehind.Scripts.Game.Gameplay.View;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
 using NothingBehind.Scripts.Game.Gameplay.View.UI;
 using NothingBehind.Scripts.Game.State;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventory;
 using ObservableCollections;
@@ -21,13 +21,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
     {
         private readonly CharactersService _charactersService;
         private readonly IGameStateProvider _gameStateProvider;
-        private readonly HeroService _heroService;
+        private readonly PlayerService _playerService;
         private readonly ResourcesService _resourcesService;
         private readonly GameplayInputManager _gameplayInputManager;
         private readonly CameraManager _cameraManager;
         private readonly InventoryService _inventoryService;
 
-        public readonly ReadOnlyReactiveProperty<PlayerViewModel> Hero;
+        public readonly ReadOnlyReactiveProperty<PlayerViewModel> Player;
         public readonly ReadOnlyReactiveProperty<CameraViewModel> CameraViewModel;
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
         public readonly IObservableCollection<InventoryViewModel> AllInventories;
@@ -36,7 +36,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
         public WorldGameplayRootViewModel(CharactersService charactersService,
             IGameStateProvider gameStateProvider,
-            HeroService heroService,
+            PlayerService playerService,
             ResourcesService resourcesService,
             SpawnService spawnService,
             MapTransferService mapService,
@@ -46,14 +46,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         {
             _charactersService = charactersService;
             _gameStateProvider = gameStateProvider;
-            _heroService = heroService;
+            _playerService = playerService;
             _resourcesService = resourcesService;
             _gameplayInputManager = gameplayInputManager;
             _cameraManager = cameraManager;
             _inventoryService = inventoryService;
 
             CameraViewModel = cameraManager.CameraViewModel;
-            Hero = heroService.HeroViewModel;
+            Player = playerService.PlayerViewModel;
             AllCharacters = charactersService.AllCharacters;
             AllInventories = inventoryService.AllInventories;
             AllMapTransfers = mapService.MapTransfers;
@@ -76,12 +76,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             foreach (var inventory in gameState.Inventories)
             {
-                if (inventory.OwnerTypeId != "Hero")
+                if (inventory.OwnerType != EntityType.Player)
                 {
                     continue;
                 }
 
-                Debug.Log(inventory.OwnerTypeId + " " + inventory.OwnerId);
+                Debug.Log(inventory.OwnerType + " " + inventory.OwnerId);
                 foreach (var grid in inventory.InventoryGrids)
                 {
                     for (int i = 0; i < grid.Items.Count; i++)
@@ -93,7 +93,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             foreach (var inventoryViewModel in AllInventories)
             {
-                if (inventoryViewModel.OwnerTypeId != "Hero")
+                if (inventoryViewModel.OwnerType != EntityType.Player)
                 {
                     continue;
                 }
@@ -109,7 +109,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             foreach (var inventory in gameState.Inventories)
             {
-                if (inventory.OwnerTypeId != "Hero")
+                if (inventory.OwnerType != EntityType.Player)
                 {
                     continue;
                 }
@@ -123,7 +123,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
                     for (int i = 0; i < grid.Grid.Value.Length; i++)
                     {
-                        Debug.Log(grid.Grid.Value[i] + $" Grid in {inventory.OwnerTypeId} {inventory.OwnerId}");
+                        Debug.Log(grid.Grid.Value[i] + $" Grid in {inventory.OwnerType} {inventory.OwnerId}");
                     }
                 }
             }
@@ -146,7 +146,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             foreach (var data in inventories)
             {
-                if (data.OwnerTypeId != "Hero")
+                if (data.OwnerType != EntityType.Player)
                 {
                     continue;
                 }
@@ -164,7 +164,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             foreach (var inventory in AllInventories)
             {
-                Debug.Log(inventory.OwnerTypeId + inventory.OwnerId);
+                Debug.Log(inventory.OwnerType + inventory.OwnerId);
             }
             // foreach (var inventory in gameState.Inventories)
             // {

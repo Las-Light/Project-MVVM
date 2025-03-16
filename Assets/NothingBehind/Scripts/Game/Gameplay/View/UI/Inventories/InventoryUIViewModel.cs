@@ -1,5 +1,6 @@
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.MVVM.UI;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.UI.Inventories
@@ -10,12 +11,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI.Inventories
         
         private readonly InventoryService _inventoryService;
         public readonly int TargetOwnerId;
-        public readonly int HeroId;
+        public readonly int PlayerId;
 
         public InventoryUIViewModel(InventoryService inventoryService, int targetOwnerId)
         {
             _inventoryService = inventoryService;
-            HeroId = inventoryService.HeroId;
+            PlayerId = inventoryService.PlayerId;
             TargetOwnerId = targetOwnerId;
         }
 
@@ -30,8 +31,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI.Inventories
             return CreateInventoryViewModel(ownerId);
         }
 
-
-        public bool CreateInventory(string ownerTypeId, int ownerId)
+        public bool CreateInventory(EntityType ownerTypeId, int ownerId)
         {
             return _inventoryService.CreateInventory(ownerTypeId, ownerId);
         }

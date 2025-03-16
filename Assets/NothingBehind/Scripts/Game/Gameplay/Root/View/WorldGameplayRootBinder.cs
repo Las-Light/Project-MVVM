@@ -16,7 +16,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly Dictionary<int, CharacterBinder> _createCharactersMap = new();
         private readonly Dictionary<MapId, MapTransferBinder> _createMapTransfersMap = new();
         private readonly Dictionary<string, EnemySpawnBinder> _createSpawns = new();
-        private PlayerView _hero;
+        private PlayerView _playerView;
         private CameraBinder _camera;
         private readonly CompositeDisposable _disposables = new();
         private WorldGameplayRootViewModel _viewModel;
@@ -27,14 +27,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         {
             _viewModel = viewModel;
 
-            viewModel.Hero.Subscribe(heroViewModel => CreateHero(heroViewModel, gameplayUIManager));
-            viewModel.CameraViewModel.Subscribe(cvm => CreateCamera(cvm, _hero));
+            viewModel.Player.Subscribe(heroViewModel => CreatePlayer(heroViewModel, gameplayUIManager));
+            viewModel.CameraViewModel.Subscribe(cvm => CreateCamera(cvm, _playerView));
             foreach (var characterViewModel in viewModel.AllCharacters) CreateCharacter(characterViewModel, gameplayUIManager);
             foreach (var mapTransferViewModel in viewModel.AllMapTransfers)
                 CreateMapTransfer(mapTransferViewModel, exitSceneSignalSubj);
             foreach (var enemySpawnViewModel in viewModel.AllSpawns) CreateSpawnTrigger(enemySpawnViewModel);
 
-            _disposables.Add(viewModel.Hero);
+            _disposables.Add(viewModel.Player);
             _disposables.Add(viewModel.AllCharacters.ObserveAdd()
                 .Subscribe(e => CreateCharacter(e.Value, gameplayUIManager)));
 
@@ -63,14 +63,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _camera = cameraBinder;
         }
 
-        private void CreateHero(PlayerViewModel playerViewModel, GameplayUIManager gameplayUIManager)
+        private void CreatePlayer(PlayerViewModel playerViewModel, GameplayUIManager gameplayUIManager)
         {
             var prefabHeroPath = "Prefabs/Gameplay/World/Characters/Player";
             var heroPrefab = Resources.Load<PlayerView>(prefabHeroPath);
 
             var heroBinder = Instantiate(heroPrefab);
             heroBinder.Bind(playerViewModel, gameplayUIManager);
-            _hero = heroBinder;
+            _playerView = heroBinder;
         }
 
         private void CreateCharacter(CharacterViewModel characterViewModel, GameplayUIManager gameplayUIManager)
@@ -79,9 +79,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             // для примера:
             var characterLevel = characterViewModel.Level.CurrentValue;
             //
-            var characterType = characterViewModel.TypeId;
+            var characterType = characterViewModel.Type;
             var prefabCharacterLevelPath =
-                $"Prefabs/Gameplay/World/Characters/Character_{characterType}_{characterLevel}";
+                $"Prefabs/Gameplay/World/Characters/{characterType}_{characterLevel}";
             var characterPrefab = Resources.Load<CharacterBinder>(prefabCharacterLevelPath);
 
             var createdCharacter = Instantiate(characterPrefab);

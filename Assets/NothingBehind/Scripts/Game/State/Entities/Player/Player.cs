@@ -1,16 +1,17 @@
 using System.Linq;
+using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
 
-namespace NothingBehind.Scripts.Game.State.Entities.Hero
+namespace NothingBehind.Scripts.Game.State.Entities.Player
 {
     public class Player
     {
         public int Id { get; }
-        public string TypeId { get; }
+        public EntityType EntityType { get; }
         public PlayerData Origin { get; }
         public ReactiveProperty<float> Health { get; }
-        public ReactiveProperty<PositionOnMapProxy> CurrentMap { get; }
+        public ReactiveProperty<MapId> CurrentMap { get; }
 
         public ObservableList<PositionOnMapProxy> PositionOnMaps { get; } = new();
 
@@ -18,13 +19,13 @@ namespace NothingBehind.Scripts.Game.State.Entities.Hero
         {
             Origin = playerData;
             Id = playerData.UniqueId;
-            TypeId = playerData.TypeId;
+            EntityType = playerData.EntityType;
             
             InitPosOnMaps(playerData);
 
-            CurrentMap = new ReactiveProperty<PositionOnMapProxy>(new PositionOnMapProxy(playerData.CurrentMap));
+            CurrentMap = new ReactiveProperty<MapId>(playerData.CurrentMap);
             Health = new ReactiveProperty<float>(playerData.Health);
-            CurrentMap.Skip(1).Subscribe(value => playerData.CurrentMap = value.Origin);
+            CurrentMap.Skip(1).Subscribe(value => playerData.CurrentMap = value);
             Health.Skip(1).Subscribe(value => playerData.Health = value);
         }
 

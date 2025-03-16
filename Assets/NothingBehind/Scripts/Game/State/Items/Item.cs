@@ -1,9 +1,8 @@
 using R3;
-using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.State.Inventory
+namespace NothingBehind.Scripts.Game.State.Items
 {
-    public partial class Item
+    public class Item
     {
         public int Id { get; }
         public ItemType ItemType { get; }

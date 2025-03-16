@@ -350,7 +350,7 @@ GameObject:
   m_Component:
   - component: {fileID: 944018454435930702}
   m_Layer: 5
-  m_Name: HeroInventoryContainer
+  m_Name: PlayerInventoryContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -605,5 +605,5 @@ MonoBehaviour:
   _btnClose: {fileID: 6194066348410309157}
   _btnCloseAlt: {fileID: 0}
   _inventoryPrefab: {fileID: 8217122136197608629, guid: c191e06bd91bc8a4392d3fe1833f8551, type: 3}
-  _heroInventoryContainer: {fileID: 944018454435930702}
+  _playerInventoryContainer: {fileID: 944018454435930702}
   _lootInventoryContainer: {fileID: 7848297733308454885}

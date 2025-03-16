@@ -5,7 +5,9 @@ using NothingBehind.Scripts.Game.Gameplay.Commands.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
@@ -16,7 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
     public class InventoryViewModel : IDisposable
     {
         public readonly int OwnerId;
-        public readonly string OwnerTypeId;
+        public readonly EntityType OwnerType;
 
         public IObservableCollection<InventoryGridViewModel> AllInventoryGrids => _allInventoryGrids;
 
@@ -36,7 +38,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             InventoryService inventoryService)
         {
             OwnerId = inventory.OwnerId;
-            OwnerTypeId = inventory.OwnerTypeId;
+            OwnerType = inventory.OwnerType;
             _commandProcessor = commandProcessor;
             _inventoryService = inventoryService;
 
@@ -73,7 +75,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         // Создает InventorGridDataProxy
         public bool CreateGridInventory(string gridTypeId)
         {
-            var command = new CmdCreateGridInventory(OwnerTypeId, OwnerId, gridTypeId);
+            var command = new CmdCreateGridInventory(OwnerType, OwnerId, gridTypeId);
             var result = _commandProcessor.Process(command);
 
             return result;
@@ -104,7 +106,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
 
             throw new Exception($"Grid {gridTypeId} not found " +
-                                $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                $"in the inventory owner {OwnerType} - {OwnerId}.");
         }
 
         // Перемещение предмета по позиции в другую сетку внутри одного инвентарая 
@@ -140,18 +142,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                     else
                     {
                         throw new Exception($"Grid {gridTypeIdTo} not found " +
-                                            $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                            $"in the inventory owner {OwnerType} - {OwnerId}.");
                     }
                 }
                 else
                 {
                     throw new Exception($"Item {itemId} in {gridTypeIdAt} don't have " +
-                                        $"position in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                        $"position in the inventory owner {OwnerType} - {OwnerId}.");
                 }
             }
 
             throw new Exception($"Grid {gridTypeIdAt} not found " +
-                                $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                $"in the inventory owner {OwnerType} - {OwnerId}.");
         }
 
         // Автоперемещение предмета из одной сетки в ругую
@@ -186,18 +188,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                     else
                     {
                         throw new Exception($"Grid {gridTypeIdTo} not found " +
-                                            $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                            $"in the inventory owner {OwnerType} - {OwnerId}.");
                     }
                 }
                 else
                 {
                     throw new Exception($"Item {itemId} in {gridTypeIdAt} don't have " +
-                                        $"position in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                        $"position in the inventory owner {OwnerType} - {OwnerId}.");
                 }
             }
 
             throw new Exception($"Grid {gridTypeIdAt} not found " +
-                                $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                $"in the inventory owner {OwnerType} - {OwnerId}.");
         }
 
         // Перемещение предмета по позиции из одного инвентаря в другой
@@ -225,7 +227,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
 
             throw new Exception($"Grid {gridTypeId} not found " +
-                                $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                $"in the inventory owner {OwnerType} - {OwnerId}.");
         }
 
         // Полпытаться удалить некоторое количество из стека предмета
@@ -237,7 +239,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
 
             throw new Exception($"Grid {gridTypeId} not found " +
-                                $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                $"in the inventory owner {OwnerType} - {OwnerId}.");
         }
 
         public AddItemsToInventoryGridResult TryAddToGrid(string gridTypeId, Item item, Vector2Int position,
@@ -249,7 +251,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
 
             throw new Exception($"Grid {gridTypeId} not found " +
-                                $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                $"in the inventory owner {OwnerType} - {OwnerId}.");
         }
 
         public AddItemsToInventoryGridResult TryAddToGrid(string gridTypeId, Item item, int amount)
@@ -260,7 +262,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             }
 
             throw new Exception($"Grid {gridTypeId} not found " +
-                                $"in the inventory owner {OwnerTypeId} - {OwnerId}.");
+                                $"in the inventory owner {OwnerType} - {OwnerId}.");
         }
 
         private void CreateInventoryGridViewModel(InventoryGrid inventoryGridDataProxy)

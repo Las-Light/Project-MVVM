@@ -1,4 +1,5 @@
 using System.Linq;
+using NothingBehind.Scripts.Game.State.Entities;
 using R3;
 using ObservableCollections;
 
@@ -7,7 +8,7 @@ namespace NothingBehind.Scripts.Game.State.Inventory
     public class Inventory
     {
         public int OwnerId { get; }
-        public string OwnerTypeId { get; }
+        public EntityType OwnerType { get; }
         public InventoryData Origin { get; }
         public ObservableList<InventoryGrid> InventoryGrids { get; } = new();
 
@@ -15,7 +16,7 @@ namespace NothingBehind.Scripts.Game.State.Inventory
         {
             Origin = inventoryData;
             OwnerId = inventoryData.OwnerId;
-            OwnerTypeId = inventoryData.OwnerTypeId;
+            OwnerType = inventoryData.OwnerType;
             inventoryData.InventoryGrids.ForEach(gridData => InventoryGrids.Add(new InventoryGrid(gridData)));
             
             InventoryGrids.ObserveAdd().Subscribe(e =>

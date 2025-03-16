@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.State.Items;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Inventory

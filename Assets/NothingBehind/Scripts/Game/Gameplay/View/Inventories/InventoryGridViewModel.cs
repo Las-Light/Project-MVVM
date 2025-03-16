@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;

@@ -1,3 +1,4 @@
+using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.View.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -11,11 +12,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Characters
 
         public void Bind(PlayerViewModel viewModel, GameplayUIManager gameplayUIManager)
         {
-            _viewModel = viewModel; 
-            var currentPosOnMap = viewModel.CurrentMap;
-            transform.position = currentPosOnMap.CurrentValue.Position.Value;
+            _viewModel = viewModel;
+            var currentMap = viewModel.CurrentMap.CurrentValue;
+            var currentPosOnMap = viewModel.PositionOnMaps.First(posOnMap => posOnMap.MapId == currentMap);
+            transform.position = currentPosOnMap.Position.Value;
             var mainCamera = Camera.main;
-            viewModel.SetHeroViewWithComponent(this, mainCamera);
+            viewModel.SetPlayerViewWithComponent(this, mainCamera);
         }
 
         private void Update()

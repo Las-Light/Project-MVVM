@@ -1,4 +1,5 @@
 using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Items;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Utils

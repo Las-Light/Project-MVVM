@@ -2,13 +2,12 @@ using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers;
-using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Hero;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories;
+using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Player;
 using NothingBehind.Scripts.Game.Gameplay.Logic;
-using NothingBehind.Scripts.Game.Gameplay.Logic.Hero;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
+using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.Services;
-using NothingBehind.Scripts.Game.Gameplay.Services.Hero;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
@@ -28,7 +27,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var gameSettings = settingsProvider.GameSettings;
             var charactersSettings = gameSettings.CharactersSettings;
             var gameplayCameraSettings = gameSettings.GameplayCameraSettings;
-            var heroSettings = gameSettings.playerSettings;
+            var heroSettings = gameSettings.PlayerSettings;
             var inventoriesSettings = gameSettings.InventoriesSettings;
             var coroutines = container.Resolve<Coroutines>(AppConstants.COROUTINES);
 
@@ -36,7 +35,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 
             // регистрируем процессор и команды, а также кладём CommandProcessor в контейнер
             var commandProcessor = new CommandProcessor(gameStateProvider);
-            commandProcessor.RegisterHandler(new CmdInitHeroPosOnMapHandler(gameState, gameSettings));
+            commandProcessor.RegisterHandler(new CmdInitPlayerPosOnMapHandler(gameState, gameSettings));
             commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState, charactersSettings));
             commandProcessor.RegisterHandler(new CmdCreateInventoryHandler(gameState, inventoriesSettings));
             commandProcessor.RegisterHandler(new CmdRemoveInventoryHandler(gameState));
@@ -45,7 +44,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             commandProcessor.RegisterHandler(new CmdResourcesAddHandler(gameState));
             commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));
             commandProcessor.RegisterHandler(new CmdTriggeredEnemySpawnHandler(gameState));
-            commandProcessor.RegisterHandler(new CmdUpdateHeroPosOnMapHandler(gameState));
+            commandProcessor.RegisterHandler(new CmdUpdatePlayerPosOnMapHandler(gameState));
             container.RegisterInstance<ICommandProcessor>(commandProcessor);
 
             // регистрируем менеджеры
@@ -60,9 +59,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var cameraService = container.Resolve<CameraManager>();
 
             container.RegisterFactory(c =>
-                new HeroMovementManager(heroSettings, inputManager)).AsSingle();
+                new PlayerMovementManager(heroSettings, inputManager)).AsSingle();
             
-            container.RegisterFactory(c => new HeroTurnManager(inputManager, heroSettings)).AsSingle();
+            container.RegisterFactory(c => new PlayerTurnManager(inputManager, heroSettings)).AsSingle();
             
             
             // регистрируем сервисы
@@ -71,13 +70,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
                 new InventoryService(gameState.Inventories, 
                     inventoriesSettings, 
                     commandProcessor, 
-                    gameState.Hero.Value.Id))
+                    gameState.Player.Value.Id))
                 .AsSingle();
             var inventoryService = container.Resolve<InventoryService>();
-            container.RegisterFactory(c => new HeroService(
+            container.RegisterFactory(c => new PlayerService(
                     inventoryService,
-                    container.Resolve<HeroMovementManager>(),
-                    container.Resolve<HeroTurnManager>(),
+                    container.Resolve<PlayerMovementManager>(),
+                    container.Resolve<PlayerTurnManager>(),
                     gameState,
                     commandProcessor,
                     enterParams))

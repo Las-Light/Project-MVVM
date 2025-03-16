@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 509199e3d08d423f834507a901e02b43, type: 3}
   m_Name: Inventory Config
   m_EditorClassIdentifier: 
-  OwnerTypeId: Hero
+  OwnerType: 1
   InventoryGrids:
   - {fileID: 11400000, guid: 5bb6ffb417fe74b4cb1e987ed3c50762, type: 2}
   - {fileID: 11400000, guid: 45ccfb3300188a44abe299529c515563, type: 2}

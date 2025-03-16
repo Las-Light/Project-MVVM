@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ce64501b5d54b08ad874153891756e6, type: 3}
   m_Name: DummyCharacterSettings
   m_EditorClassIdentifier: 
-  TypeId: Dummy
+  EntityType: 2
   TitleLID: Hunter
   DescriptionLID: Meelee enemy
   LevelSettings:

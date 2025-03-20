@@ -12,7 +12,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
         private readonly GameStateProxy _gameState;
         private readonly CharactersSettings _charactersSettings;
 
-        public CmdCreateCharacterHandler(GameStateProxy gameState, CharactersSettings charactersSettings)
+        public CmdCreateCharacterHandler(GameStateProxy gameState,
+            CharactersSettings charactersSettings)
         {
             _gameState = gameState;
             _charactersSettings = charactersSettings;
@@ -39,6 +40,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             };
 
             var newCharacterEntityProxy = new Character(characterData);
+            command.EquipmentService.CreateEquipment(entityId, command.CharacterType);
             command.InventoryService.CreateInventory(command.CharacterType, entityId);
             currentMap.Characters.Add(newCharacterEntityProxy);
 

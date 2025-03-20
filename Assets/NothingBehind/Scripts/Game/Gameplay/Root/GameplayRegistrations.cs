@@ -2,8 +2,9 @@ using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers;
-using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Inventories;
-using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Player;
+using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandlers;
+using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandlers;
+using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.PlayerHandlers;
 using NothingBehind.Scripts.Game.Gameplay.Logic;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
@@ -29,6 +30,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var gameplayCameraSettings = gameSettings.GameplayCameraSettings;
             var heroSettings = gameSettings.PlayerSettings;
             var inventoriesSettings = gameSettings.InventoriesSettings;
+            var equipmentsSettings = gameSettings.EquipmentsSettings;
             var coroutines = container.Resolve<Coroutines>(AppConstants.COROUTINES);
 
             container.RegisterInstance(AppConstants.EXIT_SCENE_REQUEST_TAG, new Subject<GameplayExitParams>());
@@ -39,8 +41,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState, charactersSettings));
             commandProcessor.RegisterHandler(new CmdCreateInventoryHandler(gameState, inventoriesSettings));
             commandProcessor.RegisterHandler(new CmdRemoveInventoryHandler(gameState));
-            commandProcessor.RegisterHandler(new CmdCreateGridInventoryHandler(gameState, inventoriesSettings));
+            commandProcessor.RegisterHandler(new CmdAddGridToInventoryHandler(gameState));
             commandProcessor.RegisterHandler(new CmdRemoveGridInventoryHandler(gameState));
+            commandProcessor.RegisterHandler(new CmdCreateEquipmentHandler(gameState, equipmentsSettings));
+            commandProcessor.RegisterHandler(new CmdRemoveEquipmentHandler(gameState));
             commandProcessor.RegisterHandler(new CmdResourcesAddHandler(gameState));
             commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));
             commandProcessor.RegisterHandler(new CmdTriggeredEnemySpawnHandler(gameState));
@@ -65,14 +69,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             
             
             // регистрируем сервисы
-
+            container.RegisterFactory(c => new EquipmentService(gameState.Equipments,
+                commandProcessor)).AsSingle();
+            var equipmentService = container.Resolve<EquipmentService>();
+            
             container.RegisterFactory(c =>
                 new InventoryService(gameState.Inventories, 
+                    equipmentService,
                     inventoriesSettings, 
                     commandProcessor, 
                     gameState.Player.Value.Id))
                 .AsSingle();
             var inventoryService = container.Resolve<InventoryService>();
+            
             container.RegisterFactory(c => new PlayerService(
                     inventoryService,
                     container.Resolve<PlayerMovementManager>(),
@@ -92,6 +101,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             container.RegisterFactory(c => new CharactersService(
                 loadingMap.Characters,
                 gameSettings.CharactersSettings,
+                equipmentService,
                 inventoryService,
                 commandProcessor)
             ).AsSingle();

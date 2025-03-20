@@ -1,4 +1,3 @@
-using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Logic;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Services;
@@ -6,11 +5,12 @@ using NothingBehind.Scripts.Game.Gameplay.View;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.View.Maps;
-using NothingBehind.Scripts.Game.Gameplay.View.UI;
+using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.GameResources;
-using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Inventories.Grids;
+using NothingBehind.Scripts.Game.State.Items;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -19,6 +19,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 {
     public class WorldGameplayRootViewModel
     {
+        private readonly ISettingsProvider _settingsProvider;
         private readonly CharactersService _charactersService;
         private readonly IGameStateProvider _gameStateProvider;
         private readonly PlayerService _playerService;
@@ -34,7 +35,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         public readonly IObservableCollection<MapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<EnemySpawnViewModel> AllSpawns;
 
-        public WorldGameplayRootViewModel(CharactersService charactersService,
+        public WorldGameplayRootViewModel(
+            ISettingsProvider settingsProvider,
+            CharactersService charactersService,
             IGameStateProvider gameStateProvider,
             PlayerService playerService,
             ResourcesService resourcesService,
@@ -44,6 +47,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             CameraManager cameraManager,
             InventoryService inventoryService)
         {
+            _settingsProvider = settingsProvider;
             _charactersService = charactersService;
             _gameStateProvider = gameStateProvider;
             _playerService = playerService;
@@ -86,7 +90,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                 {
                     for (int i = 0; i < grid.Items.Count; i++)
                     {
-                        Debug.Log(grid.Items[i].Id + " " + grid.Positions[i]);
+                        Debug.Log(grid.Grid.Value[i] + " " + grid.Positions[i]);
                     }
                 }
             }
@@ -116,14 +120,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
                 foreach (var grid in inventory.InventoryGrids)
                 {
-                    for (int i = 0; i < grid.Items.Count; i++)
+                    if (grid.GridType == InventoryGridType.ChestRig)
                     {
-                        Debug.Log($"{grid.Items[i].ItemType} {grid.Items[i].Id} {grid.Positions[i]} Stack = {grid.Items[i].CurrentStack.Value}");
-                    }
+                        for (int i = 0; i < grid.Items.Count; i++)
+                        {
+                            Debug.Log($"{grid.Items[i].ItemType} {grid.Items[i].Id} {grid.Positions[i]} Stack = {grid.Items[i].CurrentStack.Value}");
+                        }
 
-                    for (int i = 0; i < grid.Grid.Value.Length; i++)
-                    {
-                        Debug.Log(grid.Grid.Value[i] + $" Grid in {inventory.OwnerType} {inventory.OwnerId}");
+                        for (int i = 0; i < grid.Grid.Value.Length; i++)
+                        {
+                            Debug.Log(grid.Grid.Value[i] + $" Grid in {inventory.OwnerType} {inventory.OwnerId}");
+                        }
                     }
                 }
             }
@@ -142,7 +149,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             //         itemProxy2.CurrentStack.Value);
             // }
 
-            var inventories = _gameStateProvider.GameState._gameState.Inventories;
+            /*var inventories = _gameStateProvider.GameState._gameState.Inventories;
 
             foreach (var data in inventories)
             {
@@ -155,16 +162,43 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                 {
                     for (int i = 0; i < gridDataProxy.Items.Count; i++)
                     {
-                        Debug.Log(gridDataProxy.GridTypeId + ":");
+                        Debug.Log(gridDataProxy.GridType + ":");
                         Debug.Log(gridDataProxy.Items[i].ItemType + " ID:" + gridDataProxy.Items[i].Id + " stack:" + gridDataProxy.Items[i].CurrentStack + " " +
                                   gridDataProxy.Positions[i]);
                     }
                 }
-            }
+            }*/
 
             foreach (var inventory in AllInventories)
             {
-                Debug.Log(inventory.OwnerType + inventory.OwnerId);
+                var itemSettings = _settingsProvider.GameSettings.ItemsSettings.Items[Random.Range(0, 4)];
+                var gameState = _gameStateProvider.GameState._gameState;
+                var item = ItemsFactory.CreateItem(ItemsDataFactory.CreateItemData(
+                    gameState, itemSettings));
+                Debug.Log($"{inventory.OwnerType} + {inventory.OwnerId}");
+                foreach (var grid in inventory.AllInventoryGrids)
+                {
+                    if (grid.GridType == InventoryGridType.Backpack)
+                    {
+                        grid.AddItems(item, item.CurrentStack.Value);
+                    }
+
+                    foreach (var itemInGrid in grid.Items)
+                    {
+                        Debug.Log($"{itemInGrid.ItemType} + {itemInGrid.Id}");
+                    }
+                }
+
+                /*foreach (var inventoryData in gameState.Inventories)
+                {
+                    foreach (var inventoryGrid in inventoryData.InventoryGrids)
+                    {
+                        foreach (var b in inventoryGrid.Grid)
+                        {
+                            Debug.Log(b);
+                        }
+                    }
+                }*/
             }
             // foreach (var inventory in gameState.Inventories)
             // {

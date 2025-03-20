@@ -14,6 +14,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 {
     public class CharactersService
     {
+        private readonly EquipmentService _equipmentService;
         private readonly InventoryService _inventoryService;
         private readonly ICommandProcessor _commandProcessor;
         private readonly ObservableList<CharacterViewModel> _allCharacters = new();
@@ -25,9 +26,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         public CharactersService(
             IObservableCollection<Character> characters,
             CharactersSettings charactersSettings,
+            EquipmentService equipmentService,
             InventoryService inventoryService,
             ICommandProcessor commandProcessor)
         {
+            _equipmentService = equipmentService;
             _inventoryService = inventoryService;
             _commandProcessor = commandProcessor;
 
@@ -54,7 +57,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         public bool CreateCharacter(EntityType characterType, int level, Vector3 position)
         {
-            var command = new CmdCreateCharacter(characterType, level, position, _inventoryService);
+            var command = new CmdCreateCharacter(characterType, level,
+                position, _equipmentService, _inventoryService);
             var result = _commandProcessor.Process(command);
             
             return result;

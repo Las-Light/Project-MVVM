@@ -1,10 +1,12 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.State.Entities.Player;
+using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.GameResources;
-using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Inventories;
 using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
 using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Root
 {
@@ -13,10 +15,11 @@ namespace NothingBehind.Scripts.Game.State.Root
         //TODO: сделать поле приватным
         public readonly GameState _gameState;
         public readonly ReactiveProperty<MapId> CurrentMapId = new();
-        public ReactiveProperty<Player> Player { get; } = new();
+        public ReactiveProperty<Player> Player { get; }
         public ObservableList<Map> Maps { get; } = new();
         public ObservableList<Resource> Resources { get; } = new();
-        public ObservableList<Inventory.Inventory> Inventories { get; } = new();
+        public ObservableList<Inventory> Inventories { get; } = new();
+        public ObservableList<Equipment> Equipments { get; } = new();
 
         public GameStateProxy(GameState gameState)
         {
@@ -26,7 +29,9 @@ namespace NothingBehind.Scripts.Game.State.Root
             InitMaps(gameState);
             InitResources(gameState);
             InitInventories(gameState);
-            InitPlayer(gameState);
+            InitEquipments(gameState);
+            Player = new ReactiveProperty<Player>(new Player(gameState.PlayerData));
+            Player.Subscribe(player => gameState.PlayerData = player.Origin);
 
             CurrentMapId.Skip(1).Subscribe(newValue => gameState.CurrentMapId = newValue);
         }
@@ -40,10 +45,10 @@ namespace NothingBehind.Scripts.Game.State.Root
         {
             return _gameState.CreateItemId();
         }
-
-        private void InitPlayer(GameState gameState)
+        
+        public int CreateGridId()
         {
-            Player.Value = new Player(gameState.PlayerData);
+            return _gameState.CreateGridId();
         }
 
         private void InitMaps(GameState gameState)
@@ -67,7 +72,7 @@ namespace NothingBehind.Scripts.Game.State.Root
 
         private void InitInventories(GameState gameState)
         {
-            gameState.Inventories.ForEach(inventoryOrigin => Inventories.Add(new Inventory.Inventory(inventoryOrigin)));
+            gameState.Inventories.ForEach(inventoryOrigin => Inventories.Add(new Inventory(inventoryOrigin)));
 
             Inventories.ObserveAdd().Subscribe(e =>
             {
@@ -81,6 +86,25 @@ namespace NothingBehind.Scripts.Game.State.Root
                 var removedInventoryData = gameState.Inventories.FirstOrDefault(c =>
                     c.OwnerId == removedInventory.OwnerId);
                 gameState.Inventories.Remove(removedInventoryData);
+            });
+        }
+        
+        private void InitEquipments(GameState gameState)
+        {
+            gameState.Equipments.ForEach(equipmentData => Equipments.Add(new Equipment(equipmentData)));
+
+            Equipments.ObserveAdd().Subscribe(e =>
+            {
+                var addedEquipment = e.Value;
+                gameState.Equipments.Add(addedEquipment.Origin);
+            });
+
+            Equipments.ObserveRemove().Subscribe(e =>
+            {
+                var removedEquipment = e.Value;
+                var removedEquipmentData = gameState.Equipments.FirstOrDefault(c =>
+                    c.OwnerId == removedEquipment.OwnerId);
+                gameState.Equipments.Remove(removedEquipmentData);
             });
         }
 

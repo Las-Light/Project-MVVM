@@ -1,4 +1,3 @@
-using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.State.Entities;
 using UnityEngine;
 
@@ -68,8 +67,8 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Characters
         [Tooltip("What layers the character uses as ground")]
         public LayerMask GroundLayers;
 
-        [Space(10)] [Header("Aim")] [SerializeField]
-        public LayerMask AimColliderLayerMask = new LayerMask();
+        [Space(10)] [Header("Aim")]
+        public LayerMask AimColliderLayerMask;
 
         public Vector3 WeaponHeightOffset = new Vector3(0f, 1.2f, 0f);
         

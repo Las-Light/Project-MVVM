@@ -15,5 +15,7 @@ MonoBehaviour:
   PlayerSettings: {fileID: 11400000, guid: a8035d62227d7684286663f676fe255e, type: 2}
   CharactersSettings: {fileID: 11400000, guid: 6eeb940890d75fb4ab918746b93564ad, type: 2}
   InventoriesSettings: {fileID: 11400000, guid: 8ba2d268abdc4e14d8001eb47cbb71fb, type: 2}
+  ItemsSettings: {fileID: 11400000, guid: b2a2ee8a7cddba94db121e048249e4e0, type: 2}
+  EquipmentsSettings: {fileID: 11400000, guid: 864a80e844ff48046bb40e45b7ae8b0f, type: 2}
   GameplayCameraSettings: {fileID: 11400000, guid: fa7c3e452673d0b41bc4a24d07c5f1d0, type: 2}
   MapsSettings: {fileID: 11400000, guid: a0467520b93e95f43a27c9409e429d2d, type: 2}

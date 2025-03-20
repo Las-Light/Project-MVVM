@@ -11,13 +11,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands
         public readonly int Level;
         public readonly Vector3 Position;
         public readonly InventoryService InventoryService;
+        public readonly EquipmentService EquipmentService;
 
-        public CmdCreateCharacter(EntityType characterType, int level, Vector3 position,
+        public CmdCreateCharacter(EntityType characterType,
+            int level,
+            Vector3 position,
+            EquipmentService equipmentService,
             InventoryService inventoryService)
         {
             CharacterType = characterType;
             Level = level;
             Position = position;
+            EquipmentService = equipmentService;
             InventoryService = inventoryService;
         }
 

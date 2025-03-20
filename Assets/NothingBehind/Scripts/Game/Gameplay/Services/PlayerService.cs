@@ -1,4 +1,4 @@
-using NothingBehind.Scripts.Game.Gameplay.Commands.Player;
+using NothingBehind.Scripts.Game.Gameplay.Commands.PlayerCommands;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.View.Characters;
 using NothingBehind.Scripts.Game.GameRoot;

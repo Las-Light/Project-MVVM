@@ -1,30 +1,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Settings;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Entities.Player;
+using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.GameResources;
-using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Inventories;
+using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using NothingBehind.Scripts.Game.State.Root;
-using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.GameRoot.Services
 {
     public class InitialGameStateService
     {
-        public GameState CreateGameState(GameSettings gameSettings, SceneEnterParams sceneEnterParams)
+        public GameState CreateGameState(GameSettings gameSettings, 
+            SceneEnterParams sceneEnterParams)
         {
             var currentMapId = sceneEnterParams.TargetMapId;
             var currentMapSettings = gameSettings.MapsSettings.Maps.First(m => m.MapId == currentMapId);
 
             var gameState = new GameState();
+            gameState.Equipments = new List<EquipmentData>();
             gameState.Inventories = new List<InventoryData>();
             gameState.Maps = CreateMaps(gameState, gameSettings);
             gameState.CurrentMapId = currentMapId;
@@ -41,7 +43,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
         private PlayerData CreatePlayer(GameState gameState, GameSettings gameSettings, MapId currentMapId,
             MapSettings currentMapSettings)
         {
-            var hero = new PlayerData()
+            var player = new PlayerData()
             {
                 UniqueId = gameState.CreateEntityId(),
                 EntityType = gameSettings.PlayerSettings.EntityType,
@@ -56,9 +58,10 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                 },
                 Health = gameSettings.PlayerSettings.Health
             };
-            gameState.Inventories.Add(CreateInventories(gameState, gameSettings, hero.EntityType, hero.UniqueId));
+            gameState.Equipments.Add(CreateEquipmentData(gameState, gameSettings, player.EntityType, player.UniqueId));
+            gameState.Inventories.Add(CreateInventoryData(player.EntityType, player.UniqueId));
 
-            return hero;
+            return player;
         }
 
         private List<MapData> CreateMaps(GameState gameState, GameSettings gameSettings)
@@ -136,83 +139,54 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                     Level = characterLevelSettings.Level,
                     Health = characterLevelSettings.Health
                 };
-                gameState.Inventories.Add(CreateInventories(gameState, gameSettings, initialCharacter.EntityType, initialCharacter.UniqueId));
+                gameState.Equipments.Add(CreateEquipmentData(gameState, gameSettings, initialCharacter.EntityType, initialCharacter.UniqueId));
+                gameState.Inventories.Add(CreateInventoryData(initialCharacter.EntityType, initialCharacter.UniqueId));
                 initialCharacters.Add(initialCharacter);
             }
 
             return initialCharacters;
         }
 
-        private InventoryData CreateInventories(GameState gameState, GameSettings gameSettings, EntityType ownerType,
+        private InventoryData CreateInventoryData(EntityType ownerType,
             int ownerId)
         {
-            var inventorySettings =
-                gameSettings.InventoriesSettings.Inventories.First(settings => settings.OwnerType == ownerType);
             var inventory = new InventoryData()
             {
                 OwnerId = ownerId,
                 OwnerType = ownerType
             };
             var inventoryGrids = new List<InventoryGridData>();
-            foreach (var inventoryGridSettings in inventorySettings.InventoryGrids)
-            {
-                var inventorySubGrids = CreateSubGrids(gameState, ownerId, inventoryGridSettings.SubGrids);
-
-                var items = CreateItems(gameState, inventoryGridSettings.Items);
-
-                inventoryGrids.Add(new InventoryGridData(ownerId,
-                    inventoryGridSettings.GridTypeId,
-                    inventoryGridSettings.Width,
-                    inventoryGridSettings.Height,
-                    inventoryGridSettings.CellSize,
-                    inventoryGridSettings.IsSubGrid,
-                    inventorySubGrids,
-                    items));
-            }
 
             inventory.InventoryGrids = inventoryGrids;
 
             return inventory;
         }
 
-        private List<InventoryGridData> CreateSubGrids(GameState gameState, int ownerId, List<InventoryGridSettings> subGrids)
+        private EquipmentData CreateEquipmentData(GameState gameState,
+            GameSettings gameSettings,
+            EntityType ownerType,
+            int ownerId)
         {
-            var inventorySubGrids = new List<InventoryGridData>();
-            foreach (var subGridSettings in subGrids)
+            var equipmentSettings =
+                gameSettings.EquipmentsSettings.AllEquipments.First(settings => settings.EntityType == ownerType);
+            var equipmentSlots = new List<EquipmentSlotData>();
+            foreach (var settingsSlot in equipmentSettings.Slots)
             {
-                var subGridData = new InventoryGridData(ownerId,
-                    subGridSettings.GridTypeId,
-                    subGridSettings.Width,
-                    subGridSettings.Height,
-                    subGridSettings.CellSize,
-                    subGridSettings.IsSubGrid,
-                    new List<InventoryGridData>(),
-                    CreateItems(gameState, subGridSettings.Items));
-                inventorySubGrids.Add(subGridData);
+                var slot = new EquipmentSlotData
+                {
+                    SlotType = settingsSlot.SlotType,
+                    ItemType = settingsSlot.ItemType,
+                    EquippedItem = ItemsDataFactory.CreateItemData(gameState, settingsSlot.EquippedItemSettings)
+                };
+                equipmentSlots.Add(slot);
             }
 
-            return inventorySubGrids;
-        }
-
-        private List<ItemData> CreateItems(GameState gameState, List<ItemSettings> itemsSettings)
-        {
-            var items = new List<ItemData>();
-            foreach (var itemSettings in itemsSettings)
+            var equipment = new EquipmentData
             {
-                var item = new ItemData(gameState.CreateItemId(),
-                    itemSettings.ItemType,
-                    itemSettings.Width,
-                    itemSettings.Height,
-                    itemSettings.Weight,
-                    itemSettings.CanRotate,
-                    itemSettings.IsRotated,
-                    itemSettings.IsStackable,
-                    itemSettings.MaxStackSize,
-                    itemSettings.CurrentStack);
-                items.Add(item);
-            }
-
-            return items;
+                OwnerId = ownerId,
+                Slots = equipmentSlots
+            };
+            return equipment;
         }
     }
 }

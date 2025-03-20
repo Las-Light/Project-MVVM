@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
-using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.State.Inventories;
+using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Utils;
 using ObservableCollections;
@@ -13,14 +14,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 {
     public class InventoryGridViewModel : IDisposable
     {
-        public int OwnerId { get; }
-        public string GridTypeID { get; }
+        public int GridId { get; }
+        public InventoryGridType GridType { get; }
         public int Width { get; }
         public int Height { get; }
         public float CellSize { get; }
         public bool IsSubGrid { get; }
-
-        public List<InventoryGrid> SubGrids { get; }
         
         public IObservableCollection<Item> Items;
         public IReadOnlyObservableDictionary<int, Item> ItemsMap => _itemsMap;
@@ -39,13 +38,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             InventoryGridSettings gridSettings
         )
         {
-            GridTypeID = inventoryGrid.GridTypeId;
-            OwnerId = inventoryGrid.OwnerId;
+            GridType = inventoryGrid.GridType;
+            GridId = inventoryGrid.GridId;
             Height = inventoryGrid.Height;
             Width = inventoryGrid.Width;
             CellSize = inventoryGrid.CellSize;
             IsSubGrid = inventoryGrid.IsSubGrid;
-            SubGrids = inventoryGrid.SubGrids;
             _inventoryGrid = inventoryGrid;
             _gridSettings = gridSettings;
             Items = inventoryGrid.Items;
@@ -131,6 +129,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                     amount,
                     totalAddedItemsAmount, false, true);
             }
+            
 
             return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
                 totalAddedItemsAmount, false, false); // Нет свободного места
@@ -149,7 +148,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 {
                     PlaceItem(item, position, item.IsRotated.Value);
                     return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
-                        remainingAmount, false, true); // Перемещение успешно
+                        remainingAmount, true, true); // Перемещение успешно
                 }
                 else
                 {
@@ -342,30 +341,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return true;
         }
 
-        private void SortItems(Func<Item, object> sortBy)
-        {
-            // Временно удаляем все предметы из сетки
-            var items = _itemsPositionsMap.Select(kvp => kvp.Key).ToList();
-
-            foreach (var item in items)
-            {
-                RemoveItem(item.Id);
-            }
-
-            // Сортируем предметы
-            var sortedItems = items.OrderBy(sortBy).ToList();
-
-            // Размещаем предметы обратно в сетку
-            foreach (var item in sortedItems)
-            {
-                var position = FindFreePosition(item);
-                if (position.HasValue)
-                {
-                    PlaceItem(item, position.Value, item.IsRotated.Value);
-                }
-            }
-        }
-
         public bool RotateItem(int itemId)
         {
             if (!_itemsMap.TryGetValue(itemId, out var item))
@@ -393,6 +368,30 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 throw new Exception("Item not found in the grid.");
 
             return _itemsPositionsMap.TryGetValue(item, out var position) ? position : null;
+        }
+
+        private void SortItems(Func<Item, object> sortBy)
+        {
+            // Временно удаляем все предметы из сетки
+            var items = _itemsPositionsMap.Select(kvp => kvp.Key).ToList();
+
+            foreach (var item in items)
+            {
+                RemoveItem(item.Id);
+            }
+
+            // Сортируем предметы
+            var sortedItems = items.OrderBy(sortBy).ToList();
+
+            // Размещаем предметы обратно в сетку
+            foreach (var item in sortedItems)
+            {
+                var position = FindFreePosition(item);
+                if (position.HasValue)
+                {
+                    PlaceItem(item, position.Value, item.IsRotated.Value);
+                }
+            }
         }
 
         private Item GetItemAtPosition(Vector2Int position)

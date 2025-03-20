@@ -1,6 +1,8 @@
 using System.Collections.Generic;
-using NothingBehind.Scripts.Game.State.Inventory;
+using NothingBehind.Scripts.Game.Gameplay.View.Items;
+using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
+using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -16,18 +18,20 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         [SerializeField] private Button _sortByQuantityButton;
         [SerializeField] private Button _sortByWeightButton;
 
-        public float CellSize; // Размер ячейки в пикселях
         public RectTransform GridContainer; // Контейнер для сетки
-        public int Width { get; private set; }
-        public int Height { get; private set; }
-        public string GridTypeId { get; private set; }
-        private bool IsSubGrid { get; set; }
 
         private InventoryGridViewModel _viewModel;
 
+        public int GridId { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public InventoryGridType GridType { get; private set; }
+        public float CellSize; // Размер ячейки в пикселях
+
+
         private IReadOnlyObservableDictionary<Item, Vector2Int> _itemsPositionsMap;
         private readonly Dictionary<Item, GameObject> _itemsViewMap = new Dictionary<Item, GameObject>();
-        private readonly CompositeDisposable _disposables = new ();
+        private readonly CompositeDisposable _disposables = new();
 
         private GameObject[,] _cells;
         private RectTransform _inventoryGridViewRectTransform;
@@ -36,11 +40,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         public void Bind(InventoryGridViewModel viewModel)
         {
             _viewModel = viewModel;
-            GridTypeId = viewModel.GridTypeID;
+            GridId = viewModel.GridId;
+            GridType = viewModel.GridType;
             Width = viewModel.Width;
             Height = viewModel.Height;
             CellSize = viewModel.CellSize;
-            IsSubGrid = viewModel.IsSubGrid;
             _itemsPositionsMap = viewModel.ItemsPositionsMap;
 
             // Очистка сетки перед инициализацией
@@ -55,7 +59,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
             // Устанавливаем размер InventoryGridView в учетом с размера GridContainer
             _inventoryGridViewRectTransform = GetComponent<RectTransform>();
-            _inventoryGridViewRectTransform.sizeDelta = newGridSize; // TODO: Надо откорректировать на размер кнопок сортировки
+            _inventoryGridViewRectTransform.sizeDelta =
+                newGridSize; // TODO: Надо откорректировать на размер кнопок сортировки
             // viewSize += new Vector2(0, newGridSize.y);
             // GetComponent<RectTransform>().sizeDelta = viewSize;
 
@@ -85,13 +90,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 itemView.transform.SetAsLastSibling();
             }
 
-            if (!viewModel.IsSubGrid)
-            {
-                // Назначение обработчиков для кнопок сортировки
-                _sortByTypeButton?.onClick.AddListener(viewModel.SortByType);
-                _sortByQuantityButton?.onClick.AddListener(viewModel.SortByQuantity);
-                _sortByWeightButton?.onClick.AddListener(viewModel.SortByWeight);
-            }
+
+            // Назначение обработчиков для кнопок сортировки
+            _sortByTypeButton?.onClick.AddListener(viewModel.SortByType);
+            _sortByQuantityButton?.onClick.AddListener(viewModel.SortByQuantity);
+            _sortByWeightButton?.onClick.AddListener(viewModel.SortByWeight);
+
 
             // Подписываемся на добавление и удаление предметов для создания и удаления вьюх на сетке
             // И добавляем подписку в CompositeDispose для отписки при удалении вьюхи
@@ -111,13 +115,41 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
         private void OnDestroy()
         {
-            if (!IsSubGrid)
-            {
-                _sortByTypeButton?.onClick.RemoveListener(_viewModel.SortByType);
-                _sortByQuantityButton?.onClick.RemoveListener(_viewModel.SortByQuantity);
-                _sortByWeightButton?.onClick.RemoveListener(_viewModel.SortByWeight);
-            }
+            _sortByTypeButton?.onClick.RemoveListener(_viewModel.SortByType);
+            _sortByQuantityButton?.onClick.RemoveListener(_viewModel.SortByQuantity);
+            _sortByWeightButton?.onClick.RemoveListener(_viewModel.SortByWeight);
+
             _disposables.Dispose();
+        }
+
+        public AddItemsToInventoryGridResult AddItems(Item item, int amount)
+        {
+            return _viewModel.AddItems(item, amount);
+        }
+
+        public AddItemsToInventoryGridResult AddItems(Item item, Vector2Int position, int amount)
+        {
+            return _viewModel.AddItems(item, position, amount);
+        }
+
+        public RemoveItemsFromInventoryGridResult RemoveItem(int itemId)
+        {
+            return _viewModel.RemoveItem(itemId);
+        }
+
+        public RemoveItemsFromInventoryGridResult RemoveItemAmount(int itemId, int amount)
+        {
+            return _viewModel.RemoveItemAmount(itemId, amount);
+        }
+
+        public AddItemsToInventoryGridResult TryMoveItem(int itemId, Vector2Int newPosition, int amount)
+        {
+            return _viewModel.TryMoveItem(itemId, newPosition, amount);
+        }
+
+        public Vector2Int? GetItemPosition(int itemId)
+        {
+            return _viewModel.GetItemPosition(itemId);
         }
 
         public void UpdateHighlights(Item item, Vector2Int position)

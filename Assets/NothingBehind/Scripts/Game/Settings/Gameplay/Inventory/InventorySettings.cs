@@ -8,6 +8,6 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Inventory
     public class InventorySettings : ScriptableObject
     {
         public EntityType OwnerType;
-        public List<InventoryGridSettings> InventoryGrids;
+        public List<InventoryGridSettings> GridsSettings;
     }
 }

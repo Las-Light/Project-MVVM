@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a9710a4cf954abbbc8e4725102c776c, type: 3}
   m_Name: ChestRig
   m_EditorClassIdentifier: 
-  GridTypeId: ChestRig
+  GridType: 2
   Width: 0
   Height: 0
   CellSize: 50
@@ -21,4 +21,3 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0104d95411866f24294d3c5da9649ea8, type: 2}
   - {fileID: 11400000, guid: 68ebdf2a20257d64f9f68d5d744754f1, type: 2}
   - {fileID: 11400000, guid: 60234cb8ad73e9847ab62f5d507150b0, type: 2}
-  Items: []

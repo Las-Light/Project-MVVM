@@ -2,7 +2,7 @@ using R3;
 
 namespace NothingBehind.Scripts.Game.State.Items
 {
-    public class Item
+    public abstract class Item
     {
         public int Id { get; }
         public ItemType ItemType { get; }

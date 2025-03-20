@@ -1,7 +1,5 @@
-using System;
 using NothingBehind.Scripts.MVVM.UI;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.UI.ScreenGameplay
@@ -30,7 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI.ScreenGameplay
 
         private void OnInventoryButtonClicked()
         {
-            ViewModel.RequestOpenInventory(3);
+            ViewModel.RequestOpenInventory(0);
         }
         
         private void OnPopupAButtonClicked()

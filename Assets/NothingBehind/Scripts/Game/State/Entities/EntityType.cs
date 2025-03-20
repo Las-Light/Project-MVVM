@@ -4,6 +4,7 @@ namespace NothingBehind.Scripts.Game.State.Entities
     {
         Unknown = 0,
         Player = 1,
-        Character = 2
+        Character = 2,
+        Storage = 3
     }
 }

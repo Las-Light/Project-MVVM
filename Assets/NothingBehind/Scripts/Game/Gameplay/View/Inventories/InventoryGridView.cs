@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 {
-    public class InventoryGridView : MonoBehaviour
+    public class InventoryGridView : MonoBehaviour, IView
     {
         [SerializeField] private GameObject _cellPrefab; // Префаб для ячеек
         [SerializeField] private GameObject _itemPrefab; // Префаб для предметов
@@ -20,7 +20,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
         public RectTransform GridContainer; // Контейнер для сетки
 
-        private InventoryGridViewModel _viewModel;
 
         public int GridId { get; private set; }
         public int Width { get; private set; }
@@ -33,7 +32,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         private readonly Dictionary<Item, GameObject> _itemsViewMap = new Dictionary<Item, GameObject>();
         private readonly CompositeDisposable _disposables = new();
 
-        private GameObject[,] _cells;
+        private Image[,] _cellsImage;
+        private InventoryGridViewModel _viewModel;
         private RectTransform _inventoryGridViewRectTransform;
 
 
@@ -51,7 +51,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             foreach (Transform child in GridContainer) Destroy(child.gameObject);
 
             // Создание двумерного массива ячеек сетки
-            _cells = new GameObject[Width, Height];
+            _cellsImage = new Image[Width, Height];
 
             // Устанавливаем размер GridContainer в соответствии с кол-вом ячеек
             var newGridSize = new Vector2(CellSize * Width, CellSize * Height);
@@ -72,7 +72,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                     var cell = Instantiate(_cellPrefab, GridContainer);
                     var cellPosition = cell.GetComponent<RectTransform>().anchoredPosition =
                         new Vector2(x * CellSize, -y * CellSize);
-                    _cells[x, y] = cell;
+                    _cellsImage[x, y] = cell.GetComponent<Image>();
                     foreach (var kvp in _itemsPositionsMap)
                     {
                         if (kvp.Value == new Vector2Int(x, y))
@@ -89,7 +89,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             {
                 itemView.transform.SetAsLastSibling();
             }
-
 
             // Назначение обработчиков для кнопок сортировки
             _sortByTypeButton?.onClick.AddListener(viewModel.SortByType);
@@ -160,9 +159,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             int itemWidth = item.IsRotated.Value ? item.Height.Value : item.Width.Value;
             int itemHeight = item.IsRotated.Value ? item.Width.Value : item.Height.Value;
 
-            for (int x = 0; x < _cells.GetLength(0); x++)
+            for (int x = 0; x < _cellsImage.GetLength(0); x++)
             {
-                for (int y = 0; y < _cells.GetLength(1); y++)
+                for (int y = 0; y < _cellsImage.GetLength(1); y++)
                 {
                     bool isHighlighted = x >= position.x && x < position.x + itemWidth &&
                                          y >= position.y && y < position.y + itemHeight;
@@ -170,7 +169,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                     if (isHighlighted)
                     {
                         bool canPlace = _viewModel.CanPlaceItem(item, position, item.IsRotated.Value);
-                        _cells[x, y].GetComponent<Image>().color = canPlace ? Color.green : Color.red;
+                        _cellsImage[x, y].color = canPlace ? Color.green : Color.red;
                     }
                 }
             }
@@ -178,22 +177,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
         public void ClearHighlights()
         {
-            for (int x = 0; x < _cells.GetLength(0); x++)
+            for (int x = 0; x < _cellsImage.GetLength(0); x++)
             {
-                for (int y = 0; y < _cells.GetLength(1); y++)
+                for (int y = 0; y < _cellsImage.GetLength(1); y++)
                 {
-                    _cells[x, y].GetComponent<Image>().color = Color.white;
+                    _cellsImage[x, y].color = Color.white;
                 }
             }
         }
 
         // Добавление предмета в UI
-        private void AddItemView(Item itemData, Vector2 cellPosition)
+        private void AddItemView(Item item, Vector2 cellPosition)
         {
             var itemView = Instantiate(_itemPrefab, GridContainer.transform);
             itemView.GetComponent<RectTransform>().anchoredPosition = cellPosition;
-            itemView.GetComponent<ItemView>().Initialize(itemData, CellSize);
-            _itemsViewMap[itemData] = itemView;
+            itemView.GetComponent<ItemView>().Bind(item, CellSize);
+            _itemsViewMap[item] = itemView;
         }
     }
 }

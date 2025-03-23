@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using ObservableCollections;
+using R3;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
@@ -12,10 +16,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
         private InventoryViewModel _inventoryViewModel;
 
-
+        private IObservableCollection<InventoryGridViewModel> _inventoryGridViewModels;
+        private Dictionary<InventoryGridViewModel, InventoryGridView> _gridViewsMap = new ();
+        private readonly CompositeDisposable _disposables = new ();
         public void Bind(InventoryViewModel viewModel)
         {
             _inventoryViewModel = viewModel;
+            _inventoryGridViewModels = viewModel.AllInventoryGrids;
             OwnerId = viewModel.OwnerId;
             foreach (var inventoryGridViewModel in viewModel.AllInventoryGrids)
             {
@@ -29,6 +36,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 }
             }
 
+            _disposables.Add(_inventoryGridViewModels.ObserveAdd().Subscribe(e =>
+            {
+                if (e.Value.IsSubGrid)
+                {
+                    CreateInventorSubGridView(e.Value);
+                }
+                else
+                {
+                    CreateInventorGridView(e.Value);
+                }
+            }));
+            _disposables.Add(_inventoryGridViewModels.ObserveRemove().Subscribe(e=>RemoveGridView(e.Value)));
+
             // Задаем размер инвентаря в соответствии с размером экрана
             var viewScreenSize = new Vector2(Screen.width / 3, Screen.height);
             transform.parent.GetComponent<RectTransform>().sizeDelta = viewScreenSize;
@@ -36,16 +56,36 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             _gridContainer.GetComponent<RectTransform>().sizeDelta = viewScreenSize;
         }
 
+        private void OnDestroy()
+        {
+            _disposables.Dispose();
+        }
+
         private void CreateInventorGridView(InventoryGridViewModel inventoryGridViewModel)
         {
-            var itemView = Instantiate(_gridPrefab, _gridContainer);
-            itemView.GetComponent<InventoryGridView>().Bind(inventoryGridViewModel);
+            var grid = Instantiate(_gridPrefab, _gridContainer);
+            var gridView = grid.GetComponent<InventoryGridView>();
+            grid.name = new string($"{inventoryGridViewModel.GridType} {inventoryGridViewModel.GridId}");
+            gridView.Bind(inventoryGridViewModel);
+            _gridViewsMap[inventoryGridViewModel] = gridView;
         }
 
         private void CreateInventorSubGridView(InventoryGridViewModel inventoryGridViewModel)
         {
-            var itemView = Instantiate(_subGridPrefab, _subGridContainer);
-            itemView.GetComponent<InventoryGridView>().Bind(inventoryGridViewModel);
+            var subGrid = Instantiate(_subGridPrefab, _subGridContainer);
+            var subGridView = subGrid.GetComponent<InventoryGridView>();
+            subGrid.name = new string($"{inventoryGridViewModel.GridType} {inventoryGridViewModel.GridId}");
+            subGridView.Bind(inventoryGridViewModel);
+            _gridViewsMap[inventoryGridViewModel] = subGridView;
+        }
+
+        private void RemoveGridView(InventoryGridViewModel inventoryGridViewModel)
+        {
+            _gridViewsMap.TryGetValue(inventoryGridViewModel, out var gridView);
+            if (gridView != null)
+            {
+                Destroy(gridView.gameObject);
+            }
         }
     }
 }

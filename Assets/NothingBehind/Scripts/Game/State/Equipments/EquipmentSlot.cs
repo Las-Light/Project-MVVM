@@ -16,23 +16,20 @@ namespace NothingBehind.Scripts.Game.State.Equipments
 
             EquippedItem = new ReactiveProperty<Item>(ItemsFactory.CreateItem(equipmentSlotData.EquippedItem));
 
-            EquippedItem.Subscribe(value => equipmentSlotData.EquippedItem = value.Origin);
+            EquippedItem.Subscribe(value => { equipmentSlotData.EquippedItem = value != null ? value.Origin : null; });
         }
 
-        public bool TryEquip(Item item)
+        public void Equip(Item item)
         {
-            if (item.ItemType == ItemType)
-            {
-                EquippedItem.Value = item;
-                return true;
-            }
-
-            return false;
+            EquippedItem.Value = item;
         }
-        
+
         public void Unequip()
         {
-            EquippedItem.Value = null;
+            if (EquippedItem != null)
+            {
+                EquippedItem.Value = null;
+            }
         }
     }
 }

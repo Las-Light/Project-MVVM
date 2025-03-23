@@ -78,20 +78,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             //
             var gameState = _gameStateProvider.GameState;
 
-            foreach (var inventory in gameState.Inventories)
+            foreach (var equipment in gameState.Equipments)
             {
-                if (inventory.OwnerType != EntityType.Player)
+                foreach (var slot in equipment.Slots)
                 {
-                    continue;
-                }
-
-                Debug.Log(inventory.OwnerType + " " + inventory.OwnerId);
-                foreach (var grid in inventory.InventoryGrids)
-                {
-                    for (int i = 0; i < grid.Items.Count; i++)
-                    {
-                        Debug.Log(grid.Grid.Value[i] + " " + grid.Positions[i]);
-                    }
+                    Debug.Log($"{slot.SlotType} - {slot.EquippedItem.Value}");
                 }
             }
 
@@ -101,9 +92,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                 {
                     continue;
                 }
+                Debug.Log("Inv ViewModel " + inventoryViewModel.OwnerType);
 
                 foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
                 {
+                    Debug.Log(inventoryGridViewModel.GridId + " Type " + inventoryGridViewModel.GridType);
                     foreach (var kvp in inventoryGridViewModel.ItemsPositionsMap)
                     {
                         Debug.Log($"In dictionary {kvp.Key.ItemType} {kvp.Key.Id} in position {kvp.Value}");
@@ -120,18 +113,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
                 foreach (var grid in inventory.InventoryGrids)
                 {
-                    if (grid.GridType == InventoryGridType.ChestRig)
-                    {
-                        for (int i = 0; i < grid.Items.Count; i++)
-                        {
-                            Debug.Log($"{grid.Items[i].ItemType} {grid.Items[i].Id} {grid.Positions[i]} Stack = {grid.Items[i].CurrentStack.Value}");
-                        }
-
-                        for (int i = 0; i < grid.Grid.Value.Length; i++)
-                        {
-                            Debug.Log(grid.Grid.Value[i] + $" Grid in {inventory.OwnerType} {inventory.OwnerId}");
-                        }
-                    }
+                    Debug.Log($"GridId - {grid.GridId} is subGrid - {grid is InventoryGridWithSubGrid}");
                 }
             }
         }

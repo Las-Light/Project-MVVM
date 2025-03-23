@@ -28,10 +28,10 @@ namespace NothingBehind.Scripts.Game.State.Items
                     gridItemData.IsStackable = itemSettings.IsStackable;
                     gridItemData.MaxStackSize = itemSettings.MaxStackSize;
                     gridItemData.CurrentStack = itemSettings.CurrentStack;
-                    gridItemData.GridId = gameState.CreateGridId();
                     gridItemData.GridType = itemSettings.GridType;
                     gridItemData.GridData =
                         InventoryGridsDataFactory.CreateInventorGridData(gameState, itemSettings.GridSettings);
+                    gridItemData.GridId = gridItemData.GridData.GridId;
                     return gridItemData;
 
                 case ItemType.Armor:

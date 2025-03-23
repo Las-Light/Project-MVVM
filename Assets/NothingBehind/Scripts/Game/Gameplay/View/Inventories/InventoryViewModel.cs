@@ -14,6 +14,7 @@ using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
 using ObservableCollections;
 using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 {
@@ -32,7 +33,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         private readonly Dictionary<InventoryGridType, InventoryGridSettings> _inventoryGridSettingsMap = new();
         private readonly Dictionary<int, Item> _allInventoryItems = new();
 
-        public IReadOnlyObservableDictionary<SlotType, EquipmentSlot> EquipmentSlotsMap { get; }
+        private IReadOnlyObservableDictionary<SlotType, Item> EquipmentItems { get; }
 
         private readonly CompositeDisposable _disposables = new();
 
@@ -63,12 +64,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
             if (equipmentService.EquipmentViewModelsMap.TryGetValue(OwnerId, out var equipmentViewModel))
             {
-                EquipmentSlotsMap = equipmentViewModel.SlotsMap;
-                foreach (var equipmentSlot in EquipmentSlotsMap)
+                EquipmentItems = equipmentViewModel.AllEquippedItems;
+                foreach (var equippedItem in EquipmentItems)
                 {
-                    if (equipmentSlot.Key is SlotType.Backpack or SlotType.ChestRig)
+                    if (equippedItem.Key is SlotType.Backpack or SlotType.ChestRig)
                     {
-                        if (equipmentSlot.Value.EquippedItem.CurrentValue is GridItem gridItem)
+                        if (equippedItem.Value is GridItem gridItem)
                         {
                             var inventoryGrid =
                                 inventory.InventoryGrids.FirstOrDefault(grid => grid.GridId == gridItem.GridId);
@@ -79,6 +80,36 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                         }
                     }
                 }
+
+                _disposables.Add(EquipmentItems.ObserveRemove().Subscribe(e =>
+                {
+                    var removedItem = e.Value.Value;
+                    if (removedItem is GridItem removedGridItem)
+                    {
+                        if (removedGridItem.Grid.Value is InventoryGridWithSubGrid subGrid)
+                        {
+                            foreach (var grid in subGrid.SubGrids)
+                            {
+                                RemoveInventoryGridViewModel(grid);
+                            }
+                        }
+                        RemoveGridFromInventory(OwnerId, removedGridItem.Grid.Value);
+                    }
+                }));
+
+                _disposables.Add(EquipmentItems.ObserveAdd().Subscribe(e =>
+                {
+                var addedItem = e.Value.Value;
+                    if (addedItem is GridItem addedGridItem)
+                    {
+                        var inventoryGrid =
+                            inventory.InventoryGrids.FirstOrDefault(grid => grid.GridId == addedGridItem.GridId);
+                        if (inventoryGrid == null)
+                        {
+                            AddGridToInventory(OwnerId, addedGridItem.Grid.Value);
+                        }
+                    }
+                }));
             }
 
             foreach (var inventoryGrid in inventory.InventoryGrids)
@@ -96,30 +127,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 }
             }
 
-            _disposables.Add(EquipmentSlotsMap?.ObserveReplace().Subscribe(e =>
-            {
-                var removedItem = e.OldValue.Value.EquippedItem.Value;
-                if (removedItem is GridItem removedGridItem)
-                {
-                    if (!_allInventoryItems.ContainsKey(removedGridItem.GridId))
-                    {
-                        RemoveGridFromInventory(OwnerId, removedGridItem.Grid.Value);
-                    }
-                }
-
-                var addedItem = e.NewValue.Value.EquippedItem.Value;
-                if (addedItem is GridItem addedGridItem)
-                {
-                    var inventoryGrid =
-                        inventory.InventoryGrids.FirstOrDefault(grid => grid.GridId == addedGridItem.GridId);
-                    if (inventoryGrid == null)
-                    {
-                        AddGridToInventory(OwnerId, addedGridItem.Grid.Value);
-                    }
-                }
-            }));
             _disposables.Add(inventory.InventoryGrids.ObserveAdd()
-                .Subscribe(e => CreateInventoryGridViewModel(e.Value)));
+                .Subscribe(e =>
+                {
+                    var addedGrid = e.Value;
+                    if (addedGrid is InventoryGridWithSubGrid gridWithSubGrid)
+                        foreach (var subGrid in gridWithSubGrid.SubGrids)
+                            CreateInventoryGridViewModel(subGrid);
+                    else
+                    {
+                        CreateInventoryGridViewModel(addedGrid);
+                    }
+                }));
             _disposables.Add(inventory.InventoryGrids.ObserveRemove()
                 .Subscribe(e => RemoveInventoryGridViewModel(e.Value)));
         }

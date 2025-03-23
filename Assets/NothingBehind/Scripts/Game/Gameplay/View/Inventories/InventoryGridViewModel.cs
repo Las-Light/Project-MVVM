@@ -5,6 +5,7 @@ using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.State.Inventories;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
 using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
@@ -317,6 +318,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 
         public bool CanPlaceItem(Item item, Vector2Int position, bool isRotated)
         {
+            if (!CheckForAttachInside(item)) return false;
+            
             int itemWidth = isRotated ? item.Height.Value : item.Width.Value;
             int itemHeight = isRotated ? item.Width.Value : item.Height.Value;
 
@@ -368,6 +371,30 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                 throw new Exception("Item not found in the grid.");
 
             return _itemsPositionsMap.TryGetValue(item, out var position) ? position : null;
+        }
+
+        private bool CheckForAttachInside(Item item)
+        {
+            if (item is GridItem gridItem)
+            {
+                if (_inventoryGrid == gridItem.Grid.Value)
+                {
+                    return false;
+                }
+
+                if (gridItem.Grid.Value is InventoryGridWithSubGrid subGrid)
+                {
+                    foreach (var grid in subGrid.SubGrids)
+                    {
+                        if (grid == _inventoryGrid)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         private void SortItems(Func<Item, object> sortBy)

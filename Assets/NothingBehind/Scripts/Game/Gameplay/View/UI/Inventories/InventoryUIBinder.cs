@@ -19,10 +19,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI.Inventories
             if (viewModel.PlayerId == viewModel.TargetOwnerId)
             {
                 CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.PlayerId));
+                CreateEquipmentView(viewModel.GetEquipmentViewModel(viewModel.PlayerId));
             }
             else
             {
                 CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.PlayerId));
+                CreateEquipmentView(viewModel.GetEquipmentViewModel(viewModel.PlayerId));
                 CreateLootInventoryView(viewModel.GetInventoryViewModel(viewModel.TargetOwnerId));
             }
         }

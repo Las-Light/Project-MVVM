@@ -15,11 +15,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI
     {
         private readonly Subject<GameplayExitParams> _exitSceneRequest;
         private readonly InventoryService _inventoryService;
+        private readonly EquipmentService _equipmentService;
 
         public GameplayUIManager(DIContainer container) : base(container)
         {
             _exitSceneRequest = container.Resolve<Subject<GameplayExitParams>>(AppConstants.EXIT_SCENE_REQUEST_TAG);
             _inventoryService = container.Resolve<InventoryService>();
+            _equipmentService = container.Resolve<EquipmentService>();
         }
 
         public ScreenGameplayViewModel OpenScreenGameplay()
@@ -34,7 +36,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI
 
         public InventoryUIViewModel OpenInventory(int targetOwnerId)
         {
-            var inventoryUI = new InventoryUIViewModel(_inventoryService, targetOwnerId);
+            var inventoryUI = new InventoryUIViewModel(_inventoryService, _equipmentService, targetOwnerId);
             var rootUI = Container.Resolve<UIGameplayRootViewModel>();
 
             rootUI.OpenPopup(inventoryUI);

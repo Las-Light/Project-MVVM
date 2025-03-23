@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.Gameplay.View.Equipments;
 using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
 using NothingBehind.Scripts.Game.State.Items;
-using NothingBehind.Scripts.Utils;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -13,7 +13,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
     public class ItemView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         [SerializeField] private TMP_Text stackText;
-        private Item _item;
+
+        public Item Item;
+
         private float _cellSize;
         private int _id;
         private bool _isStackable;
@@ -25,9 +27,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
 
         private Vector2 _startPosition;
         private Transform _startParent;
-        private InventoryGridView _startInventoryGridView;
-        private InventoryView _startInventoryView;
-        private InventoryGridView _currentGridView;
+        private IView _startView;
+        private IView _currentView;
 
         private ReadOnlyReactiveProperty<int> _currentStack;
         private ReadOnlyReactiveProperty<bool> _isRotated;
@@ -36,9 +37,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
 
         private readonly CompositeDisposable _disposables = new();
 
-        public void Initialize(Item item, float cellSize)
+        public void Bind(Item item, float cellSize)
         {
-            _item = item;
+            Item = item;
             _currentStack = item.CurrentStack;
             _width = item.Width;
             _height = item.Height;
@@ -50,10 +51,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
             _rectTransform = GetComponent<RectTransform>();
             _canvasGroup = GetComponent<CanvasGroup>();
             _itemImage = GetComponent<Image>();
+            _currentView = _startView = GetComponentInParent<IView>();
             _mainCanvas = GetComponentInParent<Canvas>();
             _canvasRectTransform = _mainCanvas.transform as RectTransform;
-            _startInventoryView = GetComponentInParent<InventoryView>();
-            _startInventoryGridView = GetComponentInParent<InventoryGridView>();
 
             _disposables.Add(_currentStack.Subscribe(_ => UpdateStack()));
             _disposables.Add(_isRotated.Subscribe(_ => UpdateRotate()));
@@ -83,28 +83,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
 
         public void OnDrag(PointerEventData eventData)
         {
+            _currentView?.ClearHighlights();
             // Перемещаем предмет за курсором
             _rectTransform.anchoredPosition += eventData.delta / _mainCanvas.scaleFactor;
 
-            // Получаем целевой инвентарь (через Raycast)
+            // Получаем целевую вьюху
             var targetViews = GetTargetInventoryView(eventData);
 
             // Обновляем подсветку
-            if (targetViews?.Item1 != null && targetViews?.Item2 != null)
+            if (targetViews is InventoryGridView gridView)
             {
-                var targetInventoryGridView = targetViews.Value.Item1;
-                if (_currentGridView != null && _currentGridView != targetInventoryGridView)
-                {
-                    _currentGridView.ClearHighlights();
-                }
-
-                _currentGridView = targetInventoryGridView;
-                var gridPos = CalculateGridPosition(eventData.position, targetInventoryGridView);
-                targetInventoryGridView.UpdateHighlights(_item, gridPos);
+                _currentView = gridView;
+                var gridPos = CalculateGridPosition(eventData.position, gridView);
+                gridView.UpdateHighlights(Item, gridPos);
             }
-            else
+
+            if (targetViews is EquipmentSlotView slotView)
             {
-                _currentGridView?.ClearHighlights();
+                _currentView = slotView;
+                slotView.UpdateHighlight(slotView.SlotType, Item);
             }
         }
 
@@ -116,73 +113,148 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
             // Получаем целевой инвентарь (через Raycast)
             var targetViews = GetTargetInventoryView(eventData);
 
-            if (targetViews?.Item1 != null && targetViews?.Item2 != null)
+            _currentView?.ClearHighlights();
+
+            if (targetViews is InventoryGridView targetGridView)
             {
-                var targetInventoryGridView = targetViews.Value.Item1;
-                _currentGridView = targetInventoryGridView;
+                _currentView = targetGridView;
 
                 // Преобразуем позицию курсора в координаты сетки целевого инвентаря
-                var gridPos = CalculateGridPosition(eventData.position, targetInventoryGridView);
-                var oldPosition = _startInventoryGridView.GetItemPosition(_id);
-
-                var removeItemResult = _startInventoryGridView.RemoveItem(_id);
-                var addedItemResult = targetInventoryGridView.AddItems(_item, gridPos, removeItemResult.ItemsToRemoveAmount);
-
-                if (addedItemResult.Success)
+                var gridPos = CalculateGridPosition(eventData.position, targetGridView);
+                if (_startView is InventoryGridView gridView)
                 {
-                    if (!addedItemResult.NeedRemove)
+                    var oldPosition = gridView.GetItemPosition(_id);
+
+                    var removeItemResult = gridView.RemoveItem(_id);
+                    var addedItemResult = targetGridView.AddItems(Item, gridPos, removeItemResult.ItemsToRemoveAmount);
+
+                    if (addedItemResult.Success)
+                    {
+                        if (!addedItemResult.NeedRemove)
+                        {
+                            if (oldPosition != null)
+                            {
+                                gridView.AddItems(Item, oldPosition.Value,
+                                    addedItemResult.ItemsNotAddedAmount);
+                            }
+                            else
+                            {
+                                gridView.AddItems(Item, addedItemResult.ItemsNotAddedAmount);
+                            }
+
+                            _rectTransform.SetParent(targetGridView.GridContainer.transform);
+                            // Устанавливаем позицию предмета на основе координат ячейки сетки
+                            Vector2 cellPosition = new Vector2(
+                                gridPos.x * targetGridView.CellSize,
+                                -gridPos.y * targetGridView.CellSize
+                            );
+                            _rectTransform.anchoredPosition = cellPosition;
+                            _rectTransform.SetAsLastSibling();
+                            _startView = targetGridView;
+                        }
+                        else
+                        {
+                            Destroy(gameObject);
+                        }
+                    }
+                    else
                     {
                         if (oldPosition != null)
                         {
-                            _startInventoryGridView.AddItems(_item, oldPosition.Value,
+                            gridView.AddItems(Item, oldPosition.Value,
                                 addedItemResult.ItemsNotAddedAmount);
                         }
                         else
                         {
-                            _startInventoryGridView.AddItems(_item, addedItemResult.ItemsNotAddedAmount);
+                            gridView.AddItems(Item, addedItemResult.ItemsNotAddedAmount);
                         }
 
-                        _rectTransform.SetParent(targetInventoryGridView.GridContainer.transform);
-                        // Устанавливаем позицию предмета на основе координат ячейки сетки
-                        Vector2 cellPosition = new Vector2(
-                            gridPos.x * targetInventoryGridView.CellSize,
-                            -gridPos.y * targetInventoryGridView.CellSize
-                        );
-                        _rectTransform.anchoredPosition = cellPosition;
-                        _rectTransform.SetAsLastSibling();
-                        _startInventoryGridView = targetInventoryGridView;
+                        ReturnToStartPosition();
                     }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
+
+                    return;
                 }
-                else
+
+                if (_startView is EquipmentSlotView startSlotView)
                 {
-                    if (oldPosition != null)
+                    var addedItemResult = targetGridView.AddItems(Item, gridPos, _currentStack.CurrentValue);
+
+                    if (addedItemResult.Success)
                     {
-                        _startInventoryGridView.AddItems(_item, oldPosition.Value,
-                            addedItemResult.ItemsNotAddedAmount);
+                        startSlotView.Unequip();
                     }
                     else
                     {
-                        _startInventoryGridView.AddItems(_item, addedItemResult.ItemsNotAddedAmount);
+                        ReturnToStartPosition();
                     }
 
-                    // Если передача не удалась, возвращаем предмет на исходную позицию
-                    _rectTransform.SetParent(_startParent);
-                    _rectTransform.anchoredPosition = _startPosition;
+                    return;
+                }
+            }
+
+            if (targetViews is EquipmentSlotView slotView)
+            {
+                _currentView = slotView;
+                //TODO: Если из сетки где лежит предмет-сетка(рюкзак например) экипировать этот предмет,
+                // то куда деть предмет который был экипирован до этого
+                if (_startView is InventoryGridView startGridView)
+                {
+                    var itemAtSlot = slotView.GetItemAtSlot(slotView.SlotType);
+                    if (itemAtSlot != null && slotView.CanEquipItem(slotView.SlotType, Item))
+                    {
+                        slotView.Unequip();
+                        if (slotView.TryEquip(Item))
+                        {
+                            var itemPosition = startGridView.GetItemPosition(_id);
+                            if (itemPosition != null)
+                            {
+                                startGridView.RemoveItem(_id);
+                                startGridView.AddItems(itemAtSlot, itemPosition.Value,
+                                    itemAtSlot.CurrentStack.CurrentValue);
+                                _startView = slotView;
+                                return;
+                            }
+                        }
+                    }
+
+                    if (slotView.CanEquipItem(slotView.SlotType, Item))
+                    {
+                        startGridView.RemoveItem(_id);
+                        slotView.TryEquip(Item);
+                        return;
+                    }
+                    ReturnToStartPosition();
+                    return;
                 }
 
-                targetInventoryGridView.ClearHighlights();
+                if (_startView is EquipmentSlotView startView)
+                {
+                    //TODO: здесь может быть ситуация когда экипированный предмет врага сразу экипируется на игрока
+                    //TODO: куда положить предмет который был экипирован???
+                    if (slotView.TryEquip(Item))
+                    {
+                        startView.Unequip();
+                    }
+                    else
+                    {
+                        ReturnToStartPosition();
+                    }
+
+                    return;
+                }
             }
-            else
+
+            if (targetViews == null)
             {
-                // Если целевой инвентарь не найден, возвращаем предмет на исходную позицию
-                _rectTransform.SetParent(_startParent);
-                _rectTransform.anchoredPosition = _startPosition;
-                _currentGridView?.ClearHighlights();
+                ReturnToStartPosition();
             }
+        }
+
+        private void ReturnToStartPosition()
+        {
+            // Если передача не удалась, возвращаем предмет на исходную позицию
+            _rectTransform.SetParent(_startParent);
+            _rectTransform.anchoredPosition = _startPosition;
         }
 
         private void InitializeVisuals()
@@ -216,19 +288,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
         private void UpdateRotate()
         {
             _rectTransform.sizeDelta = new Vector2(
-                _item.Width.Value * _cellSize,
-                _item.Height.Value * _cellSize
+                Item.Width.Value * _cellSize,
+                Item.Height.Value * _cellSize
             );
         }
 
         private void UpdateStack()
         {
-            if (_isStackable)
+            if (stackText != null)
             {
-                if (stackText != null)
-                {
-                    stackText.text = _currentStack.CurrentValue.ToString();
-                }
+                stackText.text = _currentStack.CurrentValue.ToString();
             }
         }
 
@@ -260,25 +329,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
             return new Vector2Int(gridX, gridY);
         }
 
-        private (InventoryGridView, InventoryView)? GetTargetInventoryView(PointerEventData eventData)
+        private IView GetTargetInventoryView(PointerEventData eventData)
         {
-            (InventoryGridView, InventoryView) targetView = new();
+            IView targetView = null;
 
-            // GraphicRaycaster ray = GetComponentInParent<GraphicRaycaster>();
-            // List<RaycastResult> results = new List<RaycastResult>();
-            // ray.Raycast(eventData, results);
+            GraphicRaycaster ray = GetComponentInParent<GraphicRaycaster>();
+            List<RaycastResult> results = new List<RaycastResult>();
+            ray.Raycast(eventData, results);
 
-            var results = eventData.hovered;
+            // var results = eventData.hovered;
             foreach (var result in results)
             {
                 if (result.gameObject.TryGetComponent(out InventoryGridView gridView))
                 {
-                    targetView.Item1 = gridView;
+                    targetView = gridView;
                 }
 
-                if (result.gameObject.TryGetComponent(out InventoryView inventoryView))
+                if (result.gameObject.TryGetComponent(out EquipmentSlotView slotView))
                 {
-                    targetView.Item2 = inventoryView;
+                    targetView = slotView;
                 }
             }
 

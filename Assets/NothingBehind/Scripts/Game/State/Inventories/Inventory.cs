@@ -19,18 +19,6 @@ namespace NothingBehind.Scripts.Game.State.Inventories
             Origin = inventoryData;
             OwnerId = inventoryData.OwnerId;
             OwnerType = inventoryData.OwnerType;
-            inventoryData.InventoryGrids.ForEach(gridData =>
-            {
-                if (gridData is InventoryGridWithSubGridData subGridData)
-                {
-                    Debug.Log(subGridData.GridId);
-                    InventoryGrids.Add(new InventoryGridWithSubGrid(subGridData));
-                }
-                else
-                {
-                    InventoryGrids.Add(new InventoryGrid(gridData));
-                }
-            });
 
             InventoryGrids.ObserveAdd().Subscribe(e =>
             {

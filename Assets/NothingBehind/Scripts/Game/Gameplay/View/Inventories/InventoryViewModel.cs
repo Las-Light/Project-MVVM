@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using NothingBehind.Scripts.Game.Gameplay.Commands.InventoriesCommands;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
@@ -14,7 +13,6 @@ using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
 using ObservableCollections;
 using R3;
-using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
 {
@@ -133,7 +131,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
                     var addedGrid = e.Value;
                     if (addedGrid is InventoryGridWithSubGrid gridWithSubGrid)
                         foreach (var subGrid in gridWithSubGrid.SubGrids)
+                        {
                             CreateInventoryGridViewModel(subGrid);
+                        }
                     else
                     {
                         CreateInventoryGridViewModel(addedGrid);

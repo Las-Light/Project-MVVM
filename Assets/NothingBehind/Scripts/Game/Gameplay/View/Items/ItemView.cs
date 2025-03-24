@@ -86,6 +86,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
             _currentView?.ClearHighlights();
             // Перемещаем предмет за курсором
             _rectTransform.anchoredPosition += eventData.delta / _mainCanvas.scaleFactor;
+            
 
             // Получаем целевую вьюху
             var targetViews = GetTargetInventoryView(eventData);

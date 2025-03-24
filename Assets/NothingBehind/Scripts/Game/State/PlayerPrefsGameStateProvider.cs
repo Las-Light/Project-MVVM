@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.Settings;
@@ -26,10 +27,17 @@ namespace NothingBehind.Scripts.Game.State
 
         public Observable<GameStateProxy> LoadGameState(GameSettings gameSettings, SceneEnterParams sceneEnterParams)
         {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+            {
+                TypeNameHandling = TypeNameHandling.Auto,
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+            
             if (!PlayerPrefs.HasKey(GAME_STATE_KEY))
             {
                 GameState = CreateGameStateFromSettings(gameSettings, sceneEnterParams);
-                Debug.Log("Game State created from settings" + JsonUtility.ToJson(_gameStateOrigin, true));
+                Debug.Log("Game State created from settings" + JsonConvert.SerializeObject(_gameStateOrigin, Formatting.Indented));
 
                 SaveGameState(); // Сохраним дефолтное состояние
             }
@@ -37,7 +45,7 @@ namespace NothingBehind.Scripts.Game.State
             {
                 // Загружаем
                 var json = PlayerPrefs.GetString(GAME_STATE_KEY);
-                _gameStateOrigin = JsonUtility.FromJson<GameState>(json);
+                _gameStateOrigin = JsonConvert.DeserializeObject<GameState>(json);
 
                 GameState = new GameStateProxy(_gameStateOrigin);
                 // добавил передачу куррентМэпИд
@@ -62,7 +70,7 @@ namespace NothingBehind.Scripts.Game.State
             {
                 // Загружаем
                 var json = PlayerPrefs.GetString(GAME_SETTINGS_STATE_KEY);
-                _gameSettingsStateOrigin = JsonUtility.FromJson<GameSettingsState>(json);
+                _gameSettingsStateOrigin = JsonConvert.DeserializeObject<GameSettingsState>(json);
                 SettingsState = new GameSettingsStateProxy(_gameSettingsStateOrigin);
             }
 
@@ -71,7 +79,7 @@ namespace NothingBehind.Scripts.Game.State
 
         public Observable<bool> SaveGameState()
         {
-            var json = JsonUtility.ToJson(_gameStateOrigin, true);
+            var json = JsonConvert.SerializeObject(_gameStateOrigin, Formatting.Indented);
             PlayerPrefs.SetString(GAME_STATE_KEY, json);
 
             //Debug.Log("Save GameState");
@@ -81,7 +89,7 @@ namespace NothingBehind.Scripts.Game.State
 
         public Observable<bool> SaveSettingsState()
         {
-            var json = JsonUtility.ToJson(_gameSettingsStateOrigin, true);
+            var json = JsonConvert.SerializeObject(_gameSettingsStateOrigin, Formatting.Indented);
             PlayerPrefs.SetString(GAME_SETTINGS_STATE_KEY, json);
 
             return Observable.Return(true);

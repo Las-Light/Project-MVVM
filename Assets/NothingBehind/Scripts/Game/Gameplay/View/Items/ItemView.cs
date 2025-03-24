@@ -195,29 +195,30 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
             if (targetViews is EquipmentSlotView slotView)
             {
                 _currentView = slotView;
-                //TODO: Если из сетки где лежит предмет-сетка(рюкзак например) экипировать этот предмет,
-                // то куда деть предмет который был экипирован до этого
+                
+                var itemAtSlot = slotView.GetItemAtSlot(slotView.SlotType);
                 if (_startView is InventoryGridView startGridView)
                 {
-                    var itemAtSlot = slotView.GetItemAtSlot(slotView.SlotType);
-                    if (itemAtSlot != null && slotView.CanEquipItem(slotView.SlotType, Item))
-                    {
-                        slotView.Unequip();
-                        if (slotView.TryEquip(Item))
-                        {
-                            var itemPosition = startGridView.GetItemPosition(_id);
-                            if (itemPosition != null)
-                            {
-                                startGridView.RemoveItem(_id);
-                                startGridView.AddItems(itemAtSlot, itemPosition.Value,
-                                    itemAtSlot.CurrentStack.CurrentValue);
-                                _startView = slotView;
-                                return;
-                            }
-                        }
-                    }
+                    //TODO: Если из сетки где лежит предмет-сетка(рюкзак например) экипировать этот предмет,
+                    //TODO: то куда деть предмет который был экипирован до этого
+                    // if (itemAtSlot != null && slotView.CanEquipItem(slotView.SlotType, Item))
+                    // {
+                    //     slotView.Unequip();
+                    //     if (slotView.TryEquip(Item))
+                    //     {
+                    //         var itemPosition = startGridView.GetItemPosition(_id);
+                    //         if (itemPosition != null)
+                    //         {
+                    //             startGridView.RemoveItem(_id);
+                    //             startGridView.AddItems(itemAtSlot, itemPosition.Value,
+                    //                 itemAtSlot.CurrentStack.CurrentValue);
+                    //             _startView = slotView;
+                    //             return;
+                    //         }
+                    //     }
+                    // }
 
-                    if (slotView.CanEquipItem(slotView.SlotType, Item))
+                    if (itemAtSlot == null && slotView.CanEquipItem(slotView.SlotType, Item))
                     {
                         startGridView.RemoveItem(_id);
                         slotView.TryEquip(Item);

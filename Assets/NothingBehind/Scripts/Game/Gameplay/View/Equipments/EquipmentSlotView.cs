@@ -85,7 +85,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Equipments
             ClearHighlights();
             
             var canEquip = CanEquipItem(slotType, item);
-            _slotImage.color = canEquip ? Color.green : Color.red;
+            var itemAtSlot = _viewModel.GetItemAtSlot(SlotType);
+            _slotImage.color = canEquip && itemAtSlot==null ? Color.green : Color.red;
         }
 
         public void ClearHighlights()

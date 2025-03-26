@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.View.Equipments;
 using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
 using NothingBehind.Scripts.Game.State.Items;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
 using R3;
 using TMPro;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
     {
         [SerializeField] private TMP_Text stackText;
 
-        public Item Item;
+        private Item _item;
 
         private float _cellSize;
         private int _id;
@@ -39,7 +40,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
 
         public void Bind(Item item, float cellSize)
         {
-            Item = item;
+            _item = item;
             _currentStack = item.CurrentStack;
             _width = item.Width;
             _height = item.Height;
@@ -96,13 +97,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
             {
                 _currentView = gridView;
                 var gridPos = CalculateGridPosition(eventData.position, gridView);
-                gridView.UpdateHighlights(Item, gridPos);
+                gridView.UpdateHighlights(_item, gridPos);
             }
 
             if (targetViews is EquipmentSlotView slotView)
             {
                 _currentView = slotView;
-                slotView.UpdateHighlight(slotView.SlotType, Item);
+                slotView.UpdateHighlight(slotView.SlotType, _item);
             }
         }
 
@@ -122,73 +123,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
 
                 // Преобразуем позицию курсора в координаты сетки целевого инвентаря
                 var gridPos = CalculateGridPosition(eventData.position, targetGridView);
+                
                 if (_startView is InventoryGridView gridView)
                 {
-                    var oldPosition = gridView.GetItemPosition(_id);
-
-                    var removeItemResult = gridView.RemoveItem(_id);
-                    var addedItemResult = targetGridView.AddItems(Item, gridPos, removeItemResult.ItemsToRemoveAmount);
-
-                    if (addedItemResult.Success)
+                    //пытаемся положить предмет в предмет-сетку
+                    if (TryPlaceToItemGrid(targetGridView, gridPos, gridView))
                     {
-                        if (!addedItemResult.NeedRemove)
-                        {
-                            if (oldPosition != null)
-                            {
-                                gridView.AddItems(Item, oldPosition.Value,
-                                    addedItemResult.ItemsNotAddedAmount);
-                            }
-                            else
-                            {
-                                gridView.AddItems(Item, addedItemResult.ItemsNotAddedAmount);
-                            }
-
-                            _rectTransform.SetParent(targetGridView.GridContainer.transform);
-                            // Устанавливаем позицию предмета на основе координат ячейки сетки
-                            Vector2 cellPosition = new Vector2(
-                                gridPos.x * targetGridView.CellSize,
-                                -gridPos.y * targetGridView.CellSize
-                            );
-                            _rectTransform.anchoredPosition = cellPosition;
-                            _rectTransform.SetAsLastSibling();
-                            _startView = targetGridView;
-                        }
-                        else
-                        {
-                            Destroy(gameObject);
-                        }
-                    }
-                    else
-                    {
-                        if (oldPosition != null)
-                        {
-                            gridView.AddItems(Item, oldPosition.Value,
-                                addedItemResult.ItemsNotAddedAmount);
-                        }
-                        else
-                        {
-                            gridView.AddItems(Item, addedItemResult.ItemsNotAddedAmount);
-                        }
-
-                        ReturnToStartPosition();
+                        return;
                     }
 
+                    TryPlaceToGridAtGrid(gridView, targetGridView, gridPos);
                     return;
                 }
 
                 if (_startView is EquipmentSlotView startSlotView)
                 {
-                    var addedItemResult = targetGridView.AddItems(Item, gridPos, _currentStack.CurrentValue);
-
-                    if (addedItemResult.Success)
-                    {
-                        startSlotView.Unequip();
-                    }
-                    else
-                    {
-                        ReturnToStartPosition();
-                    }
-
+                    TryPlaceToGridAtEquipmentSlot(targetGridView, gridPos, startSlotView);
                     return;
                 }
             }
@@ -200,32 +150,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
                 var itemAtSlot = slotView.GetItemAtSlot(slotView.SlotType);
                 if (_startView is InventoryGridView startGridView)
                 {
-                    //TODO: Если из сетки где лежит предмет-сетка(рюкзак например) экипировать этот предмет,
-                    //TODO: то куда деть предмет который был экипирован до этого
-                    // if (itemAtSlot != null && slotView.CanEquipItem(slotView.SlotType, Item))
-                    // {
-                    //     slotView.Unequip();
-                    //     if (slotView.TryEquip(Item))
-                    //     {
-                    //         var itemPosition = startGridView.GetItemPosition(_id);
-                    //         if (itemPosition != null)
-                    //         {
-                    //             startGridView.RemoveItem(_id);
-                    //             startGridView.AddItems(itemAtSlot, itemPosition.Value,
-                    //                 itemAtSlot.CurrentStack.CurrentValue);
-                    //             _startView = slotView;
-                    //             return;
-                    //         }
-                    //     }
-                    // }
-
-                    if (itemAtSlot == null && slotView.CanEquipItem(slotView.SlotType, Item))
-                    {
-                        startGridView.RemoveItem(_id);
-                        slotView.TryEquip(Item);
-                        return;
-                    }
-                    ReturnToStartPosition();
+                    TryEquipAtGrid(itemAtSlot, slotView, startGridView);
                     return;
                 }
 
@@ -233,14 +158,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
                 {
                     //TODO: здесь может быть ситуация когда экипированный предмет врага сразу экипируется на игрока
                     //TODO: куда положить предмет который был экипирован???
-                    if (slotView.TryEquip(Item))
-                    {
-                        startView.Unequip();
-                    }
-                    else
-                    {
-                        ReturnToStartPosition();
-                    }
+                    TryEquipAtEquipmentSlot(slotView, startView);
 
                     return;
                 }
@@ -250,6 +168,115 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
             {
                 ReturnToStartPosition();
             }
+        }
+
+        private void TryEquipAtEquipmentSlot(EquipmentSlotView slotView, EquipmentSlotView startView)
+        {
+            if (slotView.TryEquip(_item))
+            {
+                startView.Unequip();
+            }
+            else
+            {
+                ReturnToStartPosition();
+            }
+        }
+
+        private void TryEquipAtGrid(Item itemAtSlot, EquipmentSlotView slotView, InventoryGridView startGridView)
+        {
+            if (itemAtSlot == null && slotView.CanEquipItem(slotView.SlotType, _item))
+            {
+                startGridView.RemoveItem(_id);
+                slotView.TryEquip(_item);
+                return;
+            }
+
+            ReturnToStartPosition();
+        }
+
+        private void TryPlaceToGridAtEquipmentSlot(InventoryGridView targetGridView, Vector2Int gridPos,
+            EquipmentSlotView startSlotView)
+        {
+            var addedItemResult = targetGridView.AddItems(_item, gridPos, _currentStack.CurrentValue);
+
+            if (addedItemResult.Success)
+            {
+                startSlotView.Unequip();
+            }
+            else
+            {
+                ReturnToStartPosition();
+            }
+        }
+
+        private void TryPlaceToGridAtGrid(InventoryGridView gridView, InventoryGridView targetGridView, Vector2Int gridPos)
+        {
+            var oldPosition = gridView.GetItemPosition(_id);
+
+            var removeItemResult = gridView.RemoveItem(_id);
+            var addedItemResult = targetGridView.AddItems(_item, gridPos, removeItemResult.ItemsToRemoveAmount);
+
+            if (addedItemResult.Success)
+            {
+                if (!addedItemResult.NeedRemove)
+                {
+                    if (oldPosition != null)
+                    {
+                        gridView.AddItems(_item, oldPosition.Value,
+                            addedItemResult.ItemsNotAddedAmount);
+                    }
+                    else
+                    {
+                        gridView.AddItems(_item, addedItemResult.ItemsNotAddedAmount);
+                    }
+
+                    _rectTransform.SetParent(targetGridView.GridContainer.transform);
+                    // Устанавливаем позицию предмета на основе координат ячейки сетки
+                    Vector2 cellPosition = new Vector2(
+                        gridPos.x * targetGridView.CellSize,
+                        -gridPos.y * targetGridView.CellSize
+                    );
+                    _rectTransform.anchoredPosition = cellPosition;
+                    _rectTransform.SetAsLastSibling();
+                    _startView = targetGridView;
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
+            }
+            else
+            {
+                if (oldPosition != null)
+                {
+                    gridView.AddItems(_item, oldPosition.Value,
+                        addedItemResult.ItemsNotAddedAmount);
+                }
+                else
+                {
+                    gridView.AddItems(_item, addedItemResult.ItemsNotAddedAmount);
+                }
+
+                ReturnToStartPosition();
+            }
+        }
+
+        private bool TryPlaceToItemGrid(InventoryGridView targetGridView, Vector2Int gridPos, InventoryGridView gridView)
+        {
+            var itemAtPosition = targetGridView.GetItemAtPosition(gridPos);
+            if (itemAtPosition != null && itemAtPosition != _item)
+            {
+                if (itemAtPosition is GridItem gridItem)
+                {
+                    if (gridItem.Grid.Value.TryAddItemToGrid(_item))
+                    {
+                        gridView.RemoveItem(_id);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private void ReturnToStartPosition()
@@ -290,8 +317,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Items
         private void UpdateRotate()
         {
             _rectTransform.sizeDelta = new Vector2(
-                Item.Width.Value * _cellSize,
-                Item.Height.Value * _cellSize
+                _item.Width.Value * _cellSize,
+                _item.Height.Value * _cellSize
             );
         }
 

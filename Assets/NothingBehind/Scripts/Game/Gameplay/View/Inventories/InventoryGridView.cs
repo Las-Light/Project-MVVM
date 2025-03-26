@@ -141,14 +141,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
             return _viewModel.RemoveItemAmount(itemId, amount);
         }
 
-        public AddItemsToInventoryGridResult TryMoveItem(int itemId, Vector2Int newPosition, int amount)
-        {
-            return _viewModel.TryMoveItem(itemId, newPosition, amount);
-        }
-
         public Vector2Int? GetItemPosition(int itemId)
         {
             return _viewModel.GetItemPosition(itemId);
+        }
+
+        public Item GetItemAtPosition(Vector2Int position)
+        {
+            return _viewModel.GetItemAtPosition(position);
         }
 
         public void UpdateHighlights(Item item, Vector2Int position)

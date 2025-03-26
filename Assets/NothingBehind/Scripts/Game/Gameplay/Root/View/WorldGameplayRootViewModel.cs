@@ -165,9 +165,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                         grid.AddItems(item, item.CurrentStack.Value);
                     }
 
-                    foreach (var itemInGrid in grid.Items)
+                    foreach (var keyValuePair in grid.ItemsPositionsMap)
                     {
-                        Debug.Log($"{itemInGrid.ItemType} + {itemInGrid.Id}");
+                        Debug.Log($"{keyValuePair.Key.ItemType} + {keyValuePair.Key.Id}");
                     }
                 }
 

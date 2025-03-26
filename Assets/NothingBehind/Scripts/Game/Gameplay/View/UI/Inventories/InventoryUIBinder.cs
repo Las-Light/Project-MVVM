@@ -1,6 +1,7 @@
 using NothingBehind.Scripts.Game.Gameplay.View.Equipments;
 using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
 using NothingBehind.Scripts.MVVM.UI;
+using ObservableCollections;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.View.UI.Inventories
@@ -12,6 +13,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI.Inventories
         [SerializeField] private RectTransform _playerInventoryContainer;
         [SerializeField] private RectTransform _playerEquipmentContainer;
         [SerializeField] private RectTransform _lootInventoryContainer;
+
+        //private ObservableList<IView> _views = new ();
 
         protected override void OnBind(InventoryUIViewModel viewModel)
         {
@@ -31,8 +34,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.UI.Inventories
 
         private void CreatePlayerInventoryView(InventoryViewModel inventoryViewModel)
         {
-            var inventoryView = Instantiate(_inventoryPrefab, _playerInventoryContainer);
-            inventoryView.GetComponent<InventoryView>().Bind(inventoryViewModel);
+            var inventoryUI = Instantiate(_inventoryPrefab, _playerInventoryContainer);
+            var inventoryView = inventoryUI.GetComponent<InventoryView>();
+            inventoryView.Bind(inventoryViewModel);
+            //_views.Add(inventoryView);
         }
 
         private void CreateLootInventoryView(InventoryViewModel inventoryViewModel)

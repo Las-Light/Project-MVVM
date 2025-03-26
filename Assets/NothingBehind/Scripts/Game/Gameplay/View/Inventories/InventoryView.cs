@@ -17,7 +17,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.View.Inventories
         private InventoryViewModel _inventoryViewModel;
 
         private IObservableCollection<InventoryGridViewModel> _inventoryGridViewModels;
-        private Dictionary<InventoryGridViewModel, InventoryGridView> _gridViewsMap = new ();
+        private readonly Dictionary<InventoryGridViewModel, InventoryGridView> _gridViewsMap = new ();
         private readonly CompositeDisposable _disposables = new ();
         public void Bind(InventoryViewModel viewModel)
         {

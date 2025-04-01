@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _sceneUIRootPrefab: {fileID: 91992379363235827, guid: d4d1b1e10906526448a2405c61017e7f, type: 3}
-  _worldRootBinder: {fileID: 1780069855}
+  worldRootView: {fileID: 1780069855}
 --- !u!4 &207031324
 Transform:
   m_ObjectHideFlags: 0

@@ -4,6 +4,7 @@ using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Storages;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Settings
@@ -16,6 +17,7 @@ namespace NothingBehind.Scripts.Game.Settings
         public InventoriesSettings InventoriesSettings;
         public ItemsSettings ItemsSettings;
         public EquipmentsSettings EquipmentsSettings;
+        public StoragesSettings StoragesSettings;
         public GameplayCameraSettings GameplayCameraSettings;
         public MapsSettings MapsSettings;
     }

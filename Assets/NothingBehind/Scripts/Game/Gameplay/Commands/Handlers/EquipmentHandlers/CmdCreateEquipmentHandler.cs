@@ -6,6 +6,7 @@ using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Root;
+using NothingBehind.Scripts.Utils;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandlers
 {
@@ -21,7 +22,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandler
             _equipmentsSettings = equipmentsSettings;
         }
 
-        public bool Handle(CmdCreateEquipment command)
+        public CommandResult Handle(CmdCreateEquipment command)
         {
             var equipmentSettings = _equipmentsSettings.AllEquipments
                 .First(settings => settings.EntityType == command.OwnerType);
@@ -44,9 +45,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandler
                 Slots = equipmentSlots
             };
 
-            _gameState.Equipments.Add(new State.Equipments.Equipment(equipment));
+            _gameState.Equipments.Add(new Equipment(equipment));
 
-            return true;
+            return new CommandResult(command.OwnerId,true);
         }
     }
 }

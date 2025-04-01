@@ -2,6 +2,7 @@ using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Commands.InventoriesCommands;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Root;
+using NothingBehind.Scripts.Utils;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandlers
@@ -14,7 +15,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandl
         {
             _gameState = gameState;
         }
-        public bool Handle(CmdRemoveGridFromInventory command)
+        public CommandResult Handle(CmdRemoveGridFromInventory command)
         {
             var inventory = _gameState.Inventories.First(inventory => inventory.OwnerId == command.OwnerId);
             var removedInventoryGrid = inventory.InventoryGrids.FirstOrDefault(grid => grid.GridId == command.Grid.GridId);
@@ -22,11 +23,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandl
             if (removedInventoryGrid == null)
             {
                 Debug.LogError($"Couldn't find InventoryGrid with ID: {command.Grid} for owner with ID: {command.OwnerId}");
-                return false;
+                return new CommandResult(command.Grid.GridId, false);
             }
             
             inventory.InventoryGrids.Remove(removedInventoryGrid);
-            return true;
+            return new CommandResult(command.Grid.GridId, true);
         }
     }
 }

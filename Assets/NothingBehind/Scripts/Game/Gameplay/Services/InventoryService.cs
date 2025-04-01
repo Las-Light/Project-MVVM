@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Commands.InventoriesCommands;
-using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Inventories;
+using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
 
@@ -22,7 +23,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         private readonly Dictionary<EntityType, InventorySettings> _inventorySettingsMap = new();
 
         public IObservableCollection<InventoryViewModel> AllInventories => _allInventories;
-
         public Dictionary<int, InventoryViewModel> InventoryMap => _inventoryMap;
 
         public InventoryService(IObservableCollection<Inventory> inventories,
@@ -54,7 +54,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             });
         }
 
-        public bool CreateInventory(EntityType ownerType, int ownerId)
+        public CommandResult CreateInventory(EntityType ownerType, int ownerId)
         {
             var command = new CmdCreateInventory(ownerType, ownerId);
             var result = _commandProcessor.Process(command);
@@ -62,7 +62,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             return result;
         }
 
-        public bool RemoveInventory(int ownerId)
+        public CommandResult RemoveInventory(int ownerId)
         {
             var command = new CmdRemoveInventory(ownerId);
             var result = _commandProcessor.Process(command);

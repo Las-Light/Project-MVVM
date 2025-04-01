@@ -1,4 +1,4 @@
-using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem

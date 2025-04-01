@@ -3,6 +3,7 @@ using NothingBehind.Scripts.Game.Gameplay.Commands.InventoriesCommands;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Root;
+using NothingBehind.Scripts.Utils;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandlers
@@ -16,14 +17,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandl
             _gameState = gameState;
         }
 
-        public bool Handle(CmdAddGridToInventory command)
+        public CommandResult Handle(CmdAddGridToInventory command)
         {
             var inventory = _gameState.Inventories.First(inventory => inventory.OwnerId == command.OwnerId);
             if (inventory.InventoryGrids.FirstOrDefault(grid => grid.GridId == command.Grid.GridId) != null)
             {
                 Debug.LogError(
                     $"InventoryGrid with Id {command.Grid} already exists in Inventory {inventory.OwnerType}-{inventory.OwnerId}.");
-                return false;
+                return new CommandResult(command.Grid.GridId,false);
             }
 
             if (command.Grid is InventoryGridWithSubGrid subGrid)
@@ -35,7 +36,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandl
                 inventory.InventoryGrids.Add(command.Grid);
             }
 
-            return true;
+            return new CommandResult(command.Grid.GridId, true);
         }
     }
 }

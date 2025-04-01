@@ -20,6 +20,11 @@ namespace NothingBehind.Scripts.Game.State.Inventories
             OwnerId = inventoryData.OwnerId;
             OwnerType = inventoryData.OwnerType;
 
+            if (OwnerType == EntityType.Storage && inventoryData.InventoryGrids.Count > 0)
+            {
+                inventoryData.InventoryGrids.ForEach(data => InventoryGrids.Add(new InventoryGrid(data)));
+            }
+
             InventoryGrids.ObserveAdd().Subscribe(e =>
             {
                 var addedInventorGrid = e.Value;

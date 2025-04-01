@@ -18,7 +18,7 @@ MonoBehaviour:
   Weight: 1
   CanRotate: 0
   IsRotated: 0
-  IsStackable: 1
+  IsStackable: 0
   MaxStackSize: 1
   CurrentStack: 1
   GridType: 2

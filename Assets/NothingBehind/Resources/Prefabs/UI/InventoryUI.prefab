@@ -642,6 +642,7 @@ MonoBehaviour:
   _btnCloseAlt: {fileID: 0}
   _inventoryPrefab: {fileID: 8217122136197608629, guid: c191e06bd91bc8a4392d3fe1833f8551, type: 3}
   _equipmentPrefab: {fileID: 8217122136197608629, guid: 5fbc5554dd22c7b418f14a720f9b3a23, type: 3}
+  _storagePrefab: {fileID: 3378940066427147889, guid: 7294d1a531e4cf6448465006d8ffb0e9, type: 3}
   _playerInventoryContainer: {fileID: 944018454435930702}
   _playerEquipmentContainer: {fileID: 7606019527918748595}
   _lootInventoryContainer: {fileID: 7848297733308454885}

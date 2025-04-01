@@ -1,6 +1,6 @@
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
-using NothingBehind.Scripts.Game.Gameplay.View.Characters;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using R3;
 using UnityEngine;

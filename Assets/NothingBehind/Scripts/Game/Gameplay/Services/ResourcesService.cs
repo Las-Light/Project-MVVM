@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Commands;
-using NothingBehind.Scripts.Game.Gameplay.View.GameResources;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.GameResources;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.GameResources;
+using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
 
@@ -25,14 +26,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             resources.ObserveRemove().Subscribe(e => RemoveResourceViewModel(e.Value));
         }
 
-        public bool AddResources(ResourceType resourceType, int amount)
+        public CommandResult AddResources(ResourceType resourceType, int amount)
         {
             var command = new CmdResourcesAdd(resourceType, amount);
 
             return _cmd.Process(command);
         }
 
-        public bool TrySpendResources(ResourceType resourceType, int amount)
+        public CommandResult TrySpendResources(ResourceType resourceType, int amount)
         {
             var command = new CmdResourcesSpend(resourceType, amount);
 

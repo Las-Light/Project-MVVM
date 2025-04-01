@@ -1,10 +1,11 @@
 using NothingBehind.Scripts.Game.Gameplay.Logic;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
+using NothingBehind.Scripts.Game.Gameplay.MVVM;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Maps;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Storages;
 using NothingBehind.Scripts.Game.Gameplay.Services;
-using NothingBehind.Scripts.Game.Gameplay.View;
-using NothingBehind.Scripts.Game.Gameplay.View.Characters;
-using NothingBehind.Scripts.Game.Gameplay.View.Inventories;
-using NothingBehind.Scripts.Game.Gameplay.View.Maps;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Entities;
@@ -21,6 +22,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
     {
         private readonly ISettingsProvider _settingsProvider;
         private readonly CharactersService _charactersService;
+        private readonly StorageService _storageService;
         private readonly IGameStateProvider _gameStateProvider;
         private readonly PlayerService _playerService;
         private readonly ResourcesService _resourcesService;
@@ -31,6 +33,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         public readonly ReadOnlyReactiveProperty<PlayerViewModel> Player;
         public readonly ReadOnlyReactiveProperty<CameraViewModel> CameraViewModel;
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
+        public readonly IObservableCollection<StorageViewModel> AllStorages;
         public readonly IObservableCollection<InventoryViewModel> AllInventories;
         public readonly IObservableCollection<MapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<EnemySpawnViewModel> AllSpawns;
@@ -38,6 +41,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         public WorldGameplayRootViewModel(
             ISettingsProvider settingsProvider,
             CharactersService charactersService,
+            StorageService storageService,
             IGameStateProvider gameStateProvider,
             PlayerService playerService,
             ResourcesService resourcesService,
@@ -49,6 +53,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         {
             _settingsProvider = settingsProvider;
             _charactersService = charactersService;
+            _storageService = storageService;
             _gameStateProvider = gameStateProvider;
             _playerService = playerService;
             _resourcesService = resourcesService;
@@ -59,6 +64,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             CameraViewModel = cameraManager.CameraViewModel;
             Player = playerService.PlayerViewModel;
             AllCharacters = charactersService.AllCharacters;
+            AllStorages = storageService.AllStorages;
             AllInventories = inventoryService.AllInventories;
             AllMapTransfers = mapService.MapTransfers;
             AllSpawns = spawnService.EnemySpawns;
@@ -106,10 +112,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             foreach (var inventory in gameState.Inventories)
             {
-                if (inventory.OwnerType != EntityType.Player)
-                {
-                    continue;
-                }
+                Debug.Log(inventory.OwnerType);
 
                 foreach (var grid in inventory.InventoryGrids)
                 {

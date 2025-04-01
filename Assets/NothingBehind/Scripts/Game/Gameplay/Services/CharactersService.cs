@@ -1,11 +1,11 @@
-using System;
 using System.Collections.Generic;
-using NothingBehind.Scripts.Game.Gameplay.Commands;
-using NothingBehind.Scripts.Game.Gameplay.View.Characters;
+using NothingBehind.Scripts.Game.Gameplay.Commands.CharactersCommands;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
+using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -23,12 +23,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         public IObservableCollection<CharacterViewModel> AllCharacters => _allCharacters;
 
-        public CharactersService(
-            IObservableCollection<Character> characters,
+        public CharactersService(IObservableCollection<Character> characters,
             CharactersSettings charactersSettings,
             EquipmentService equipmentService,
             InventoryService inventoryService,
-            ICommandProcessor commandProcessor)
+            ICommandProcessor commandProcessor, Subject<ExitInventoryRequestResult> exitInventorRequest)
         {
             _equipmentService = equipmentService;
             _inventoryService = inventoryService;
@@ -53,9 +52,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             {
                 RemoveCharacterViewModel(e.Value);
             });
+            
+            exitInventorRequest.Where(result => result.IsEmptyInventory && result.EntityType == EntityType.Character)
+                .Subscribe(result =>
+                {
+                    RemoveCharacter(result.OwnerId);
+                });
         }
 
-        public bool CreateCharacter(EntityType characterType, int level, Vector3 position)
+        public CommandResult CreateCharacter(EntityType characterType, int level, Vector3 position)
         {
             var command = new CmdCreateCharacter(characterType, level,
                 position, _equipmentService, _inventoryService);
@@ -64,18 +69,26 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             return result;
         }
 
-        public bool RemoveCharacter(int characterEntityId)
+        public CommandResult RemoveCharacter(int characterEntityId)
         {
-            throw new NotImplementedException();
+            var command = new CmdRemoveCharacter(characterEntityId, _inventoryService, _equipmentService);
+            var result = _commandProcessor.Process(command);
+            
+            return result;
         }
 
-        private void CreateCharacterViewModel(Character characterEntityProxy)
+        private void CreateCharacterViewModel(Character character)
         {
-            var characterSettings = _characterSettingsMap[characterEntityProxy.EntityType];
-            var characterViewModel = new CharacterViewModel(characterEntityProxy, characterSettings, this);
+            var characterSettings = _characterSettingsMap[character.EntityType];
+            if (_inventoryService.InventoryMap.TryGetValue(character.Id, out var inventoryViewModel))
+            {
+                Debug.LogError($"Inventory with Id - {character.Id} not found");
+            }
+            var characterViewModel = new CharacterViewModel(character,
+                characterSettings, this, inventoryViewModel);
             
             _allCharacters.Add(characterViewModel);
-            _characterMap[characterEntityProxy.Id] = characterViewModel;
+            _characterMap[character.Id] = characterViewModel;
         }
 
         private void RemoveCharacterViewModel(Character characterEntityProxy)

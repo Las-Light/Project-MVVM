@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using NothingBehind.Scripts.Game.Gameplay.View.Maps;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Maps;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using ObservableCollections;

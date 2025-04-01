@@ -2,6 +2,7 @@ using System.Linq;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Root;
+using NothingBehind.Scripts.Utils;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
 {
@@ -14,7 +15,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
             _gameState = gameState;
         }
 
-        public bool Handle(CmdResourcesAdd command)
+        public CommandResult Handle(CmdResourcesAdd command)
         {
             var requiredResourceType = command.ResourceType;
             var requiredResource = _gameState.Resources.FirstOrDefault(
@@ -27,7 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers
 
             requiredResource.Amount.Value += command.Amount;
 
-            return true;
+            return new CommandResult( true);
         }
 
         private Resource CreateNewResource(ResourceType resourceType)

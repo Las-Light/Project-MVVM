@@ -2,6 +2,7 @@ using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Commands.EquipmentCommands;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Root;
+using NothingBehind.Scripts.Utils;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandlers
@@ -14,7 +15,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandler
         {
             _gameState = gameState;
         }
-        public bool Handle(CmdRemoveEquipment command)
+        public CommandResult Handle(CmdRemoveEquipment command)
         {
             var equipments = _gameState.Equipments;
             var removedEquipment =
@@ -23,11 +24,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandler
             if (removedEquipment == null)
             {
                 Debug.Log($"Couldn't find Inventory for ID: {command.OwnerId}");
-                return false;
+                return new CommandResult(false);
             }
 
             equipments.Remove(removedEquipment);
-            return true;
+            return new CommandResult(command.OwnerId,true);
         }
     }
 }

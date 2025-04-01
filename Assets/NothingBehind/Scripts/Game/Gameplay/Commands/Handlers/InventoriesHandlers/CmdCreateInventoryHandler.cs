@@ -3,9 +3,12 @@ using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Commands.InventoriesCommands;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Inventories;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Root;
+using NothingBehind.Scripts.Utils;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandlers
 {
@@ -21,11 +24,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandl
             _inventoriesSettings = inventoriesSettings;
         }
 
-        public bool Handle(CmdCreateInventory command)
+        public CommandResult Handle(CmdCreateInventory command)
         {
             var inventorySettings =
                 _inventoriesSettings.Inventories.First(settings => settings.OwnerType == command.OwnerType);
-            var inventory = new InventoryData()
+            var inventoryData = new InventoryData()
             {
                 OwnerId = command.OwnerId,
                 OwnerType = command.OwnerType
@@ -33,12 +36,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandl
 
             var inventoryGrids = new List<InventoryGridData>();
 
-            inventory.InventoryGrids = inventoryGrids;
+            // Для сущностей у которых есть инвентарь, но нет EquipmentSystem создаем сетки
+            if (command.OwnerType == EntityType.Storage)
+            {
+                var gridsSettings = inventorySettings.GridsSettings;
+                foreach (var gridSettings in gridsSettings)
+                {
+                    var grid = InventoryGridsDataFactory.CreateInventorGridData(_gameState._gameState, gridSettings);
+                    inventoryGrids.Add(grid);
+                }
+            }
 
-            var inventoryProxy = new Inventory(inventory);
-            _gameState.Inventories.Add(inventoryProxy);
+            inventoryData.InventoryGrids = inventoryGrids;
+            var inventory = new Inventory(inventoryData);
+            _gameState.Inventories.Add(inventory);
 
-            return true;
+            return new CommandResult(command.OwnerId, true);
         }
     }
 }

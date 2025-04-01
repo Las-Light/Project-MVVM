@@ -5,6 +5,7 @@ using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Entities.Player;
+using NothingBehind.Scripts.Game.State.Entities.Storages;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventories;
@@ -47,8 +48,8 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             {
                 UniqueId = gameState.CreateEntityId(),
                 EntityType = gameSettings.PlayerSettings.EntityType,
-                CurrentMap = currentMapId,
-                PositionOnMaps = new List<PositionOnMap>()
+                CurrentMapId = currentMapId,
+                PositionOnMaps = new List<PositionOnMapData>()
                 {
                     new()
                     {
@@ -87,7 +88,8 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                 SceneName = sceneName,
                 Characters = InitialCharacters(gameSettings, newMapInitialStateSettings, gameState),
                 MapTransfers = InitialMapTransfers(newMapInitialStateSettings),
-                EnemySpawns = InitialEnemySpawns(newMapInitialStateSettings)
+                EnemySpawns = InitialEnemySpawns(newMapInitialStateSettings),
+                Storages = new List<StorageData>()
             };
 
             return newMapState;

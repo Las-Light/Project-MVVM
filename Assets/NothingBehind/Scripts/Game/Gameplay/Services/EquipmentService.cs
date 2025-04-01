@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Commands.EquipmentCommands;
-using NothingBehind.Scripts.Game.Gameplay.View.Equipments;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Equipments;
+using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
 
@@ -46,7 +47,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             });
         }
         
-        public bool CreateEquipment(int ownerId, EntityType entityType)
+        public CommandResult CreateEquipment(int ownerId, EntityType entityType)
         {
             var command = new CmdCreateEquipment(ownerId, entityType);
             var result = _commandProcessor.Process(command);
@@ -54,7 +55,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             return result;
         }
 
-        public bool RemoveEquipment(int ownerId)
+        public CommandResult RemoveEquipment(int ownerId)
         {
             var command = new CmdRemoveEquipment(ownerId);
             var result = _commandProcessor.Process(command);

@@ -1,7 +1,7 @@
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.UI;
 using NothingBehind.Scripts.Game.Gameplay.Root.View;
-using NothingBehind.Scripts.Game.Gameplay.View.UI;
 using NothingBehind.Scripts.Game.GameRoot;
 using R3;
 using UnityEngine;
@@ -10,8 +10,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 {
     public class GameplayEntryPoint : MonoBehaviour
     {
-        [SerializeField] private UIGameplayRootBinder _sceneUIRootPrefab;
-        [SerializeField] private WorldGameplayRootBinder _worldRootBinder;
+        [SerializeField] private UIGameplayRootView _sceneUIRootPrefab;
+        [SerializeField] private WorldGameplayRootView worldRootView;
 
         public Subject<GameplayExitParams> Run(DIContainer gameplayContainer, SceneEnterParams enterParams)
         {
@@ -32,7 +32,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
         private void InitWorld(DIContainer gameplayViewModelsContainer, Subject<GameplayExitParams> exitSceneRequest)
         {
             //Добавить сюда инициализацию мира (статик дату, героя, спавнеры врагов)
-            _worldRootBinder.Bind(
+            worldRootView.Bind(
                 gameplayViewModelsContainer.Resolve<WorldGameplayRootViewModel>(),
                 gameplayViewModelsContainer.Resolve<GameplayUIManager>(),
                 exitSceneRequest);

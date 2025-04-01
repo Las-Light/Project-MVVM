@@ -8,15 +8,15 @@ namespace NothingBehind.Scripts.MVVM.UI
         [SerializeField] private Transform _screensContainer;
         [SerializeField] private Transform _popupsContainer;
 
-        private readonly Dictionary<WindowViewModel, IWindowBinder> _openedPopupBinders = new();
-        private IWindowBinder _openedScreenBinder;
+        private readonly Dictionary<WindowViewModel, IWindowView> _openedPopupBinders = new();
+        private IWindowView _openedScreenView;
 
         public void OpenPopup(WindowViewModel popupViewModel)
         {
             var prefabPath = GetPrefabPath(popupViewModel);
             var prefab = Resources.Load<GameObject>(prefabPath);
             var createdPopup = Instantiate(prefab, _popupsContainer);
-            var binder = createdPopup.GetComponent<IWindowBinder>();
+            var binder = createdPopup.GetComponent<IWindowView>();
             
             binder.Bind(popupViewModel);
             _openedPopupBinders.Add(popupViewModel, binder);
@@ -35,15 +35,15 @@ namespace NothingBehind.Scripts.MVVM.UI
             if (screenViewModel == null)
                 return;
 
-            _openedScreenBinder?.Close();
+            _openedScreenView?.Close();
             
             var prefabPath = GetPrefabPath(screenViewModel);
             var prefab = Resources.Load<GameObject>(prefabPath);
             var createdScreen = Instantiate(prefab, _screensContainer);
-            var binder = createdScreen.GetComponent<IWindowBinder>();
+            var binder = createdScreen.GetComponent<IWindowView>();
             
             binder.Bind(screenViewModel);
-            _openedScreenBinder = binder;
+            _openedScreenView = binder;
         }
 
         private static string GetPrefabPath(WindowViewModel viewModel)

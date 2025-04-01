@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using NothingBehind.Scripts.Game.State.Items;
 
 namespace NothingBehind.Scripts.Game.State.Equipments
@@ -8,6 +9,6 @@ namespace NothingBehind.Scripts.Game.State.Equipments
     {
         public SlotType SlotType;
         public ItemType ItemType;
-        public ItemData EquippedItem;
+        [CanBeNull] public ItemData EquippedItem;
     }
 }

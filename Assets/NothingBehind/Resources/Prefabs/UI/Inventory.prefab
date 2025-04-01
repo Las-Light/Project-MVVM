@@ -209,6 +209,7 @@ MonoBehaviour:
   _subGridPrefab: {fileID: 8217122136197608629, guid: 3abdc97374a533d4f8e65f935fc575d7, type: 3}
   _gridContainer: {fileID: 944018454435930702}
   _subGridContainer: {fileID: 4347680008323487303}
+  InventoryGridViews: []
 --- !u!222 &4364899101850093543
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -268,8 +269,8 @@ MonoBehaviour:
   m_Spacing: 5
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 1
-  m_ChildScaleHeight: 1
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
   m_ReverseArrangement: 0

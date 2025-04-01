@@ -1,4 +1,5 @@
 using ObservableCollections;
+using R3;
 
 namespace NothingBehind.Scripts.Game.State.Equipments
 {

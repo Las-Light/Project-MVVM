@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Commands;
-using NothingBehind.Scripts.Game.Gameplay.View.Maps;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Maps;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
+using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
 
@@ -27,7 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             InitialEnemySpawn(enemySpawns);
         }
 
-        public bool TriggeredEnemySpawn(string id)
+        public CommandResult TriggeredEnemySpawn(string id)
         {
             var command = new CmdTriggeredEnemySpawn(id);
 

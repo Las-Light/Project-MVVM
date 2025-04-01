@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NothingBehind.Scripts.Utils;
 
 namespace NothingBehind.Scripts.Game.State.Commands
 {
@@ -18,7 +19,7 @@ namespace NothingBehind.Scripts.Game.State.Commands
             _handlesMap[typeof(TCommand)] = handler;
         }
 
-        public bool Process<TCommand>(TCommand command) where TCommand : ICommand
+        public CommandResult Process<TCommand>(TCommand command) where TCommand : ICommand
         {
             if (_handlesMap.TryGetValue(typeof(TCommand), out var handler))
             {
@@ -26,7 +27,7 @@ namespace NothingBehind.Scripts.Game.State.Commands
                 var result = typeHandler.Handle(command);
 
                 // сохранение состояния после выполнения команды, не всегда это нужно 
-                if (result)
+                if (result.Success)
                 {
                     _gameStateProvider.SaveGameState();
                 }
@@ -34,7 +35,7 @@ namespace NothingBehind.Scripts.Game.State.Commands
                 return result;
             }
 
-            return false;
+            return new CommandResult(false);
         }
     }
 }

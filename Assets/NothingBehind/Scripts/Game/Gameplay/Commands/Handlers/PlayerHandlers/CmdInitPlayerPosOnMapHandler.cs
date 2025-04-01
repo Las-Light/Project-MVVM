@@ -6,6 +6,7 @@ using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Player;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Root;
+using NothingBehind.Scripts.Utils;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.PlayerHandlers
 {
@@ -19,10 +20,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.PlayerHandlers
             _gameState = gameState;
             _gameSettings = gameSettings;
         }
-        public bool Handle(CmdInitPlayerPosOnMap command)
+        public CommandResult Handle(CmdInitPlayerPosOnMap command)
         {
             InitialPlayerPosition(command);
-            return true;
+            return new CommandResult( true);
         }
         
         private void InitialPlayerPosition(CmdInitPlayerPosOnMap command)
@@ -38,18 +39,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.PlayerHandlers
                 CreateNewPosOnMap(requiredMap, initialStateSettings);
             }
 
-            _gameState.Player.Value.CurrentMap.Value = requiredMap;
+            _gameState.Player.Value.CurrentMapId.Value = requiredMap;
         }
 
         private void CreateNewPosOnMap(MapId requiredMap, MapInitialStateSettings initialStateSettings)
         {
-            var newPosOnMap = new PositionOnMap()
+            var newPosOnMap = new PositionOnMapData()
             {
                 MapId = requiredMap,
                 Position = initialStateSettings.PlayerInitialPosition
             };
             
-            var posOnMap = new PositionOnMapProxy(newPosOnMap);
+            var posOnMap = new PositionOnMap(newPosOnMap);
             _gameState.Player.Value.PositionOnMaps.Add(posOnMap);
         }
     }

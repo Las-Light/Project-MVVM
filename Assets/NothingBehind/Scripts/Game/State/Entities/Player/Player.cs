@@ -11,9 +11,9 @@ namespace NothingBehind.Scripts.Game.State.Entities.Player
         public EntityType EntityType { get; }
         public PlayerData Origin { get; }
         public ReactiveProperty<float> Health { get; }
-        public ReactiveProperty<MapId> CurrentMap { get; }
+        public ReactiveProperty<MapId> CurrentMapId { get; }
 
-        public ObservableList<PositionOnMapProxy> PositionOnMaps { get; } = new();
+        public ObservableList<PositionOnMap> PositionOnMaps { get; } = new();
 
         public Player(PlayerData playerData)
         {
@@ -23,15 +23,15 @@ namespace NothingBehind.Scripts.Game.State.Entities.Player
             
             InitPosOnMaps(playerData);
 
-            CurrentMap = new ReactiveProperty<MapId>(playerData.CurrentMap);
+            CurrentMapId = new ReactiveProperty<MapId>(playerData.CurrentMapId);
             Health = new ReactiveProperty<float>(playerData.Health);
-            CurrentMap.Skip(1).Subscribe(value => playerData.CurrentMap = value);
+            CurrentMapId.Skip(1).Subscribe(value => playerData.CurrentMapId = value);
             Health.Skip(1).Subscribe(value => playerData.Health = value);
         }
 
         private void InitPosOnMaps(PlayerData playerData)
         {
-            playerData.PositionOnMaps.ForEach(positionOnMap => PositionOnMaps.Add(new PositionOnMapProxy(positionOnMap)));
+            playerData.PositionOnMaps.ForEach(positionOnMap => PositionOnMaps.Add(new PositionOnMap(positionOnMap)));
             
             PositionOnMaps.ObserveAdd().Subscribe(e =>
             {

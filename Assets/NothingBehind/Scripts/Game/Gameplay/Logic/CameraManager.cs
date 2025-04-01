@@ -1,6 +1,6 @@
 using System.Collections;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
-using NothingBehind.Scripts.Game.Gameplay.View;
+using NothingBehind.Scripts.Game.Gameplay.MVVM;
 using NothingBehind.Scripts.Game.Settings.Gameplay;
 using NothingBehind.Scripts.Utils;
 using R3;
@@ -17,7 +17,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic
         private readonly GameplayCameraSettings _cameraSettings;
         public ReadOnlyReactiveProperty<CameraViewModel> CameraViewModel => _cameraViewModel;
 
-        private CameraBinder _cameraView;
+        private CameraView _cameraView;
         private CinemachineCamera _cinemachineCamera;
         private CinemachineFollow _cinemachineFollow;
 
@@ -48,7 +48,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic
             _cameraViewModel.OnNext(cameraViewModel);
         }
 
-        public void BindCameraViewComponent(CameraBinder cameraView,
+        public void BindCameraViewComponent(CameraView cameraView,
             CinemachineCamera cinemachineCamera,
             CinemachineFollow cinemachineFollow)
         {

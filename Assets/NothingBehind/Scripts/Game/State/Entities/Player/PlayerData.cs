@@ -7,8 +7,8 @@ namespace NothingBehind.Scripts.Game.State.Entities.Player
     [Serializable]
     public class PlayerData : Entity
     {
-        public MapId CurrentMap;
-        public List<PositionOnMap> PositionOnMaps;
+        public MapId CurrentMapId;
+        public List<PositionOnMapData> PositionOnMaps;
         public float Health;
     }
 }

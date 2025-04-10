@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Commands.EquipmentCommands;
+using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.Settings.Equipment;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Items;
@@ -14,12 +16,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandler
     {
         private readonly GameStateProxy _gameState;
         private readonly EquipmentsSettings _equipmentsSettings;
+        private readonly GameSettings _gameSettings;
 
         public CmdCreateEquipmentHandler(GameStateProxy gameState,
-            EquipmentsSettings equipmentsSettings)
+            EquipmentsSettings equipmentsSettings,
+            GameSettings gameSettings)
         {
             _gameState = gameState;
             _equipmentsSettings = equipmentsSettings;
+            _gameSettings = gameSettings;
         }
 
         public CommandResult Handle(CmdCreateEquipment command)
@@ -34,7 +39,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandler
                 {
                     SlotType = settingsSlot.SlotType,
                     ItemType = settingsSlot.ItemType,
-                    EquippedItem = ItemsDataFactory.CreateItemData(_gameState._gameState, itemSettings)
+                    EquippedItem = ItemsDataFactory.CreateItemData(_gameState.GameState, 
+                        _gameSettings, settingsSlot.ItemType)
                 };
                 equipmentSlots.Add(slot);
             }

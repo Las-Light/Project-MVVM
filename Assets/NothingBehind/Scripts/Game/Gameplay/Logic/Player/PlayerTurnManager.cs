@@ -17,7 +17,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         private PlayerView _playerView;
         private Camera _mainCamera;
         private PlayerInput _playerInput;
-        private AnimatorManager _animatorManager;
+        private AnimatorController _animatorController;
 
         private Vector3 _mouseWorldPosition;
         private float _turnRotation;
@@ -34,7 +34,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             _playerView = heroView;
             _mainCamera = mainCamera;
             _playerInput = playerInput;
-            _animatorManager = heroView.GetComponent<AnimatorManager>();
+            _animatorController = heroView.GetComponent<AnimatorController>();
         }
 
         //метод задает направление игрока когда игрок не движется
@@ -73,16 +73,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                 //анимация поворота на месте
                 if (moveDirection == Vector2.zero)
                 {
-                    _animatorManager.Turn(_turnRotation, (int)_turnRotation);
+                    _animatorController.Turn(_turnRotation, (int)_turnRotation);
                 }
                 else
                 {
-                    _animatorManager.Turn(0, 0);
+                    _animatorController.Turn(0, 0);
                 }
             }
             else
             {
-                _animatorManager.Turn(0f, 0);
+                _animatorController.Turn(0f, 0);
             }
         }
 
@@ -130,12 +130,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 
                 // анимация поворота на месте 
                 if (_inputManager.Move.CurrentValue == Vector2.zero && turnRotAbs >= 45)
-                    _animatorManager.Turn(_turnRotation, (int)_turnRotation);
+                    _animatorController.Turn(_turnRotation, (int)_turnRotation);
                 else
-                    _animatorManager.Turn(0, 0);
+                    _animatorController.Turn(0, 0);
             }
             else
-                _animatorManager.Turn(0, 0);
+                _animatorController.Turn(0, 0);
         }
 
         private Vector3 CalculateAimMousePosition(Vector3 hit, Vector2 mousePos)

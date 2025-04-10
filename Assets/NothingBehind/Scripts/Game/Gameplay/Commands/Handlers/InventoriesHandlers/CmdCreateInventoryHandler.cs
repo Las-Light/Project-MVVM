@@ -42,7 +42,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandl
                 var gridsSettings = inventorySettings.GridsSettings;
                 foreach (var gridSettings in gridsSettings)
                 {
-                    var grid = InventoryGridsDataFactory.CreateInventorGridData(_gameState._gameState, gridSettings);
+                    var grid = InventoryGridsDataFactory.CreateInventorGridData(_gameState.GameState, gridSettings);
                     inventoryGrids.Add(grid);
                 }
             }

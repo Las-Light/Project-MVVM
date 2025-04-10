@@ -124,22 +124,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             _disposables.Dispose();
         }
 
-        public AddItemsToInventoryGridResult AddItems(Item item, int amount)
+        public AddItemAmountResult AddItems(Item item, int amount)
         {
             return _viewModel.AddItems(item, amount);
         }
 
-        public AddItemsToInventoryGridResult AddItems(Item item, Vector2Int position, int amount)
+        public AddItemAmountResult AddItems(Item item, Vector2Int position, int amount)
         {
             return _viewModel.AddItems(item, position, amount);
         }
 
-        public RemoveItemsFromInventoryGridResult RemoveItem(int itemId)
+        public RemoveItemAmountResult RemoveItem(int itemId)
         {
             return _viewModel.RemoveItem(itemId);
         }
 
-        public RemoveItemsFromInventoryGridResult RemoveItemAmount(int itemId, int amount)
+        public RemoveItemAmountResult RemoveItemAmount(int itemId, int amount)
         {
             return _viewModel.RemoveItemAmount(itemId, amount);
         }

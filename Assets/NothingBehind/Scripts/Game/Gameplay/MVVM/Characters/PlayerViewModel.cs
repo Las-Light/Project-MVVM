@@ -1,5 +1,6 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.State.Entities.Player;
 using NothingBehind.Scripts.Game.State.Maps;
@@ -17,6 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
         public ReadOnlyReactiveProperty<MapId> CurrentMapId { get; }
         public ReadOnlyReactiveProperty<float> Health { get; }
         public ReadOnlyReactiveProperty<Vector3> Position { get; }
+        public readonly ArsenalViewModel ArsenalViewModel;
         
         private ObservableList<PositionOnMap> _positionOnMaps { get; }
         
@@ -33,7 +35,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             Player player, 
             PlayerService playerService, 
             PlayerMovementManager playerMovementManager,
-            PlayerTurnManager playerTurnManager)
+            PlayerTurnManager playerTurnManager,
+            ArsenalViewModel arsenalViewModel)
         {
             Id = player.Id;
             CurrentMapId = player.CurrentMapId;
@@ -44,6 +47,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             _playerService = playerService;
             _playerMovementManager = playerMovementManager;
             _playerTurnManager = playerTurnManager;
+            ArsenalViewModel = arsenalViewModel;
 
             var currentPosOnMap = _positionOnMaps.FirstOrDefault(map => map.MapId == CurrentMapId.CurrentValue);
             if (currentPosOnMap != null) Position = currentPosOnMap.Position;

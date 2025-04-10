@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7272fb9d899f403c88e60db878668bfb, type: 3}
+  m_Name: Unarmed
+  m_EditorClassIdentifier: 
+  ImpactType: 0
+  WeaponType: 0
+  WeaponName: 0
+  Caliber: 0
+  ModelPrefab: {fileID: 0}
+  SpawnPoint: {x: 0, y: 0, z: 0}
+  SpawnRotation: {x: -180, y: -180, z: 180}
+  CheckDistanceToWall: 0
+  AimingRange: 0
+  damageSettings: {fileID: 11400000, guid: 35c9c54f8113c3841b2a66d96e621ca0, type: 2}
+  shootSettings: {fileID: 11400000, guid: f0182b0d70a0eee4b96626903c7c667e, type: 2}
+  ammoSettings: {fileID: 11400000, guid: 5d4dc6be9948f884fbebd3f01f90ba7d, type: 2}
+  trailSettings: {fileID: 11400000, guid: 668d38e42a7cf064ead4d35e6ff7d128, type: 2}
+  audioSettings: {fileID: 11400000, guid: bb5c881460077ee41bacf9419f4310b1, type: 2}
+  bulletPenSettings: {fileID: 11400000, guid: 6ed391c4985bf9e4397b141d7fbe305e, type: 2}
+  knockbackSettings: {fileID: 11400000, guid: 51d571f9ec4074c4e90c1946875379a9, type: 2}

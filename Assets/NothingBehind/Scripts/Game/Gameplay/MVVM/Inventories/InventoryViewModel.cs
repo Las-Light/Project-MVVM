@@ -4,6 +4,7 @@ using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Commands.InventoriesCommands;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Equipments;
@@ -24,6 +25,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         public readonly EntityType OwnerType;
 
         public IObservableCollection<InventoryGridViewModel> AllInventoryGrids => _allInventoryGrids;
+        public IReadOnlyObservableDictionary<int, Item> AllInventoryItems => _allInventoryItems;
 
         private readonly ICommandProcessor _commandProcessor;
         private readonly InventoryService _inventoryService;
@@ -31,7 +33,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         private readonly ObservableList<InventoryGridViewModel> _allInventoryGrids = new();
         private readonly Dictionary<int, InventoryGridViewModel> _inventoryGridMap = new();
         private readonly Dictionary<InventoryGridType, InventoryGridSettings> _inventoryGridSettingsMap = new();
-        private readonly Dictionary<int, Item> _allInventoryItems = new();
+        private readonly ObservableDictionary<int, Item> _allInventoryItems = new();
         private IReadOnlyObservableDictionary<SlotType, Item> EquipmentItems { get; }
 
         private readonly CompositeDisposable _disposables = new();
@@ -40,6 +42,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         public InventoryViewModel(Inventory inventory,
             EquipmentService equipmentService,
             InventorySettings inventorySettings,
+            ItemsSettings itemsSettings,
             ICommandProcessor commandProcessor,
             InventoryService inventoryService)
         {
@@ -62,7 +65,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             }
 
             // Если у сущности есть EquipmentSystem, то добавляем им предметы-сетки если они экипированы
-            if (equipmentService.EquipmentViewModelsMap.TryGetValue(OwnerId, out var equipmentViewModel))
+            if (equipmentService.EquipmentMap.TryGetValue(OwnerId, out var equipmentViewModel))
             {
                 EquipmentItems = equipmentViewModel.AllEquippedItems;
                 foreach (var equippedItem in EquipmentItems)
@@ -86,6 +89,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                     var removedItem = e.Value.Value;
                     if (removedItem is GridItem removedGridItem)
                     {
+                        // Сначала проходимся и удаляем вью-модели субсеток (субсетки хранятся в пустой вью-модели сетки)
                         if (removedGridItem.Grid.Value is InventoryGridWithSubGrid subGrid)
                         {
                             foreach (var grid in subGrid.SubGrids)
@@ -93,7 +97,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                                 RemoveInventoryGridViewModel(grid);
                             }
                         }
-
+                        // После удаляем саму сетку из инвентаря и ниже удалится ее вью-модель
                         RemoveGridFromInventory(OwnerId, removedGridItem.Grid.Value);
                     }
                 }));
@@ -119,12 +123,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                 {
                     foreach (var subGrid in gridWithSubGrid.SubGrids)
                     {
-                        CreateInventoryGridViewModel(subGrid);
+                        CreateInventoryGridViewModel(subGrid, itemsSettings);
                     }
                 }
                 else
                 {
-                    CreateInventoryGridViewModel(inventoryGrid);
+                    CreateInventoryGridViewModel(inventoryGrid, itemsSettings);
                 }
             }
 
@@ -135,11 +139,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                     if (addedGrid is InventoryGridWithSubGrid gridWithSubGrid)
                         foreach (var subGrid in gridWithSubGrid.SubGrids)
                         {
-                            CreateInventoryGridViewModel(subGrid);
+                            CreateInventoryGridViewModel(subGrid, itemsSettings);
                         }
                     else
                     {
-                        CreateInventoryGridViewModel(addedGrid);
+                        CreateInventoryGridViewModel(addedGrid, itemsSettings);
                     }
                 }));
             _disposables.Add(inventory.InventoryGrids.ObserveRemove()
@@ -174,22 +178,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             return true;
         }
 
-        private void CreateInventoryGridViewModel(InventoryGrid inventoryGrid)
+        private void CreateInventoryGridViewModel(InventoryGrid inventoryGrid, ItemsSettings itemsSettings)
         {
             var gridSettings = _inventoryGridSettingsMap[inventoryGrid.GridType];
             var gridViewModel = new InventoryGridViewModel(inventoryGrid,
-                gridSettings, _allInventoryItems);
+                gridSettings, itemsSettings, _allInventoryItems);
 
             _allInventoryGrids.Add(gridViewModel);
             _inventoryGridMap[inventoryGrid.GridId] = gridViewModel;
         }
 
-        private void RemoveInventoryGridViewModel(InventoryGrid inventoryGridDataProxy)
+        private void RemoveInventoryGridViewModel(InventoryGrid inventoryGrid)
         {
-            if (_inventoryGridMap.TryGetValue(inventoryGridDataProxy.GridId, out var gridViewModel))
+            if (_inventoryGridMap.TryGetValue(inventoryGrid.GridId, out var gridViewModel))
             {
                 _allInventoryGrids.Remove(gridViewModel);
-                _inventoryGridMap.Remove(inventoryGridDataProxy.GridId);
+                _inventoryGridMap.Remove(inventoryGrid.GridId);
                 gridViewModel.Dispose();
             }
         }

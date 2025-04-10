@@ -6,5 +6,7 @@ namespace NothingBehind.Scripts.Game.State.Items
         Armor = 1,
         Backpack = 2,
         ChestRig = 3,
+        Ammo = 4,
+        Magazines = 5
     }
 }

@@ -16,24 +16,24 @@ namespace NothingBehind.Scripts.Game.State.Items
         public int MaxStackSize { get; }
         public int Weight { get; }
 
-        public Item(ItemData itemData)
+        public Item(ItemData ammoItemData)
         {
-            Origin = itemData;
-            Id = itemData.Id;
-            ItemType = itemData.ItemType;
-            CanRotate = itemData.CanRotate;
-            Weight = itemData.Weight;
-            IsStackable = itemData.IsStackable;
-            MaxStackSize = itemData.MaxStackSize;
-            IsRotated = new ReactiveProperty<bool>(itemData.IsRotated);
-            CurrentStack = new ReactiveProperty<int>(itemData.CurrentStack);
-            Width = new ReactiveProperty<int>(itemData.Width);
-            Height = new ReactiveProperty<int>(itemData.Height);
+            Origin = ammoItemData;
+            Id = ammoItemData.Id;
+            ItemType = ammoItemData.ItemType;
+            CanRotate = ammoItemData.CanRotate;
+            Weight = ammoItemData.Weight;
+            IsStackable = ammoItemData.IsStackable;
+            MaxStackSize = ammoItemData.MaxStackSize;
+            IsRotated = new ReactiveProperty<bool>(ammoItemData.IsRotated);
+            CurrentStack = new ReactiveProperty<int>(ammoItemData.CurrentStack);
+            Width = new ReactiveProperty<int>(ammoItemData.Width);
+            Height = new ReactiveProperty<int>(ammoItemData.Height);
 
-            Width.Subscribe(value => itemData.Width = value);
-            Height.Subscribe(value => itemData.Height = value);
-            IsRotated.Subscribe(value => itemData.IsRotated = value);
-            CurrentStack.Subscribe(value => itemData.CurrentStack = value);
+            Width.Subscribe(value => ammoItemData.Width = value);
+            Height.Subscribe(value => ammoItemData.Height = value);
+            IsRotated.Subscribe(value => ammoItemData.IsRotated = value);
+            CurrentStack.Subscribe(value => ammoItemData.CurrentStack = value);
         }
     }
 }

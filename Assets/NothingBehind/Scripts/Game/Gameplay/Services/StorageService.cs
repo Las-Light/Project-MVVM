@@ -74,7 +74,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         private void CreateStorageViewModel(Storage storage)
         {
             var storageSettings = _storageSettingsMap[storage.EntityType];
-            if (_inventoryService.InventoryMap.TryGetValue(storage.Id, out var inventoryViewModel))
+            if (!_inventoryService.InventoryMap.TryGetValue(storage.Id, out var inventoryViewModel))
             {
                 Debug.LogError($"Inventory with Id - {storage.Id} not found");
             }

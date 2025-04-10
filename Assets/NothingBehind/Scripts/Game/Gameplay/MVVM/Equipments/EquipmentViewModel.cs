@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
 using JetBrains.Annotations;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Items;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.ArmorItems;
@@ -14,19 +17,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
     public class EquipmentViewModel : IDisposable
     {
         private readonly Equipment _equipment;
+        private readonly ItemsSettings _itemsSettings;
 
         public int OwnerId { get; }
-        
+
         public IReadOnlyObservableDictionary<SlotType, Item> AllEquippedItems => _equippedItemsMap;
         public IReadOnlyObservableDictionary<SlotType, EquipmentSlot> SlotsMap => _slotsMap;
 
         private readonly ObservableDictionary<SlotType, Item> _equippedItemsMap = new();
         private readonly ObservableDictionary<SlotType, EquipmentSlot> _slotsMap = new();
+        private readonly ObservableDictionary<int, ItemViewModel> _itemViewModelsMap = new();
 
 
-        public EquipmentViewModel(Equipment equipment, EquipmentService equipmentService)
+        public EquipmentViewModel(Equipment equipment, ItemsSettings itemsSettings, EquipmentService equipmentService)
         {
             _equipment = equipment;
+            _itemsSettings = itemsSettings;
             OwnerId = equipment.OwnerId;
 
             foreach (var slot in equipment.Slots)
@@ -34,7 +40,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
                 if (slot.EquippedItem.Value != null)
                 {
                     _equippedItemsMap[slot.SlotType] = slot.EquippedItem.Value;
+                    CreateItemViewModel(slot.EquippedItem.Value, itemsSettings);
                 }
+
                 _slotsMap[slot.SlotType] = slot;
             }
         }
@@ -49,9 +57,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
                     {
                         slot.Equip(item);
                         _equippedItemsMap[slotType] = item;
+                        CreateItemViewModel(item, _itemsSettings);
                         return true;
                     }
                 }
+
                 return false;
             }
 
@@ -62,6 +72,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         {
             if (_slotsMap.TryGetValue(slotType, out var slot))
             {
+                RemoveItemViewModel(slot.EquippedItem.Value);
                 _equippedItemsMap.Remove(slotType);
                 slot.Unequip();
                 return true;
@@ -97,6 +108,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             }
 
             return false;
+        }
+
+        private void CreateItemViewModel(Item item, ItemsSettings itemsSettings)
+        {
+            var itemSettings = itemsSettings.Items.FirstOrDefault(itemConfig => itemConfig.ItemType == item.ItemType);
+            if (itemSettings == null)
+            {
+                Debug.LogError($"ItemSettings with type {item.ItemType} not found");
+            }
+            var itemViewModel = new ItemViewModel(item, itemSettings);
+            _itemViewModelsMap[item.Id] = itemViewModel;
+        }
+
+        private void RemoveItemViewModel(Item item)
+        {
+            if (_itemViewModelsMap.TryGetValue(item.Id, out _))
+            {
+                _itemViewModelsMap.Remove(item.Id);
+            }
         }
 
         public void Dispose()

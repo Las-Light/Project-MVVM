@@ -15,6 +15,8 @@ using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using NothingBehind.Scripts.Game.State.Root;
+using NothingBehind.Scripts.Game.State.Weapons;
+using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 
 namespace NothingBehind.Scripts.Game.GameRoot.Services
 {
@@ -29,6 +31,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             var gameState = new GameState();
             gameState.Equipments = new List<EquipmentData>();
             gameState.Inventories = new List<InventoryData>();
+            gameState.Arsenals = new List<ArsenalData>();
             gameState.Maps = CreateMaps(gameState, gameSettings);
             gameState.CurrentMapId = currentMapId;
             gameState.PlayerData = CreatePlayer(gameState, gameSettings, currentMapId, currentMapSettings);
@@ -61,6 +64,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             };
             gameState.Equipments.Add(CreateEquipmentData(gameState, gameSettings, player.EntityType, player.UniqueId));
             gameState.Inventories.Add(CreateInventoryData(player.EntityType, player.UniqueId));
+            gameState.Arsenals.Add(CreateArsenalData(gameState, gameSettings, player.UniqueId));
 
             return player;
         }
@@ -143,6 +147,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                 };
                 gameState.Equipments.Add(CreateEquipmentData(gameState, gameSettings, initialCharacter.EntityType, initialCharacter.UniqueId));
                 gameState.Inventories.Add(CreateInventoryData(initialCharacter.EntityType, initialCharacter.UniqueId));
+                gameState.Arsenals.Add(CreateArsenalData(gameState, gameSettings, initialCharacter.UniqueId));
                 initialCharacters.Add(initialCharacter);
             }
 
@@ -178,7 +183,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                 {
                     SlotType = settingsSlot.SlotType,
                     ItemType = settingsSlot.ItemType,
-                    EquippedItem = ItemsDataFactory.CreateItemData(gameState, settingsSlot.EquippedItemSettings)
+                    EquippedItem = ItemsDataFactory.CreateItemData(gameState, gameSettings, settingsSlot.ItemType)
                 };
                 equipmentSlots.Add(slot);
             }
@@ -189,6 +194,20 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                 Slots = equipmentSlots
             };
             return equipment;
+        }
+
+        private ArsenalData CreateArsenalData(GameState gameState, GameSettings gameSettings, int ownerId)
+        {
+            var arsenalData = new ArsenalData
+            {
+                OwnerId = ownerId,
+                Weapons = new List<WeaponData>()
+            };
+            var weaponSettings =
+                gameSettings.WeaponsSettings.WeaponConfigs.First(settings => settings.WeaponType == WeaponType.Unarmed);
+            var unarmedData = WeaponDataFactory.CreateWeaponData(gameState, gameSettings, gameState.GlobalItemId, weaponSettings.WeaponName);
+            arsenalData.Weapons.Add(unarmedData);
+            return arsenalData;
         }
     }
 }

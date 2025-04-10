@@ -16,6 +16,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
     {
         private readonly EquipmentService _equipmentService;
         private readonly InventoryService _inventoryService;
+        private readonly ArsenalService _arsenalService;
         private readonly ICommandProcessor _commandProcessor;
         private readonly ObservableList<CharacterViewModel> _allCharacters = new();
         private readonly Dictionary<int, CharacterViewModel> _characterMap = new();
@@ -27,10 +28,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             CharactersSettings charactersSettings,
             EquipmentService equipmentService,
             InventoryService inventoryService,
-            ICommandProcessor commandProcessor, Subject<ExitInventoryRequestResult> exitInventorRequest)
+            ArsenalService arsenalService,
+            ICommandProcessor commandProcessor,
+            Subject<ExitInventoryRequestResult> exitInventorRequest)
         {
             _equipmentService = equipmentService;
             _inventoryService = inventoryService;
+            _arsenalService = arsenalService;
             _commandProcessor = commandProcessor;
 
             foreach (var characterSettings in charactersSettings.AllCharacters)
@@ -63,7 +67,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         public CommandResult CreateCharacter(EntityType characterType, int level, Vector3 position)
         {
             var command = new CmdCreateCharacter(characterType, level,
-                position, _equipmentService, _inventoryService);
+                position, _equipmentService, _inventoryService, _arsenalService);
             var result = _commandProcessor.Process(command);
             
             return result;
@@ -71,7 +75,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         public CommandResult RemoveCharacter(int characterEntityId)
         {
-            var command = new CmdRemoveCharacter(characterEntityId, _inventoryService, _equipmentService);
+            var command = new CmdRemoveCharacter(characterEntityId, _inventoryService, _equipmentService, _arsenalService);
             var result = _commandProcessor.Process(command);
             
             return result;
@@ -80,7 +84,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         private void CreateCharacterViewModel(Character character)
         {
             var characterSettings = _characterSettingsMap[character.EntityType];
-            if (_inventoryService.InventoryMap.TryGetValue(character.Id, out var inventoryViewModel))
+            if (!_inventoryService.InventoryMap.TryGetValue(character.Id, out var inventoryViewModel))
             {
                 Debug.LogError($"Inventory with Id - {character.Id} not found");
             }

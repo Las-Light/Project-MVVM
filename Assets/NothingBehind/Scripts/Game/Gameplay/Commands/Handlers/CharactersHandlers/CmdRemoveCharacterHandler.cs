@@ -34,6 +34,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.CharactersHandle
             currentMap.Characters.Remove(removedCharacter);
             command.InventoryService.RemoveInventory(command.Id);
             command.EquipmentService.RemoveEquipment(command.Id);
+            command.ArsenalService.RemoveArsenal(command.Id);
             return new CommandResult(command.Id, true);
         }
     }

@@ -156,10 +156,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             foreach (var inventory in AllInventories)
             {
-                var itemSettings = _settingsProvider.GameSettings.ItemsSettings.Items[Random.Range(0, 4)];
-                var gameState = _gameStateProvider.GameState._gameState;
+                var itemSettings = _settingsProvider.GameSettings.ItemsSettings.Items[Random.Range(0, 5)];
+                var gameState = _gameStateProvider.GameState.GameState;
                 var item = ItemsFactory.CreateItem(ItemsDataFactory.CreateItemData(
-                    gameState, itemSettings));
+                    gameState, _settingsProvider.GameSettings, itemSettings.ItemType));
                 Debug.Log($"{inventory.OwnerType} + {inventory.OwnerId}");
                 foreach (var grid in inventory.AllInventoryGrids)
                 {

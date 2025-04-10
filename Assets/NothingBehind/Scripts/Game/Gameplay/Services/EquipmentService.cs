@@ -1,38 +1,43 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Commands.EquipmentCommands;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Services
 {
     public class EquipmentService
     {
         public int PlayerId { get; }
-        
+
+        private readonly ItemsSettings _itemsSettings;
         private readonly ICommandProcessor _commandProcessor;
         private readonly ObservableList<EquipmentViewModel> _allEquipmentViewModels = new();
-        private readonly Dictionary<int, EquipmentViewModel> _equipmentViewModelsMap = new();
+        private readonly Dictionary<int, EquipmentViewModel> _equipmentMap = new();
         private readonly Dictionary<int, Equipment> _equipmentsDataMap = new();
 
 
         public IObservableCollection<EquipmentViewModel> AllEquipmentViewModels => _allEquipmentViewModels;
 
-        public Dictionary<int, EquipmentViewModel> EquipmentViewModelsMap => _equipmentViewModelsMap;
+        public Dictionary<int, EquipmentViewModel> EquipmentMap => _equipmentMap;
 
         public EquipmentService(IObservableCollection<Equipment> equipments,
+            ItemsSettings itemsSettings,
             ICommandProcessor commandProcessor)
         {
+            _itemsSettings = itemsSettings;
             _commandProcessor = commandProcessor;
             
-            foreach (var equipmentDataProxy in equipments)
+            foreach (var equipment in equipments)
             {
-                _equipmentsDataMap[equipmentDataProxy.OwnerId] = equipmentDataProxy;
-                CreateEquipmentViewModel(equipmentDataProxy.OwnerId);
+                _equipmentsDataMap[equipment.OwnerId] = equipment;
+                CreateEquipmentViewModel(equipment.OwnerId);
             }
 
             equipments.ObserveAdd().Subscribe(e =>
@@ -65,26 +70,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         
         public EquipmentViewModel CreateEquipmentViewModel(int ownerId)
         {
-            if (_equipmentsDataMap.TryGetValue(ownerId, out var equipmentDataProxy))
+            if (_equipmentsDataMap.TryGetValue(ownerId, out var equipment))
             {
-                var inventoryViewModel = new EquipmentViewModel(equipmentDataProxy,
-                    this);
+                var inventoryViewModel = new EquipmentViewModel(equipment, _itemsSettings, this);
 
                 _allEquipmentViewModels.Add(inventoryViewModel);
-                _equipmentViewModelsMap[equipmentDataProxy.OwnerId] = inventoryViewModel;
+                _equipmentMap[equipment.OwnerId] = inventoryViewModel;
                 return inventoryViewModel;
             }
-
+            Debug.LogError($"EquipmentViewModel couldn't create, equipment with ownerId {ownerId} not exist!");
             return null;
         }
 
         public void RemoveEquipmentViewModel(Equipment equipment)
         {
-            if (_equipmentViewModelsMap.TryGetValue(equipment.OwnerId, out var equipmentViewModel))
+            if (_equipmentMap.TryGetValue(equipment.OwnerId, out var equipmentViewModel))
             {
                 _allEquipmentViewModels.Remove(equipmentViewModel);
-                _equipmentViewModelsMap.Remove(equipment.OwnerId);
-                equipmentViewModel.Dispose();
+                _equipmentMap.Remove(equipment.OwnerId);
+                //equipmentViewModel.Dispose();
             }
         }
     }

@@ -50,7 +50,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         
         public EquipmentViewModel GetEquipmentViewModel(int ownerId)
         {
-            if (_equipmentService.EquipmentViewModelsMap.TryGetValue(ownerId, out var viewModel))
+            if (_equipmentService.EquipmentMap.TryGetValue(ownerId, out var viewModel))
             {
                 return viewModel;
             }

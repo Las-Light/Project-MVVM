@@ -1,6 +1,8 @@
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Weapons;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
+using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Settings.Gameplay.Items
@@ -22,5 +24,16 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Items
         [Header("InventoryGridItem")] 
         public InventoryGridType GridType;
         public InventoryGridSettings GridSettings;
+
+        [Space(5)] 
+        [Header("WeaponItem")] 
+        public WeaponType WeaponType;
+        public WeaponName WeaponName;
+
+        [Space(5)] [Header("AmmoItem")] 
+        public string Caliber;
+        
+        [Space(5)] [Header("MagazinesItem")] 
+        public MagazinesSettings MagazinesSettings;
     }
 }

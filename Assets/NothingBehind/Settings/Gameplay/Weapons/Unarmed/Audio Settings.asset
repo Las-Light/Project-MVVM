@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 659d3c0bc9d5476e913989e6192c6688, type: 3}
+  m_Name: Audio Settings
+  m_EditorClassIdentifier: 
+  Volume: 1
+  FireClips:
+  - {fileID: 8300000, guid: b7ef3279e2482b5429bdb2449942def8, type: 3}
+  EmptyClip: {fileID: 8300000, guid: 9593d1205a7c2ba4a96fe46b163561dd, type: 3}
+  ReloadClip: {fileID: 8300000, guid: 401c2968fc2aa3d428071632e8430e93, type: 3}
+  LastBulletClip: {fileID: 8300000, guid: b7ef3279e2482b5429bdb2449942def8, type: 3}

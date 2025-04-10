@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7272fb9d899f403c88e60db878668bfb, type: 3}
+  m_Name: M4A1
+  m_EditorClassIdentifier: 
+  ImpactType: 0
+  WeaponType: 1
+  WeaponName: 2
+  Caliber: 5x45
+  ModelPrefab: {fileID: 1862461175073062, guid: 460c558d562745b429e1b4ab08d8e47d, type: 3}
+  SpawnPoint: {x: 0, y: 0, z: 0}
+  SpawnRotation: {x: -180, y: -180, z: 180}
+  CheckDistanceToWall: 0.8
+  AimingRange: 8
+  damageSettings: {fileID: 11400000, guid: 135b684e827e30b439ab388ec05807e2, type: 2}
+  shootSettings: {fileID: 11400000, guid: bee291d79c7f04e4e968d5454d6213ab, type: 2}
+  ammoSettings: {fileID: 11400000, guid: 9931af3087723cb459e84874d8559e05, type: 2}
+  trailSettings: {fileID: 11400000, guid: 199dbd3c0025dfc48a4a2f8c2ad28571, type: 2}
+  audioSettings: {fileID: 11400000, guid: 85e28e149134436428dcfe550ff85af4, type: 2}
+  bulletPenSettings: {fileID: 11400000, guid: 750d32be51668cf4198fcd6e0314652b, type: 2}
+  knockbackSettings: {fileID: 11400000, guid: a9dd4d25e38d9b148a659c032f894db2, type: 2}

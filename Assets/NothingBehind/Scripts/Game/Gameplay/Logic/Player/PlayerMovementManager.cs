@@ -15,7 +15,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         private CharacterController _playerCharacterController;
         private Transform _mainCameraTransform;
         private Transform _playerTransform;
-        private AnimatorManager _animatorManager;
+        private AnimatorController _animatorController;
 
         private float _speed;
         private float _targetRotation;
@@ -42,7 +42,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             _playerCharacterController = controller;
             _mainCameraTransform = mainCamera.transform;
             _playerTransform = heroView.transform;
-            _animatorManager = heroView.GetComponent<AnimatorManager>();
+            _animatorController = heroView.GetComponent<AnimatorController>();
         }
 
         //TODO: убрать в другой сервис
@@ -75,11 +75,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             {
                 if (_inputManager.IsAim.CurrentValue)
                 {
-                    _animatorManager.AimMove(0, 0);
+                    _animatorController.AimMove(0, 0);
                 }
                 else
                 {
-                    _animatorManager.Move(_speedBlend);
+                    _animatorController.Move(_speedBlend);
                 }
             }
         }
@@ -95,7 +95,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             {
                 //pointToCheckClip.localPosition = new Vector3(0.2f, 0.95f, 0);
                 //TargetPointForAim.localPosition = new Vector3(0, 0.9f, 0);
-                _animatorManager.Crouch(_isCrouch);
+                _animatorController.Crouch(_isCrouch);
                 _playerCharacterController.height = _playerSettings.CrouchHeight;
                 _playerCharacterController.center = _playerSettings.crouchCenter;
             }
@@ -103,7 +103,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             {
                 //pointToCheckClip.localPosition = new Vector3(0.2f, 1.6f, 0);
                 //TargetPointForAim.localPosition = new Vector3(0, 1.4f, 0);
-                _animatorManager.Crouch(_isCrouch);
+                _animatorController.Crouch(_isCrouch);
                 _playerCharacterController.height = _playerSettings.DefaultHeight;
                 _playerCharacterController.center = _playerSettings.DefaultCenter;
             }
@@ -129,7 +129,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             _speedBlendX = Mathf.Lerp(_speedBlendX, relativeVector.x, Time.deltaTime * _playerSettings.SpeedBlendAim);
             _speedBlendY = Mathf.Lerp(_speedBlendY, relativeVector.z, Time.deltaTime * _playerSettings.SpeedBlendAim);
 
-            _animatorManager.AimMove(_speedBlendX, _speedBlendY);
+            _animatorController.AimMove(_speedBlendX, _speedBlendY);
         }
 
         //метод задает направление движение игрока без прицеливания
@@ -144,7 +144,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             _playerTransform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 
             // update animator if using character
-            _animatorManager.Move(_speedBlend);
+            _animatorController.Move(_speedBlend);
         }
 
         private void MovementAction(Vector2 moveDirection)
@@ -184,7 +184,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                 targetSpeed = _playerSettings.SprintSpeed;
                 _isCrouch = false;
                 //TODO: т.к. Crouch не в Update игрок не встает если нажать кропку спринт
-                _animatorManager.Crouch(_isCrouch);
+                _animatorController.Crouch(_isCrouch);
             }
             else if (_isCrouch)
             {
@@ -244,7 +244,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                 }
 
                 // update animator if using character
-                _animatorManager.FreeFall(false);
+                _animatorController.FreeFall(false);
             }
             else
             {
@@ -256,7 +256,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                 else
                 {
                     // update animator if using character
-                    _animatorManager.FreeFall(true);
+                    _animatorController.FreeFall(true);
                 }
             }
 
@@ -281,7 +281,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                 QueryTriggerInteraction.Ignore);
 
             // update animator if using character
-            _animatorManager.Grounded(_grounded);
+            _animatorController.Grounded(_grounded);
         }
     }
 }

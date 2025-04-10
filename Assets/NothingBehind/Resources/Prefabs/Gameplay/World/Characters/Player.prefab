@@ -2416,6 +2416,7 @@ GameObject:
   - component: {fileID: -5062743883620485373}
   - component: {fileID: -7389191185619032852}
   - component: {fileID: -7574051961166383507}
+  - component: {fileID: -8395793422330477699}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -2706,6 +2707,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e661c3cefb3b4af0be2f2442d2bdc606, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _arsenalPrefab: {fileID: 6042776555209846789, guid: 0d6a56980dc889f4db654251c33ff272, type: 3}
+  _pistolParent: {fileID: 8678475033698858683}
+  _rifleParent: {fileID: 2007782248383581385}
+  _unarmedParent: {fileID: 736360188}
 --- !u!114 &-7389191185619032852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2750,6 +2755,29 @@ MonoBehaviour:
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 0
+--- !u!114 &-8395793422330477699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2542824441387841026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 249a435985f544e89ebd3d801bb6a927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  riflePoseRig: {fileID: 247306662297482311}
+  pistolPoseRig: {fileID: 6288098434254507849}
+  rifleAimRig: {fileID: 2022585733405433985}
+  pistolAimRig: {fileID: 1259349261514815844}
+  rifleHandRig: {fileID: 2163416144877744422}
+  rifleRightHandRig: {fileID: 2163416146762470619}
+  rifleLeftHandRig: {fileID: 5961691840630364958}
+  pistolHandRig: {fileID: 7725711763724760722}
+  pistolRightHandRig: {fileID: 8546985508638429059}
+  pistolLeftHandRig: {fileID: 7106965323556644036}
+  clipWallRig: {fileID: 187723566}
 --- !u!1 &3123658247557856806
 GameObject:
   m_ObjectHideFlags: 0

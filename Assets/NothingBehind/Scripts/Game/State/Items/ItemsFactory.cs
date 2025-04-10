@@ -1,6 +1,8 @@
 using System;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.ArmorItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.MagazinesItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.WeaponItems;
 using UnityEngine;
 
@@ -22,6 +24,12 @@ namespace NothingBehind.Scripts.Game.State.Items
 
                     case ItemType.Weapon:
                         return new WeaponItem(itemData as WeaponItemData);
+                    
+                    case ItemType.Ammo:
+                        return new AmmoItem(itemData as AmmoItemData);
+                    
+                    case ItemType.Magazines:
+                        return new MagazinesItem(itemData as MagazinesItemData);
 
                     default:
                         throw new Exception("Unsupported item type: " + itemData.ItemType);

@@ -44,6 +44,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.CharactersHandle
             var newCharacter = new Character(characterData);
             command.EquipmentService.CreateEquipment(entityId, command.CharacterType);
             command.InventoryService.CreateInventory(command.CharacterType, entityId);
+            command.ArsenalService.CreateArsenal(entityId);
             currentMap.Characters.Add(newCharacter);
 
             return new CommandResult(entityId, true); // тут может быть валидация на создание сущности

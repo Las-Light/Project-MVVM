@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Items;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
@@ -26,6 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
 
         private readonly ObservableDictionary<Item, Vector2Int> _itemsPositionsMap;
         private readonly ObservableDictionary<int, Item> _itemsMap = new();
+        private readonly ObservableDictionary<int, ItemViewModel> _itemViewModelsMap = new();
         private readonly InventoryGrid _inventoryGrid;
         private readonly InventoryGridSettings _gridSettings;
         private readonly ReactiveMatrix<bool> _gridMatrix;
@@ -33,8 +36,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
 
 
         public InventoryGridViewModel(InventoryGrid inventoryGrid,
-            InventoryGridSettings gridSettings, 
-            Dictionary<int, Item> allInventoryItems)
+            InventoryGridSettings gridSettings,
+            ItemsSettings itemsSettings,
+            ObservableDictionary<int, Item> allInventoryItems)
         {
             GridType = inventoryGrid.GridType;
             GridId = inventoryGrid.GridId;
@@ -62,29 +66,33 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             foreach (var kvp in _itemsPositionsMap)
             {
                 _itemsMap[kvp.Key.Id] = kvp.Key;
+                CreateItemViewModel(kvp.Key, itemsSettings);
             }
 
             // Обновляем данные в GridDataProxy
             _disposables.Add(_gridMatrix.OnChange.Subscribe(_ => inventoryGrid.Grid.OnNext(_gridMatrix.GetArray())));
-            
+
             //Обновляем _itemsMap
             _disposables.Add(_itemsPositionsMap.ObserveAdd().Subscribe(kvp =>
             {
                 var addedItem = kvp.Value.Key;
                 _itemsMap[addedItem.Id] = addedItem;
                 allInventoryItems[addedItem.Id] = addedItem;
+                CreateItemViewModel(addedItem, itemsSettings);
             }));
             _disposables.Add(_itemsPositionsMap.ObserveRemove().Subscribe(kvp =>
             {
                 var removedItem = kvp.Value.Key;
                 _itemsMap.Remove(removedItem.Id);
                 allInventoryItems.Remove(removedItem.Id);
+                RemoveItemViewModel(removedItem);
             }));
         }
 
 
         // Автодобавление из другой сетки на свободные позиции или добавление количества предметов к уже существующим
-        public AddItemsToInventoryGridResult AddItems(Item item, int amount)
+
+        public AddItemAmountResult AddItems(Item item, int amount)
         {
             var remainingAmount = amount;
             var itemsAddedToSameItems =
@@ -93,7 +101,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             //если поместился без остатка, то удаляем его
             if (remainingAmount <= 0)
             {
-                return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
+                return new AddItemAmountResult(item.ItemType, item.Id,
                     amount, itemsAddedToSameItems, true, true);
             }
 
@@ -106,18 +114,20 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             if (position.HasValue)
             {
                 PlaceItem(item, position.Value, item.IsRotated.Value);
-                return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
+                return new AddItemAmountResult(item.ItemType, item.Id,
                     amount,
                     totalAddedItemsAmount, false, true);
             }
 
 
-            return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
+            return new AddItemAmountResult(item.ItemType, item.Id, amount,
                 totalAddedItemsAmount, false, false); // Нет свободного места
         }
 
+
         //Добавление предметов из другой сетки по координатам
-        public AddItemsToInventoryGridResult AddItems(Item item, Vector2Int position, int amount)
+
+        public AddItemAmountResult AddItems(Item item, Vector2Int position, int amount)
         {
             var remainingAmount = amount;
             var anotherItemAtPosition = GetItemAtPosition(position);
@@ -128,12 +138,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                 if (CanPlaceItem(item, position, item.IsRotated.Value))
                 {
                     PlaceItem(item, position, item.IsRotated.Value);
-                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
+                    return new AddItemAmountResult(item.ItemType, item.Id, amount,
                         remainingAmount, true, true); // Перемещение успешно
                 }
                 else
                 {
-                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id,
+                    return new AddItemAmountResult(item.ItemType, item.Id,
                         amount,
                         0, false, false); // Добавить предмет не удалось
                 }
@@ -145,20 +155,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                 // Если предмет поместился без остатка то удаляем его
                 if (remainingAmount == 0)
                 {
-                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
+                    return new AddItemAmountResult(item.ItemType, item.Id, amount,
                         itemsAddedToSameItems, true, true);
                 }
                 else
                 {
                     // Если все предметы не поместились
-                    return new AddItemsToInventoryGridResult(item.ItemType, item.Id, amount,
+                    return new AddItemAmountResult(item.ItemType, item.Id, amount,
                         itemsAddedToSameItems, false, false); // Добавить все предметы не удалось
                 }
             }
         }
 
+
         // Удаление предмета целиком без изменения количества
-        public RemoveItemsFromInventoryGridResult RemoveItem(int itemId)
+
+        public RemoveItemAmountResult RemoveItem(int itemId)
         {
             if (!_itemsMap.TryGetValue(itemId, out var item))
                 throw new Exception("Item not found in the grid.");
@@ -178,16 +190,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
 
                 _itemsPositionsMap.Remove(item);
 
-                return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
+                return new RemoveItemAmountResult(item.ItemType, item.Id,
                     item.CurrentStack.Value, true);
             }
 
-            return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
+            return new RemoveItemAmountResult(item.ItemType, item.Id,
                 item.CurrentStack.Value, false);
         }
 
+
         //Удаление определенного количества предметов
-        public RemoveItemsFromInventoryGridResult RemoveItemAmount(int itemId, int amount)
+
+        public RemoveItemAmountResult RemoveItemAmount(int itemId, int amount)
         {
             if (!_itemsMap.TryGetValue(itemId, out var item))
                 throw new Exception("Item not found in the grid.");
@@ -196,7 +210,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             {
                 if (!Has(item, amount))
                 {
-                    return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
+                    return new RemoveItemAmountResult(item.ItemType, item.Id,
                         amount, false);
                 }
 
@@ -218,11 +232,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                     _itemsPositionsMap.Remove(item);
                 }
 
-                return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
+                return new RemoveItemAmountResult(item.ItemType, item.Id,
                     amount, true);
             }
 
-            return new RemoveItemsFromInventoryGridResult(item.ItemType, item.Id,
+            return new RemoveItemAmountResult(item.ItemType, item.Id,
                 amount, false);
         }
 
@@ -519,6 +533,26 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             return itemsAddedAmount;
         }
 
+        private void CreateItemViewModel(Item item, ItemsSettings itemsSettings)
+        {
+            var itemSettings = itemsSettings.Items.FirstOrDefault(itemConfig => itemConfig.ItemType == item.ItemType);
+            if (itemSettings == null)
+            {
+                Debug.LogError($"ItemSettings with type {item.ItemType} not found");
+            }
+
+            var itemViewModel = new ItemViewModel(item, itemSettings);
+            _itemViewModelsMap[item.Id] = itemViewModel;
+        }
+
+        private void RemoveItemViewModel(Item item)
+        {
+            if (_itemViewModelsMap.TryGetValue(item.Id, out _))
+            {
+                _itemViewModelsMap.Remove(item.Id);
+            }
+        }
+        
         public void Dispose()
         {
             _disposables?.Dispose();

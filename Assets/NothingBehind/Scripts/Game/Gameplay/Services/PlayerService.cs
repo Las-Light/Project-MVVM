@@ -1,3 +1,4 @@
+using System;
 using NothingBehind.Scripts.Game.Gameplay.Commands.PlayerCommands;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
@@ -17,6 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         private readonly PlayerMovementManager _playerMovementManager;
         private readonly PlayerTurnManager _playerTurnManager;
+        private readonly ArsenalService _arsenalService;
         private readonly Player _player;
         private readonly ICommandProcessor _cmd;
         private readonly SceneEnterParams _sceneEnterParams;
@@ -24,12 +26,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         public PlayerService(InventoryService inventoryService,
             PlayerMovementManager playerMovementManager,
             PlayerTurnManager playerTurnManager,
+            ArsenalService arsenalService,
             Player player,
             ICommandProcessor cmd,
             SceneEnterParams sceneEnterParams)
         {
             _playerMovementManager = playerMovementManager;
             _playerTurnManager = playerTurnManager;
+            _arsenalService = arsenalService;
             _player = player;
             _cmd = cmd;
             _sceneEnterParams = sceneEnterParams;
@@ -61,7 +65,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
 
         private void CreatePlayerViewModel(Player player)
         {
-            var viewModel = new PlayerViewModel(player,this, _playerMovementManager, _playerTurnManager);
+            if (!_arsenalService.ArsenalMap.TryGetValue(player.Id, out var arsenalViewModel))
+            {
+                throw new Exception($"ArsenalViewModel for owner with Id {player.Id} not found");
+            }
+            var viewModel = new PlayerViewModel(player,this, _playerMovementManager, _playerTurnManager, arsenalViewModel);
 
             PlayerViewModel.Value = viewModel;
         }

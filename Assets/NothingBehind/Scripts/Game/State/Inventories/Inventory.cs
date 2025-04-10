@@ -39,10 +39,10 @@ namespace NothingBehind.Scripts.Game.State.Inventories
             });
             InventoryGrids.ObserveRemove().Subscribe(e =>
             {
-                var removedGridProxy = e.Value;
-                var removedGrid =
-                    inventoryData.InventoryGrids.FirstOrDefault(data => data.GridType == removedGridProxy.GridType);
-                inventoryData.InventoryGrids.Remove(removedGrid);
+                var removedGrid = e.Value;
+                var removedGridData =
+                    inventoryData.InventoryGrids.FirstOrDefault(data => data.GridId == removedGrid.GridId);
+                inventoryData.InventoryGrids.Remove(removedGridData);
             });
         }
     }

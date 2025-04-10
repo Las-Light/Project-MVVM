@@ -1,19 +1,30 @@
 using System;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
+using System.Linq;
+using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.ArmorItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.MagazinesItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.WeaponItems;
 using NothingBehind.Scripts.Game.State.Root;
-using UnityEngine;
+using NothingBehind.Scripts.Game.State.Weapons;
 
 namespace NothingBehind.Scripts.Game.State.Items
 {
     public static class ItemsDataFactory
     {
-        public static ItemData CreateItemData(GameState gameState, ItemSettings itemSettings)
+        public static ItemData CreateItemData(GameState gameState,
+            GameSettings gameSettings,
+            ItemType itemType)
         {
+            var itemSettings =
+                gameSettings.ItemsSettings.Items.FirstOrDefault(settings => settings.ItemType == itemType);
+            if (itemSettings == null)
+            {
+                throw new Exception($"Weapon with item type: {itemType} not found in settings");
+            }
+
             switch (itemSettings.ItemType)
             {
                 case ItemType.Backpack or ItemType.ChestRig:
@@ -49,6 +60,9 @@ namespace NothingBehind.Scripts.Game.State.Items
                     return armorItemData;
 
                 case ItemType.Weapon:
+                    var weaponSettings =
+                        gameSettings.WeaponsSettings.WeaponConfigs.First(config =>
+                            config.WeaponName == itemSettings.WeaponName);
                     var weaponItemData = new WeaponItemData();
                     weaponItemData.Id = gameState.CreateItemId();
                     weaponItemData.ItemType = itemSettings.ItemType;
@@ -60,7 +74,39 @@ namespace NothingBehind.Scripts.Game.State.Items
                     weaponItemData.IsStackable = itemSettings.IsStackable;
                     weaponItemData.MaxStackSize = itemSettings.MaxStackSize;
                     weaponItemData.CurrentStack = itemSettings.CurrentStack;
+                    weaponItemData.WeaponData = WeaponDataFactory.CreateWeaponData(gameState, gameSettings,
+                        weaponItemData.Id, weaponSettings.WeaponName);
                     return weaponItemData;
+                
+                case ItemType.Ammo:
+                    var ammoItemData = new AmmoItemData();
+                    ammoItemData.Id = gameState.CreateItemId();
+                    ammoItemData.ItemType = itemSettings.ItemType;
+                    ammoItemData.Width = itemSettings.Width;
+                    ammoItemData.Height = itemSettings.Height;
+                    ammoItemData.Weight = itemSettings.Weight;
+                    ammoItemData.CanRotate = itemSettings.CanRotate;
+                    ammoItemData.IsRotated = itemSettings.IsRotated;
+                    ammoItemData.IsStackable = itemSettings.IsStackable;
+                    ammoItemData.MaxStackSize = itemSettings.MaxStackSize;
+                    ammoItemData.CurrentStack = itemSettings.CurrentStack;
+                    ammoItemData.Caliber = itemSettings.Caliber;
+                    return ammoItemData;
+                
+                case ItemType.Magazines:
+                    var magazinesItemData = new MagazinesItemData();
+                    magazinesItemData.Id = gameState.CreateItemId();
+                    magazinesItemData.ItemType = itemSettings.ItemType;
+                    magazinesItemData.Width = itemSettings.Width;
+                    magazinesItemData.Height = itemSettings.Height;
+                    magazinesItemData.Weight = itemSettings.Weight;
+                    magazinesItemData.CanRotate = itemSettings.CanRotate;
+                    magazinesItemData.IsRotated = itemSettings.IsRotated;
+                    magazinesItemData.IsStackable = itemSettings.IsStackable;
+                    magazinesItemData.MaxStackSize = itemSettings.MaxStackSize;
+                    magazinesItemData.CurrentStack = itemSettings.CurrentStack;
+                    magazinesItemData.Magazines = WeaponDataFactory.CreateMagazinesData(itemSettings.MagazinesSettings);
+                    return magazinesItemData;
 
                 default:
                     throw new Exception("Unsupported item type: " + itemSettings.ItemType);

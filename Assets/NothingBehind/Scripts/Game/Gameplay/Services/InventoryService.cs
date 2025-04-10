@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Commands.InventoriesCommands;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Inventories;
@@ -15,6 +16,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
     {
         public int PlayerId { get; }
         private readonly EquipmentService _equipmentService;
+        private readonly ItemsSettings _itemsSettings;
         private readonly ICommandProcessor _commandProcessor;
 
         private readonly ObservableList<InventoryViewModel> _allInventories = new();
@@ -28,10 +30,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         public InventoryService(IObservableCollection<Inventory> inventories,
             EquipmentService equipmentService,
             InventoriesSettings inventoriesSettings,
+            ItemsSettings itemsSettings,
             ICommandProcessor commandProcessor, int playerId)
         {
             PlayerId = playerId;
             _equipmentService = equipmentService;
+            _itemsSettings = itemsSettings;
             _commandProcessor = commandProcessor;
 
             foreach (var inventorySettings in inventoriesSettings.Inventories)
@@ -42,15 +46,20 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             foreach (var inventory in inventories)
             {
                 _inventoryDataMap[inventory.OwnerId] = inventory;
+                CreateInventoryViewModel(inventory.OwnerId);
             }
 
             inventories.ObserveAdd().Subscribe(e =>
             {
-                _inventoryDataMap[e.Value.OwnerId] = e.Value;
+                var addedInventory = e.Value;
+                _inventoryDataMap[addedInventory.OwnerId] = addedInventory;
+                CreateInventoryViewModel(addedInventory.OwnerId);
             });
             inventories.ObserveRemove().Subscribe(e =>
             {
-                _inventoryDataMap.Remove(e.Value.OwnerId);
+                var removedInventory = e.Value;
+                _inventoryDataMap.Remove(removedInventory.OwnerId);
+                RemoveInventoryViewModel(removedInventory);
             });
         }
 
@@ -78,6 +87,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
                 var inventoryViewModel = new InventoryViewModel(inventory,
                     _equipmentService,
                     inventorySettings,
+                    _itemsSettings,
                     _commandProcessor,
                     this);
 

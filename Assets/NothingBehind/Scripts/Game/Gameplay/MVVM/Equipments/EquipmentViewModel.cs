@@ -25,6 +25,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         public IReadOnlyObservableDictionary<SlotType, EquipmentSlot> SlotsMap => _slotsMap;
 
         private readonly ObservableDictionary<SlotType, Item> _equippedItemsMap = new();
+        private readonly ObservableDictionary<int, EquipmentSlot> _itemSlotsMap = new();
         private readonly ObservableDictionary<SlotType, EquipmentSlot> _slotsMap = new();
         private readonly ObservableDictionary<int, ItemViewModel> _itemViewModelsMap = new();
 
@@ -40,6 +41,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
                 if (slot.EquippedItem.Value != null)
                 {
                     _equippedItemsMap[slot.SlotType] = slot.EquippedItem.Value;
+                    _itemSlotsMap[slot.EquippedItem.Value.Id] = slot;
                     CreateItemViewModel(slot.EquippedItem.Value, itemsSettings);
                 }
 
@@ -55,8 +57,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
                 {
                     if (CanEquipItem(slotType, item))
                     {
+                        if (_itemSlotsMap.TryGetValue(item.Id, out var oldSlot))
+                        {
+                            TryUnequipItem(oldSlot.SlotType);
+                        }
                         slot.Equip(item);
                         _equippedItemsMap[slotType] = item;
+                        _itemSlotsMap[item.Id] = slot;
                         CreateItemViewModel(item, _itemsSettings);
                         return true;
                     }
@@ -74,6 +81,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             {
                 RemoveItemViewModel(slot.EquippedItem.Value);
                 _equippedItemsMap.Remove(slotType);
+                _itemSlotsMap.Remove(slot.EquippedItem.Value.Id);
                 slot.Unequip();
                 return true;
             }
@@ -117,6 +125,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             {
                 Debug.LogError($"ItemSettings with type {item.ItemType} not found");
             }
+
             var itemViewModel = new ItemViewModel(item, itemSettings);
             _itemViewModelsMap[item.Id] = itemViewModel;
         }

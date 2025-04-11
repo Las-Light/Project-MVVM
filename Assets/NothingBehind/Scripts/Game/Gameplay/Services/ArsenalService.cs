@@ -36,7 +36,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             _commandProcessor = commandProcessor;
             foreach (var arsenal in arsenals)
             {
-                Debug.Log(arsenal.OwnerId);
                 _arsenalDataMap[arsenal.OwnerId] = arsenal;
                 CreateArsenalViewModel(arsenal.OwnerId);
             }

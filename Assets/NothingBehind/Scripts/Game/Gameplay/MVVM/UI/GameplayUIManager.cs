@@ -1,3 +1,4 @@
+using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories;
@@ -53,6 +54,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
 
             rootUI.OpenPopup(inventoryUI);
             return inventoryUI;
+        }
+
+        public void CloseInventory()
+        {
+            var rootUI = Container.Resolve<UIGameplayRootViewModel>();
+            var inventoryUIViewModel = rootUI.OpenedPopups.FirstOrDefault(model => model is InventoryUIViewModel);
+            if (inventoryUIViewModel != null)
+            {
+                rootUI.ClosePopup(inventoryUIViewModel);
+            }
         }
 
         public PopupAViewModel OpenPopupA()

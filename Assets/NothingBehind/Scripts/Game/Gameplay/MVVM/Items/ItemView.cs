@@ -212,11 +212,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
 
         private void TryEquipAtEquipmentSlot(EquipmentSlotView slotView, EquipmentSlotView startView)
         {
-            if (slotView.TryEquip(_item))
-            {
-                startView.Unequip();
-            }
-            else
+            if (!slotView.TryEquip(_item))
             {
                 ReturnToStartPosition();
             }

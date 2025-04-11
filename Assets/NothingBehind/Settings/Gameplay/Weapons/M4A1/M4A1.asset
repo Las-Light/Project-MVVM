@@ -17,7 +17,7 @@ MonoBehaviour:
   WeaponName: 2
   Caliber: 5x45
   ModelPrefab: {fileID: 1862461175073062, guid: 460c558d562745b429e1b4ab08d8e47d, type: 3}
-  SpawnPoint: {x: 0, y: 0, z: 0}
+  SpawnPoint: {x: 0, y: 0, z: 0.38}
   SpawnRotation: {x: -180, y: -180, z: 180}
   CheckDistanceToWall: 0.8
   AimingRange: 8

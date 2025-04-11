@@ -19,16 +19,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         public IReadOnlyObservableDictionary<SlotType, Item> EquippedItems;
         public bool IsReloading => _reloading;
 
-        private WeaponView _weaponSlot1;
-        private WeaponView _weaponSlot2;
+        public WeaponView WeaponSlot1;
+        public WeaponView WeaponSlot2;
         private WeaponView _unarmedView;
+        private WeaponView _activeGun;
         private Transform _pistolParent;
         private Transform _rifleParent;
         private Transform _unarmedParent;
         private bool autoReload = false;
 
         private readonly Dictionary<int, WeaponView> _weaponViewMap = new();
-        private WeaponView _activeGun;
 
 
         /// <summary>
@@ -82,10 +82,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                         switch (kvp.Key)
                         {
                             case SlotType.Weapon1:
-                                _weaponSlot1 = weaponView;
+                                WeaponSlot1 = weaponView;
                                 break;
                             case SlotType.Weapon2:
-                                _weaponSlot2 = weaponView;
+                                WeaponSlot2 = weaponView;
                                 break;
                         }
                     }
@@ -95,13 +95,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     }
                 }
             }
-            
+
             _disposables.Add(AllWeaponViewModels.ObserveAdd().Subscribe(e =>
             {
                 var addedWeapon = e.Value;
                 SetupWeapon(addedWeapon);
             }));
-            
+
             _disposables.Add(AllWeaponViewModels.ObserveRemove().Subscribe(e =>
             {
                 var removedWeapon = e.Value;
@@ -111,21 +111,26 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
             _disposables.Add(EquippedItems.ObserveAdd().Subscribe(e =>
             {
                 var kvp = e.Value;
-                if (_weaponViewMap.TryGetValue(kvp.Value.Id, out var weaponView))
+                if (kvp.Key is SlotType.Weapon1 or SlotType.Weapon2)
                 {
-                    switch (kvp.Key)
+                    if (_weaponViewMap.TryGetValue(kvp.Value.Id, out var weaponView))
                     {
-                        case SlotType.Weapon1:
-                            _weaponSlot1 = weaponView;
-                            break;
-                        case SlotType.Weapon2:
-                            _weaponSlot2 = weaponView;
-                            break;
+                        switch (kvp.Key)
+                        {
+                            case SlotType.Weapon1:
+                                if (_activeGun == WeaponSlot1) WeaponSwitch(weaponView);
+                                WeaponSlot1 = weaponView;
+                                break;
+                            case SlotType.Weapon2:
+                                if (_activeGun == WeaponSlot2) WeaponSwitch(weaponView);
+                                WeaponSlot2 = weaponView;
+                                break;
+                        }
                     }
-                }
-                else
-                {
-                    Debug.LogError($"WeaponView not found for weapon Id {kvp.Value.Id}");
+                    else
+                    {
+                        Debug.LogError($"WeaponView not found for weapon Id {kvp.Value.Id}");
+                    }
                 }
             }));
 
@@ -135,10 +140,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                 switch (kvp.Key)
                 {
                     case SlotType.Weapon1:
-                        _weaponSlot1 = _unarmedView;
+                        if (_activeGun == WeaponSlot1) WeaponSwitch(_unarmedView);
+                        WeaponSlot1 = _unarmedView;
                         break;
                     case SlotType.Weapon2:
-                        _weaponSlot2 = _unarmedView;
+                        if (_activeGun == WeaponSlot2) WeaponSwitch(_unarmedView);
+                        WeaponSlot2 = _unarmedView;
                         break;
                 }
             }));
@@ -163,7 +170,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
             }
         }
 
-        private void EndReload()
+        public void EndReload()
         {
             _activeGun.EndReload();
             _reloading = false;
@@ -172,7 +179,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 
 
         //метод который стреляет при нажатии на кнопку "Стрелять"
-        private bool Shoot()
+        public bool Shoot()
         {
             if (ShouldAutoReload())
             {
@@ -196,18 +203,21 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
             return true;
         }
 
-        private void WeaponSwitch(WeaponView currentWeapon)
+        public void WeaponSwitch(WeaponView targetWeapon)
         {
-            switch (currentWeapon.WeaponType)
+            if (_activeGun == targetWeapon)
+                return;
+            
+            switch (targetWeapon.WeaponType)
             {
                 case WeaponType.Unarmed:
-                    WeaponSwitchUnarmed(currentWeapon);
+                    WeaponSwitchUnarmed(targetWeapon);
                     break;
                 case WeaponType.Rifle:
-                    WeaponSwitchRifle(currentWeapon);
+                    WeaponSwitchRifle(targetWeapon);
                     break;
                 case WeaponType.Pistol:
-                    WeaponSwitchPistol(currentWeapon);
+                    WeaponSwitchPistol(targetWeapon);
                     break;
                 case WeaponType.Melee:
                     break;
@@ -223,10 +233,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                 _animatorController.RigPutPistol();
             }
 
-            if (_activeGun.WeaponType != WeaponType.Rifle)
+            if (_activeGun.WeaponType == WeaponType.Rifle && _activeGun != weaponView)
             {
-                StartCoroutine(GoStateGetRifle(weaponView));
+                _animatorController.RigPutRifle();
             }
+
+            StartCoroutine(GoStateGetRifle(weaponView));
         }
 
 
@@ -235,6 +247,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
             if (_activeGun.WeaponType == WeaponType.Rifle)
             {
                 _animatorController.RigPutRifle();
+            }
+
+            if (_activeGun.WeaponType == WeaponType.Pistol && _activeGun != weaponView)
+            {
+                _animatorController.RigPutPistol();
             }
 
             if (_activeGun.WeaponType != WeaponType.Pistol)
@@ -331,7 +348,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         //корутина нужна для завершения анимации смены оружия
         private IEnumerator GoStateGetPistol(WeaponView weaponView)
         {
-            DespawnActiveGun();
+            if (_activeGun != _unarmedView)
+            {
+                DespawnActiveGun();
+            }
+
             _activeGun = weaponView;
             _activeGun.Spawn();
 
@@ -345,7 +366,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         //корутина нужна здя завершения анимации смены оружия
         private IEnumerator GoStateGetRifle(WeaponView weaponView)
         {
-            DespawnActiveGun();
+            if (_activeGun != _unarmedView)
+            {
+                DespawnActiveGun();
+            }
+
             _activeGun = weaponView;
             _activeGun.Spawn();
 
@@ -359,15 +384,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         private IEnumerator GoStateUnarmed(WeaponView weaponView)
         {
             yield return new WaitForSeconds(0.3f);
-            DespawnActiveGun();
+            if (_activeGun != _unarmedView)
+            {
+                DespawnActiveGun();
+            }
+
             _activeGun = weaponView;
 
-            if (weaponView.WeaponType != WeaponType.Unarmed)
-            {
-                _rigController.SetRigWeightUnarmed();
-                _animatorController.Unarmed();
-                yield return new WaitForSeconds(0.3f);
-            }
+            _rigController.SetRigWeightUnarmed();
+            _animatorController.Unarmed();
+            yield return new WaitForSeconds(0.3f);
 
             yield return null;
         }
@@ -383,24 +409,30 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     return;
                 }
 
-                if (_weaponSlot1 != null)
+                if (WeaponSlot1 != null)
                 {
-                    SetBehaviorByWeaponType(_weaponSlot1.WeaponType);
-                    _activeGun = _weaponSlot1;
+                    if (WeaponSlot2 == null)
+                    {
+                        WeaponSlot2 = _unarmedView;
+                    }
+
+                    SetBehaviorByWeaponType(WeaponSlot1.WeaponType);
+                    _activeGun = WeaponSlot1;
                     _activeGun.Spawn();
                     return;
                 }
 
-                if (_weaponSlot2 != null)
+                if (WeaponSlot2 != null)
                 {
-                    SetBehaviorByWeaponType(_weaponSlot2.WeaponType);
-                    _activeGun = _weaponSlot2;
+                    WeaponSlot1 = _unarmedView;
+                    SetBehaviorByWeaponType(WeaponSlot2.WeaponType);
+                    _activeGun = WeaponSlot2;
                     _activeGun.Spawn();
                     return;
                 }
 
-                _weaponSlot1 = _unarmedView;
-                _weaponSlot2 = _unarmedView;
+                WeaponSlot1 = _unarmedView;
+                WeaponSlot2 = _unarmedView;
                 SetBehaviorByWeaponType(WeaponType.Unarmed);
                 _activeGun = _unarmedView;
             }

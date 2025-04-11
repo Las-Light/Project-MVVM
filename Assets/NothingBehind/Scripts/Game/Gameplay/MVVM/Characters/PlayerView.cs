@@ -14,6 +14,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
         [SerializeField] private Transform _rifleParent;
         [SerializeField] private Transform _unarmedParent;
         private PlayerViewModel _viewModel;
+        private ArsenalView _arsenalView;
+        private GameplayUIManager _gameplayUIManager;
+        private bool _inventoruIsOpened;
 
         public void Bind(PlayerViewModel viewModel, GameplayUIManager gameplayUIManager)
         {
@@ -23,13 +26,41 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             transform.position = currentPosOnMap.Position.Value;
             var mainCamera = Camera.main;
             viewModel.SetPlayerViewWithComponent(this, mainCamera);
-            CreateArsenalView(viewModel.ArsenalViewModel);
+            _arsenalView = CreateArsenalView(viewModel.ArsenalViewModel);
+            _gameplayUIManager = gameplayUIManager;
         }
 
         private void Update()
         {
             _viewModel.Move();
             _viewModel.Look();
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                _arsenalView.WeaponSwitch(_arsenalView.WeaponSlot1);
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                _arsenalView.WeaponSwitch(_arsenalView.WeaponSlot2);
+            }
+
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                if (!_inventoruIsOpened)
+                {
+                    _gameplayUIManager.OpenInventory(_viewModel.Id);
+                    _inventoruIsOpened = true;
+                }
+                else
+                {
+                    _gameplayUIManager.CloseInventory();
+                    _inventoruIsOpened = false;
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                _arsenalView.Reload();
+            }
         }
         
         //этот метод для RootMotion, без него игрок не движется
@@ -42,11 +73,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             return _viewModel.InteractiveActionPressed();
         }
 
-        private void CreateArsenalView(ArsenalViewModel arsenalViewModel)
+        private ArsenalView CreateArsenalView(ArsenalViewModel arsenalViewModel)
         {
             var arsenal = Instantiate(_arsenalPrefab, transform);
             var arsenalView = arsenal.GetComponent<ArsenalView>();
             arsenalView.Bind(arsenalViewModel, _pistolParent, _rifleParent, _unarmedParent);
+            return arsenalView;
         }
     }
 }

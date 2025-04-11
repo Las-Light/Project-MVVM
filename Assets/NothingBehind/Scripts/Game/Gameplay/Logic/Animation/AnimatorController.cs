@@ -5,6 +5,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Animation
 {
     public class AnimatorController : MonoBehaviour, IAnimationStateReader
     {
+        [SerializeField] private Animator _rigAnimator;
         // animation IDs
         private static readonly int AnimIDSpeed = Animator.StringToHash("Speed");
         private static readonly int AnimIDGrounded = Animator.StringToHash("Grounded");
@@ -49,7 +50,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Animation
         private readonly int _stateHashReloadRig = Animator.StringToHash("ReloadRig");
 
         private Animator _animator;
-        private Animator _rigAnimator;
         public AnimatorState State { get; private set; }
 
         public event Action<AnimatorState> StateEntered;
@@ -58,7 +58,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Animation
         public void Awake()
         {
             _animator = GetComponent<Animator>();
-            _rigAnimator = GetComponentInChildren<Animator>();
         }
 
         public void Move(float speed)

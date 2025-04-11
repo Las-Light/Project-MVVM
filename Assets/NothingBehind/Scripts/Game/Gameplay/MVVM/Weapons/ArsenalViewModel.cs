@@ -16,6 +16,7 @@ using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 {
@@ -97,19 +98,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                 _allAmmo[inventoryGrid].AddRange(ammoCollection);
 
                 //тут же подписываемся на добавление и удаление предметов из сетки
-                _disposables.Add(inventoryGrid.ItemsMap.ObserveAdd().Subscribe(e =>
-                {
-                    var addedItem = e.Value.Value;
-                    if (addedItem is MagazinesItem magazinesItem)
-                    {
-                        _allMagazines[inventoryGrid].Add(magazinesItem);
-                    }
-
-                    if (addedItem is AmmoItem ammoItem)
-                    {
-                        _allAmmo[inventoryGrid].Add(ammoItem);
-                    }
-                }));
                 _disposables.Add(inventoryGrid.ItemsMap.ObserveRemove().Subscribe(e =>
                 {
                     var removedItem = e.Value.Value;
@@ -123,6 +111,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                         _allAmmo[inventoryGrid].Remove(ammoItem);
                     }
                 }));
+                _disposables.Add(inventoryGrid.ItemsMap.ObserveAdd().Subscribe(e =>
+                {
+                    var addedItem = e.Value.Value;
+                    if (addedItem is MagazinesItem magazinesItem)
+                    {
+                        _allMagazines[inventoryGrid].Add(magazinesItem);
+                    }
+
+                    if (addedItem is AmmoItem ammoItem)
+                    {
+                        _allAmmo[inventoryGrid].Add(ammoItem);
+                    }
+                }));
             }
 
             //создаем вью-модели Weapon (в том числе Unarmed, которая добавлена при инициализации)
@@ -131,6 +132,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                 CreateWeaponViewModel(weapon, this);
             }
 
+            _disposables.Add(EquipmentItems.ObserveRemove().Subscribe(e =>
+            {
+                var removedItem = e.Value.Value;
+                if (removedItem is WeaponItem weaponItem)
+                {
+                    RemoveWeaponFromArsenal(weaponItem.Id);
+                }
+            }));
+            
             _disposables.Add(EquipmentItems.ObserveAdd().Subscribe(e =>
             {
                 var addedItem = e.Value;
@@ -148,25 +158,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                 }
             }));
 
-            _disposables.Add(EquipmentItems.ObserveRemove().Subscribe(e =>
-            {
-                var removedItem = e.Value.Value;
-                if (removedItem is WeaponItem weaponItem)
-                {
-                    RemoveWeaponFromArsenal(weaponItem.Id);
-                }
-            }));
-
-            _disposables.Add(arsenal.Weapons.ObserveAdd().Subscribe(e =>
-            {
-                var addedWeapon = e.Value;
-                CreateWeaponViewModel(addedWeapon, this);
-            }));
-
             _disposables.Add(arsenal.Weapons.ObserveRemove().Subscribe(e =>
             {
                 var removedWeapon = e.Value;
                 RemoveWeaponViewModel(removedWeapon);
+            }));
+            
+            _disposables.Add(arsenal.Weapons.ObserveAdd().Subscribe(e =>
+            {
+                var addedWeapon = e.Value;
+                CreateWeaponViewModel(addedWeapon, this);
             }));
         }
 

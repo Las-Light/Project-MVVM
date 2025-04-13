@@ -1,3 +1,4 @@
+using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Logic;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM;
@@ -12,6 +13,7 @@ using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
+using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using ObservableCollections;
 using R3;
 using UnityEngine;
@@ -94,10 +96,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
             foreach (var inventoryViewModel in AllInventories)
             {
-                if (inventoryViewModel.OwnerType != EntityType.Player)
-                {
-                    continue;
-                }
+                // if (inventoryViewModel.OwnerType != EntityType.Player)
+                // {
+                //     continue;
+                // }
                 Debug.Log("Inv ViewModel " + inventoryViewModel.OwnerType);
 
                 foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
@@ -123,85 +125,28 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
         public void HandleTestInputTab()
         {
-            // foreach (var inventoryViewModel in _inventoryService.AllInventories)
-            // {
-            //     if (inventoryViewModel.OwnerTypeId != "Hero")
-            //     {
-            //         continue;
-            //     }
-            //
-            //     inventoryViewModel.TryMoveItemInGrid( "Backpack", itemProxy2, Vector2Int.zero, 
-            //         itemProxy2.CurrentStack.Value);
-            // }
-
-            /*var inventories = _gameStateProvider.GameState._gameState.Inventories;
-
-            foreach (var data in inventories)
-            {
-                if (data.OwnerType != EntityType.Player)
-                {
-                    continue;
-                }
-
-                foreach (var gridDataProxy in data.InventoryGrids)
-                {
-                    for (int i = 0; i < gridDataProxy.Items.Count; i++)
-                    {
-                        Debug.Log(gridDataProxy.GridType + ":");
-                        Debug.Log(gridDataProxy.Items[i].ItemType + " ID:" + gridDataProxy.Items[i].Id + " stack:" + gridDataProxy.Items[i].CurrentStack + " " +
-                                  gridDataProxy.Positions[i]);
-                    }
-                }
-            }*/
-
+            var gameState = _gameStateProvider.GameState;
             foreach (var inventory in AllInventories)
             {
-                var itemSettings = _settingsProvider.GameSettings.ItemsSettings.Items[Random.Range(0, 5)];
-                var gameState = _gameStateProvider.GameState.GameState;
+                var randomInt = Random.Range(0, 7);
+                Debug.Log(randomInt);
+                var itemSettings = _settingsProvider.GameSettings.ItemsSettings.Items[randomInt];
+                //var itemSettings = _settingsProvider.GameSettings.ItemsSettings.Items.First(settings => settings.WeaponName == WeaponName.Glock);
+                var gameStateData = _gameStateProvider.GameState.GameState;
                 var item = ItemsFactory.CreateItem(ItemsDataFactory.CreateItemData(
-                    gameState, _settingsProvider.GameSettings, itemSettings.ItemType));
-                Debug.Log($"{inventory.OwnerType} + {inventory.OwnerId}");
+                    gameStateData, _settingsProvider.GameSettings, itemSettings));
                 foreach (var grid in inventory.AllInventoryGrids)
                 {
                     if (grid.GridType == InventoryGridType.Backpack)
                     {
-                        grid.AddItems(item, item.CurrentStack.Value);
-                    }
-
-                    foreach (var keyValuePair in grid.ItemsPositionsMap)
-                    {
-                        Debug.Log($"{keyValuePair.Key.ItemType} + {keyValuePair.Key.Id}");
-                    }
-                }
-
-                /*foreach (var inventoryData in gameState.Inventories)
-                {
-                    foreach (var inventoryGrid in inventoryData.InventoryGrids)
-                    {
-                        foreach (var b in inventoryGrid.Grid)
+                        var result = grid.AddItems(item, item.CurrentStack.Value);
+                        if (result.Success)
                         {
-                            Debug.Log(b);
+                            Debug.Log(item.ItemType);
                         }
                     }
-                }*/
+                }
             }
-            // foreach (var inventory in gameState.Inventories)
-            // {
-            //     Debug.Log($"Inventory {inventory.OwnerTypeId} - {inventory.OwnerId}");
-            //     foreach (var gridDataProxy in inventory.Inventories)
-            //     {
-            //         Debug.Log($"Entity {inventory.OwnerTypeId} - {inventory.OwnerId} have {gridDataProxy.GridTypeId}");
-            //     }
-            // }
-            //
-            // foreach (var inventoryViewModel in AllInventories)
-            // {
-            //     Debug.Log($"IntoriyVM - {inventoryViewModel.OwnerId}");
-            //     foreach (var gridViewModel in inventoryViewModel.AllInventoryGrids)
-            //     {
-            //         Debug.Log($"GridVM - {gridViewModel.GridTypeID}");
-            //     }
-            // }
         }
     }
 }

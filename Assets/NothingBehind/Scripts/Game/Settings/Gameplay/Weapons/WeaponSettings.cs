@@ -19,7 +19,7 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Weapons
 
         public DamageSettings damageSettings;
         public ShootSettings shootSettings;
-        public AmmoSettings ammoSettings;
+        public FeedSystemSettings feedSystemSettings;
         public TrailSettings trailSettings;
         public AudioWeaponSettings audioSettings;
         public BulletPenetrationSettings bulletPenSettings;

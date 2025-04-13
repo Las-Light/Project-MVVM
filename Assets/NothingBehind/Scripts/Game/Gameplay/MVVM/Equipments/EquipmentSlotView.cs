@@ -35,6 +35,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             _itemViews = itemViews;
             _slotImage = GetComponent<Image>();
             _baseSlotColor = _slotImage.color;
+
+            if (equipmentSlot.SlotType == SlotType.Backpack)
+            {
+                _cellSize /= 2;
+            }
+
+            if (equipmentSlot.SlotType is SlotType.Weapon1 or SlotType.Weapon2)
+            {
+                _cellSize /= 1.5f;
+            }
             
             _disposable = _equippedItem.Subscribe(item =>
             {

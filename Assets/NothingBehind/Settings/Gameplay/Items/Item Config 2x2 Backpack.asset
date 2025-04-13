@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Item Config 2x2 Backpack
   m_EditorClassIdentifier: 
   ItemType: 2
-  Width: 2
-  Height: 2
+  Width: 4
+  Height: 4
   Weight: 1
   CanRotate: 0
   IsRotated: 0
@@ -23,3 +23,7 @@ MonoBehaviour:
   CurrentStack: 1
   GridType: 1
   GridSettings: {fileID: 11400000, guid: 5bb6ffb417fe74b4cb1e987ed3c50762, type: 2}
+  WeaponType: 0
+  WeaponName: 0
+  Caliber: 
+  MagazinesSettings: {fileID: 0}

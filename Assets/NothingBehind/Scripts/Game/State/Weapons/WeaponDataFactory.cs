@@ -13,24 +13,23 @@ namespace NothingBehind.Scripts.Game.State.Weapons
         public static WeaponData CreateWeaponData(GameState gameState, GameSettings gameSettings,
             int weaponId, WeaponName weaponName)
         {
-            var weaponSettings = gameSettings.WeaponsSettings.WeaponConfigs.First(settings => settings.WeaponName == weaponName);
-            var weaponData = new WeaponData
-            {
-                Id = weaponId,
-                WeaponName = weaponSettings.WeaponName,
-                ImpactType = weaponSettings.ImpactType,
-                WeaponType = weaponSettings.WeaponType,
-                Caliber = weaponSettings.Caliber,
-                SpawnPoint = weaponSettings.SpawnPoint,
-                SpawnRotation = weaponSettings.SpawnRotation,
-                CheckDistanceToWall = weaponSettings.CheckDistanceToWall,
-                AimingRange = weaponSettings.AimingRange,
-                DamageData = CreateDamageData(weaponSettings.damageSettings),
-                ShootData = CreateShootData(weaponSettings.shootSettings),
-                FeedSystemData = CreateAmmoData(gameState, gameSettings),
-                BulletPenetrationData = CreateBulletPenData(weaponSettings.bulletPenSettings),
-                KnockbackData = CreateKnockbackData(weaponSettings.knockbackSettings),
-            };
+            var weaponSettings =
+                gameSettings.WeaponsSettings.WeaponConfigs.First(settings => settings.WeaponName == weaponName);
+            var weaponData = new WeaponData();
+            weaponData.Id = weaponId;
+            weaponData.WeaponName = weaponSettings.WeaponName;
+            weaponData.ImpactType = weaponSettings.ImpactType;
+            weaponData.WeaponType = weaponSettings.WeaponType;
+            weaponData.Caliber = weaponSettings.Caliber;
+            weaponData.SpawnPoint = weaponSettings.SpawnPoint;
+            weaponData.SpawnRotation = weaponSettings.SpawnRotation;
+            weaponData.CheckDistanceToWall = weaponSettings.CheckDistanceToWall;
+            weaponData.AimingRange = weaponSettings.AimingRange;
+            weaponData.DamageData = CreateDamageData(weaponSettings.damageSettings);
+            weaponData.ShootData = CreateShootData(weaponSettings.shootSettings);
+            weaponData.FeedSystemData = CreateAmmoData(gameState, gameSettings, weaponSettings);
+            weaponData.BulletPenetrationData = CreateBulletPenData(weaponSettings.bulletPenSettings);
+            weaponData.KnockbackData = CreateKnockbackData(weaponSettings.knockbackSettings);
 
             return weaponData;
         }
@@ -46,12 +45,14 @@ namespace NothingBehind.Scripts.Game.State.Weapons
             return magazines;
         }
 
-        private static FeedSystemData CreateAmmoData(GameState gameState, GameSettings gameSettings)
+        private static FeedSystemData CreateAmmoData(GameState gameState, GameSettings gameSettings,
+            WeaponSettings weaponSettings)
         {
-            var ammoData = ItemsDataFactory.CreateItemData(gameState, gameSettings, ItemType.Magazines);
+            var itemData = ItemsDataFactory.CreateItemData(gameState, gameSettings,
+                weaponSettings.feedSystemSettings.MagazinesItemSettings);
             var weaponAmmoData = new FeedSystemData
             {
-                MagazinesItemData = ammoData as MagazinesItemData
+                MagazinesItemData = itemData as MagazinesItemData
             };
             return weaponAmmoData;
         }
@@ -113,11 +114,13 @@ namespace NothingBehind.Scripts.Game.State.Weapons
                 timeMax = keyframe.time;
                 valueMax = keyframe.value;
             }
+
             foreach (var keyframe in damageCurve.curveMin.keys)
             {
                 timeMin = keyframe.time;
                 valueMin = keyframe.value;
             }
+
             foreach (var keyframe in damageCurve.curve.keys)
             {
                 time = keyframe.time;

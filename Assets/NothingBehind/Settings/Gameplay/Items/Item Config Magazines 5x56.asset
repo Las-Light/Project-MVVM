@@ -10,20 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8c6c25131224fc5b765d35dac387f07, type: 3}
-  m_Name: Item Config 1x2 Weapon Glock
+  m_Name: Item Config Magazines 5x56
   m_EditorClassIdentifier: 
-  ItemType: 0
-  Width: 2
+  ItemType: 5
+  Width: 1
   Height: 2
-  Weight: 1
-  CanRotate: 1
+  Weight: 2
+  CanRotate: 0
   IsRotated: 0
   IsStackable: 0
-  MaxStackSize: 1
+  MaxStackSize: 0
   CurrentStack: 1
   GridType: 0
   GridSettings: {fileID: 0}
-  WeaponType: 2
-  WeaponName: 1
+  WeaponType: 0
+  WeaponName: 0
   Caliber: 
-  MagazinesSettings: {fileID: 0}
+  MagazinesSettings: {fileID: 11400000, guid: 27c98587136d66841b205a4c9fdd054e, type: 2}

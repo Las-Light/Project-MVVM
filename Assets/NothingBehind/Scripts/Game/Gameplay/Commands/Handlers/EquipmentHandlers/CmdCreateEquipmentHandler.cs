@@ -34,14 +34,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandler
             var equipmentSlots = new List<EquipmentSlotData>();
             foreach (var settingsSlot in equipmentSettings.Slots)
             {
-                var itemSettings = settingsSlot.EquippedItemSettings;
-                var slot = new EquipmentSlotData()
+                var slot = new EquipmentSlotData();
+                slot.SlotType = settingsSlot.SlotType;
+                slot.ItemType = settingsSlot.ItemType;
+                if (settingsSlot.EquippedItemSettings != null)
                 {
-                    SlotType = settingsSlot.SlotType,
-                    ItemType = settingsSlot.ItemType,
-                    EquippedItem = ItemsDataFactory.CreateItemData(_gameState.GameState, 
-                        _gameSettings, settingsSlot.ItemType)
-                };
+                    slot.EquippedItem = ItemsDataFactory.CreateItemData(_gameState.GameState, 
+                        _gameSettings, settingsSlot.EquippedItemSettings);
+                }
                 equipmentSlots.Add(slot);
             }
 

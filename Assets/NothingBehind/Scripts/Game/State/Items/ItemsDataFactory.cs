@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NothingBehind.Scripts.Game.Settings;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.ArmorItems;
@@ -16,15 +17,8 @@ namespace NothingBehind.Scripts.Game.State.Items
     {
         public static ItemData CreateItemData(GameState gameState,
             GameSettings gameSettings,
-            ItemType itemType)
+            ItemSettings itemSettings)
         {
-            var itemSettings =
-                gameSettings.ItemsSettings.Items.FirstOrDefault(settings => settings.ItemType == itemType);
-            if (itemSettings == null)
-            {
-                throw new Exception($"Weapon with item type: {itemType} not found in settings");
-            }
-
             switch (itemSettings.ItemType)
             {
                 case ItemType.Backpack or ItemType.ChestRig:

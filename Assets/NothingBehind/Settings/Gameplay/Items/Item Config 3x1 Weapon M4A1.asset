@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Item Config 3x1 Weapon M4A1
   m_EditorClassIdentifier: 
   ItemType: 0
-  Width: 3
-  Height: 1
-  Weight: 1
+  Width: 4
+  Height: 2
+  Weight: 5
   CanRotate: 1
   IsRotated: 0
   IsStackable: 0

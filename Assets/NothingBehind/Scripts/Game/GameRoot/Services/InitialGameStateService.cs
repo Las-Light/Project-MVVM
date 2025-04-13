@@ -179,12 +179,13 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             var equipmentSlots = new List<EquipmentSlotData>();
             foreach (var settingsSlot in equipmentSettings.Slots)
             {
-                var slot = new EquipmentSlotData
+                var slot = new EquipmentSlotData();
+                slot.SlotType = settingsSlot.SlotType;
+                slot.ItemType = settingsSlot.ItemType;
+                if (settingsSlot.EquippedItemSettings != null)
                 {
-                    SlotType = settingsSlot.SlotType,
-                    ItemType = settingsSlot.ItemType,
-                    EquippedItem = ItemsDataFactory.CreateItemData(gameState, gameSettings, settingsSlot.ItemType)
-                };
+                    slot.EquippedItem = ItemsDataFactory.CreateItemData(gameState, gameSettings, settingsSlot.EquippedItemSettings);
+                }
                 equipmentSlots.Add(slot);
             }
 

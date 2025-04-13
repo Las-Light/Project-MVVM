@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fbefb62a45f4c518e4dd6fefbddab16, type: 3}
   m_Name: Magazines Settings
   m_EditorClassIdentifier: 
-  Caliber: 5x45
+  Caliber: 5x56
   ClipSize: 30
   CurrentAmmo: 30

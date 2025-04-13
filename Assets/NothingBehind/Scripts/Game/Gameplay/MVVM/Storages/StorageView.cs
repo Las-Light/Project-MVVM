@@ -7,6 +7,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Storages
 {
     public class StorageView : MonoBehaviour
     {
+        public bool IsEmpty { get; set; }
+        
         private StorageViewModel _storageViewModel;
         private int _ownerId;
         private bool _triggered;
@@ -21,7 +23,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Storages
             _storageViewModel = storageViewModel;
             _gameplayUIManager = gameplayUIManager;
             _ownerId = storageViewModel.Id;
+            IsEmpty = storageViewModel.IsEmptyInventory();
         }
+
 
         private void OnDestroy()
         {

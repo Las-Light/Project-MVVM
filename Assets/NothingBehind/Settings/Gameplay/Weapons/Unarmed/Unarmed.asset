@@ -23,7 +23,7 @@ MonoBehaviour:
   AimingRange: 0
   damageSettings: {fileID: 11400000, guid: 35c9c54f8113c3841b2a66d96e621ca0, type: 2}
   shootSettings: {fileID: 11400000, guid: f0182b0d70a0eee4b96626903c7c667e, type: 2}
-  ammoSettings: {fileID: 11400000, guid: 5d4dc6be9948f884fbebd3f01f90ba7d, type: 2}
+  feedSystemSettings: {fileID: 11400000, guid: 5d4dc6be9948f884fbebd3f01f90ba7d, type: 2}
   trailSettings: {fileID: 11400000, guid: 668d38e42a7cf064ead4d35e6ff7d128, type: 2}
   audioSettings: {fileID: 11400000, guid: bb5c881460077ee41bacf9419f4310b1, type: 2}
   bulletPenSettings: {fileID: 11400000, guid: 6ed391c4985bf9e4397b141d7fbe305e, type: 2}

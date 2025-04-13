@@ -15,7 +15,7 @@ MonoBehaviour:
   ImpactType: 0
   WeaponType: 1
   WeaponName: 2
-  Caliber: 5x45
+  Caliber: 5x56
   ModelPrefab: {fileID: 1862461175073062, guid: 460c558d562745b429e1b4ab08d8e47d, type: 3}
   SpawnPoint: {x: 0, y: 0, z: 0.38}
   SpawnRotation: {x: -180, y: -180, z: 180}
@@ -23,7 +23,7 @@ MonoBehaviour:
   AimingRange: 8
   damageSettings: {fileID: 11400000, guid: 135b684e827e30b439ab388ec05807e2, type: 2}
   shootSettings: {fileID: 11400000, guid: bee291d79c7f04e4e968d5454d6213ab, type: 2}
-  ammoSettings: {fileID: 11400000, guid: 9931af3087723cb459e84874d8559e05, type: 2}
+  feedSystemSettings: {fileID: 11400000, guid: 9931af3087723cb459e84874d8559e05, type: 2}
   trailSettings: {fileID: 11400000, guid: 199dbd3c0025dfc48a4a2f8c2ad28571, type: 2}
   audioSettings: {fileID: 11400000, guid: 85e28e149134436428dcfe550ff85af4, type: 2}
   bulletPenSettings: {fileID: 11400000, guid: 750d32be51668cf4198fcd6e0314652b, type: 2}

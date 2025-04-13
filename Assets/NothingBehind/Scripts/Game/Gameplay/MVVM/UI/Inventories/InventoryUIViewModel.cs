@@ -44,7 +44,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             {
                 return viewModel;
             }
-
+            Debug.Log("Create InventoryViewModel");
             return CreateInventoryViewModel(ownerId);
         }
         

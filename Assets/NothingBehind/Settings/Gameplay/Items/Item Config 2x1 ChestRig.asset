@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Item Config 2x1 ChestRig
   m_EditorClassIdentifier: 
   ItemType: 3
-  Width: 2
-  Height: 1
+  Width: 3
+  Height: 2
   Weight: 1
   CanRotate: 0
   IsRotated: 0
@@ -23,3 +23,7 @@ MonoBehaviour:
   CurrentStack: 1
   GridType: 2
   GridSettings: {fileID: 11400000, guid: 45ccfb3300188a44abe299529c515563, type: 2}
+  WeaponType: 0
+  WeaponName: 0
+  Caliber: 
+  MagazinesSettings: {fileID: 0}

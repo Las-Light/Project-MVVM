@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 015c22acf7414905894e72f1ed4e32aa, type: 3}
-  m_Name: Ammo Settings
+  m_Name: Feed System Settings
   m_EditorClassIdentifier: 
-  MagazinesItemSettings: {fileID: 11400000, guid: 78d52ab0294dd384e9d4476768b9843e, type: 2}
+  MagazinesItemSettings: {fileID: 11400000, guid: 6dad0ef093eb88e42a35240bbd811752, type: 2}

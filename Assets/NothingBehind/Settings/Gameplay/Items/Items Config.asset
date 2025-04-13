@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Items Config
   m_EditorClassIdentifier: 
   Items:
-  - {fileID: 11400000, guid: a8ea62659c835424e898f0b5dbba1aff, type: 2}
   - {fileID: 11400000, guid: e4cebf37e903abc4094c477ffc5d464e, type: 2}
-  - {fileID: 11400000, guid: ef9be547f2a5d4e4c86b92dc8fadb535, type: 2}
   - {fileID: 11400000, guid: 08b3103b7b2bc624c99905478b54a749, type: 2}
+  - {fileID: 11400000, guid: ef9be547f2a5d4e4c86b92dc8fadb535, type: 2}
+  - {fileID: 11400000, guid: a8ea62659c835424e898f0b5dbba1aff, type: 2}
   - {fileID: 11400000, guid: 65442dfbde8d417488f50d6897f8b941, type: 2}
+  - {fileID: 11400000, guid: 6dad0ef093eb88e42a35240bbd811752, type: 2}
   - {fileID: 11400000, guid: 9396b72f33cdec841b2e5cfa8b551cdf, type: 2}

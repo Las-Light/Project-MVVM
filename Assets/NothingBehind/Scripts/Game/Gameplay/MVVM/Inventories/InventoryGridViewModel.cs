@@ -66,6 +66,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             foreach (var kvp in _itemsPositionsMap)
             {
                 _itemsMap[kvp.Key.Id] = kvp.Key;
+                allInventoryItems[kvp.Key.Id] = kvp.Key; 
                 CreateItemViewModel(kvp.Key, itemsSettings);
             }
 

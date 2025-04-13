@@ -1,3 +1,4 @@
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI;
 using R3;
 using UnityEngine;

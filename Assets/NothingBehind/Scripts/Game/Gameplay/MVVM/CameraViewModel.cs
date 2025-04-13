@@ -1,5 +1,6 @@
 using NothingBehind.Scripts.Game.Gameplay.Logic;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using Unity.Cinemachine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM

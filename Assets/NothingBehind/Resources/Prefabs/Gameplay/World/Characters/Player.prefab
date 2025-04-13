@@ -2417,6 +2417,8 @@ GameObject:
   - component: {fileID: -7389191185619032852}
   - component: {fileID: -7574051961166383507}
   - component: {fileID: -8395793422330477699}
+  - component: {fileID: 8928115981657201790}
+  - component: {fileID: 4742491386177922945}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -2779,6 +2781,32 @@ MonoBehaviour:
   pistolRightHandRig: {fileID: 8546985508638429059}
   pistolLeftHandRig: {fileID: 7106965323556644036}
   clipWallRig: {fileID: 187723566}
+--- !u!114 &8928115981657201790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2542824441387841026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c512f942930443969cb4d18b59038c1d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetPointForAim: {fileID: 4553101830911908853}
+  pointToCheckClip: {fileID: 1257487148}
+--- !u!114 &4742491386177922945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2542824441387841026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8607aeb190a40e8b3492e6c369ed355, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3123658247557856806
 GameObject:
   m_ObjectHideFlags: 0

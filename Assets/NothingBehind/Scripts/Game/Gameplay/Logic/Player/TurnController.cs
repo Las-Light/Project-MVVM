@@ -1,7 +1,7 @@
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
-using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,32 +9,33 @@ using Math = System.Math;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 {
-    public class PlayerTurnManager
+    public class TurnController: MonoBehaviour
     {
-        private readonly GameplayInputManager _inputManager;
-        private readonly PlayerSettings _playerSettings;
-
-        private PlayerView _playerView;
         private Camera _mainCamera;
         private PlayerInput _playerInput;
         private AnimatorController _animatorController;
 
         private Vector3 _mouseWorldPosition;
         private float _turnRotation;
+        private GameplayInputManager _inputManager;
+        private PlayerSettings _playerSettings;
 
-        public PlayerTurnManager(GameplayInputManager inputManager,
-            PlayerSettings playerSettings)
+        private void Start()
         {
-            _inputManager = inputManager;
-            _playerSettings = playerSettings;
+            _mainCamera = Camera.main;
+            _playerInput = GetComponent<PlayerInput>();
+            _animatorController = GetComponent<AnimatorController>();
+            _inputManager = GetComponent<PlayerView>().InputManager;
+            _playerSettings = GetComponent<PlayerView>().PlayerSettings;
         }
-
-        public void BindPlayerViewComponent(PlayerView heroView, Camera mainCamera, PlayerInput playerInput)
+        
+        public void Look()
         {
-            _playerView = heroView;
-            _mainCamera = mainCamera;
-            _playerInput = playerInput;
-            _animatorController = heroView.GetComponent<AnimatorController>();
+            if (_playerInput.currentControlScheme == AppConstants.GamepadControlScheme)
+                LookGamepad();
+            
+            if (_playerInput.currentControlScheme == AppConstants.KeyboardMouseControlScheme)
+                LookMouse();
         }
 
         //метод задает направление игрока когда игрок не движется
@@ -56,9 +57,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                         CalculateAimMousePosition(raycastHit.point, _inputManager.LookMouse.CurrentValue);
 
                     Vector3 worldAimTarget = _mouseWorldPosition;
-                    var transform = _playerView.transform;
-                    worldAimTarget.y = transform.position.y;
-                    Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
+                    var position = transform.position;
+                    worldAimTarget.y = position.y;
+                    Vector3 aimDirection = (worldAimTarget - position).normalized;
 
                     //определяет влево или вправо совершил поворот игрок -90 или 90
                     _turnRotation = Vector3.SignedAngle(aimDirection, transform.forward, transform.up);
@@ -106,7 +107,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 
 
                 // поворот на месте на 180 градусов (без анимации)
-                var transform = _playerView.transform;
                 _turnRotation = Vector3.SignedAngle(skewedInput.normalized, transform.forward, transform.up);
                 float turnRotAbs = Mathf.Abs(_turnRotation);
 

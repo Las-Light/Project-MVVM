@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.State.Weapons
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.WeaponSystem
 {
     public class AudioWeaponData
     {

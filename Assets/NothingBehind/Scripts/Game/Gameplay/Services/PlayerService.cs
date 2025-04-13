@@ -1,8 +1,10 @@
 using System;
 using NothingBehind.Scripts.Game.Gameplay.Commands.PlayerCommands;
+using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
-using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Player;
 using NothingBehind.Scripts.Game.State.Maps;
@@ -16,29 +18,24 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
     {
         public readonly ReactiveProperty<PlayerViewModel> PlayerViewModel = new();
 
-        private readonly PlayerMovementManager _playerMovementManager;
-        private readonly PlayerTurnManager _playerTurnManager;
-        private readonly ArsenalService _arsenalService;
+        private readonly MovementController _movementController;
+        private readonly TurnController _turnController;
         private readonly Player _player;
         private readonly ICommandProcessor _cmd;
         private readonly SceneEnterParams _sceneEnterParams;
 
         public PlayerService(InventoryService inventoryService,
-            PlayerMovementManager playerMovementManager,
-            PlayerTurnManager playerTurnManager,
             ArsenalService arsenalService,
             Player player,
+            GameplayInputManager inputManager,
             ICommandProcessor cmd,
-            SceneEnterParams sceneEnterParams)
+            SceneEnterParams sceneEnterParams,
+            PlayerSettings playerSettings)
         {
-            _playerMovementManager = playerMovementManager;
-            _playerTurnManager = playerTurnManager;
-            _arsenalService = arsenalService;
-            _player = player;
             _cmd = cmd;
             _sceneEnterParams = sceneEnterParams;
 
-            InitialPlayer();
+            InitialPlayer(player, arsenalService, inputManager, playerSettings);
         }
 
         public CommandResult UpdatePlayerPosOnMap(Vector3 position, MapId currentMap)
@@ -56,20 +53,21 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             return result;
         }
 
-        private void InitialPlayer()
+        private void InitialPlayer(Player player, ArsenalService arsenalService, GameplayInputManager inputManager,
+            PlayerSettings playerSettings)
         {
             InitialPosOnMap();
-            var hero = _player;
-            CreatePlayerViewModel(hero);
+            CreatePlayerViewModel(player, arsenalService, inputManager, playerSettings);
         }
 
-        private void CreatePlayerViewModel(Player player)
+        private void CreatePlayerViewModel(Player player, ArsenalService arsenalService,
+            GameplayInputManager inputManager, PlayerSettings playerSettings)
         {
-            if (!_arsenalService.ArsenalMap.TryGetValue(player.Id, out var arsenalViewModel))
+            if (!arsenalService.ArsenalMap.TryGetValue(player.Id, out var arsenalViewModel))
             {
                 throw new Exception($"ArsenalViewModel for owner with Id {player.Id} not found");
             }
-            var viewModel = new PlayerViewModel(player,this, _playerMovementManager, _playerTurnManager, arsenalViewModel);
+            var viewModel = new PlayerViewModel(player,this, inputManager, arsenalViewModel, playerSettings);
 
             PlayerViewModel.Value = viewModel;
         }

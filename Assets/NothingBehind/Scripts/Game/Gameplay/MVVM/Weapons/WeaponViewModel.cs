@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using NothingBehind.Scripts.Game.Gameplay.Logic.WeaponSystem;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Weapons;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;

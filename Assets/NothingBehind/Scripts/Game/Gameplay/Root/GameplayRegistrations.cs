@@ -32,7 +32,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             var gameSettings = settingsProvider.GameSettings;
             var charactersSettings = gameSettings.CharactersSettings;
             var gameplayCameraSettings = gameSettings.GameplayCameraSettings;
-            var heroSettings = gameSettings.PlayerSettings;
+            var playerSettings = gameSettings.PlayerSettings;
             var inventoriesSettings = gameSettings.InventoriesSettings;
             var equipmentsSettings = gameSettings.EquipmentsSettings;
             var storagesSettings = gameSettings.StoragesSettings;
@@ -77,12 +77,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
                 gameplayCameraSettings)).AsSingle();
             var cameraService = container.Resolve<CameraManager>();
 
-            container.RegisterFactory(c =>
-                new PlayerMovementManager(heroSettings, inputManager)).AsSingle();
-            
-            container.RegisterFactory(c => new PlayerTurnManager(inputManager, heroSettings)).AsSingle();
-            
-            
             // регистрируем сервисы
             container.RegisterFactory(c => new EquipmentService(gameState.Equipments, itemsSettings,
                 commandProcessor)).AsSingle();
@@ -104,12 +98,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             
             container.RegisterFactory(c => new PlayerService(
                     inventoryService,
-                    container.Resolve<PlayerMovementManager>(),
-                    container.Resolve<PlayerTurnManager>(),
                     weaponService,
                     gameState.Player.Value,
+                    inputManager,
                     commandProcessor,
-                    enterParams))
+                    enterParams,
+                    playerSettings))
                 .AsSingle();
 
             container.RegisterFactory(c => new ResourcesService(gameState.Resources, commandProcessor)).AsSingle();

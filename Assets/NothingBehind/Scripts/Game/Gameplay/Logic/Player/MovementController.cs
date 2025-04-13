@@ -1,21 +1,29 @@
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
-using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using R3;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 {
-    public class PlayerMovementManager
+    public class MovementController : MonoBehaviour
     {
-        private readonly PlayerSettings _playerSettings;
-        private readonly GameplayInputManager _inputManager;
+        [Header("Aim")] 
+        [Tooltip("TargetAimPoint")]
+        [SerializeField] private Transform targetPointForAim;
+        [Header("Clip Prevention")] 
+        [Tooltip("ViewPoint")][SerializeField]
+        private Transform pointToCheckClip;
+        
+        private PlayerSettings _playerSettings;
+        private GameplayInputManager _inputManager;
 
+        private PlayerView _playerView;
         private CharacterController _playerCharacterController;
         private Transform _mainCameraTransform;
-        private Transform _playerTransform;
         private AnimatorController _animatorController;
+        private readonly CompositeDisposable _disposables = new();
 
         private float _speed;
         private float _targetRotation;
@@ -28,31 +36,23 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         private bool _grounded;
         private bool _isCrouch;
 
-        public PlayerMovementManager(PlayerSettings playerSettings,
-            GameplayInputManager inputManager)
+        private void Start()
         {
-            _inputManager = inputManager;
-            _playerSettings = playerSettings;
-
-            _inputManager.IsCrouch.Skip(1).Subscribe(_ => Crouch());
+            _playerView = GetComponent<PlayerView>();
+            _animatorController = GetComponent<AnimatorController>();
+            if (Camera.main != null) _mainCameraTransform = Camera.main.transform;
+            _playerCharacterController = GetComponent<CharacterController>();
+            _playerSettings = _playerView.PlayerSettings;
+            _inputManager = _playerView.InputManager;
+            _disposables.Add(_inputManager.IsCrouch.Skip(1).Subscribe(_ => Crouch()));
         }
 
-        public void BindPlayerViewComponent(PlayerView heroView, Camera mainCamera, CharacterController controller)
+        private void OnDestroy()
         {
-            _playerCharacterController = controller;
-            _mainCameraTransform = mainCamera.transform;
-            _playerTransform = heroView.transform;
-            _animatorController = heroView.GetComponent<AnimatorController>();
-        }
-
-        //TODO: убрать в другой сервис
-        public bool InteractiveActionPressed()
-        {
-            return _inputManager.IsInteract.CurrentValue;
+            _disposables.Dispose();
         }
 
         //метод управляет движением игрока
-
         public void Move()
         {
             GroundedCheck();
@@ -93,16 +93,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 
             if (_isCrouch)
             {
-                //pointToCheckClip.localPosition = new Vector3(0.2f, 0.95f, 0);
-                //TargetPointForAim.localPosition = new Vector3(0, 0.9f, 0);
+                pointToCheckClip.localPosition = new Vector3(0.2f, 0.95f, 0);
+                targetPointForAim.localPosition = new Vector3(0, 0.9f, 0);
                 _animatorController.Crouch(_isCrouch);
                 _playerCharacterController.height = _playerSettings.CrouchHeight;
                 _playerCharacterController.center = _playerSettings.crouchCenter;
             }
             else
             {
-                //pointToCheckClip.localPosition = new Vector3(0.2f, 1.6f, 0);
-                //TargetPointForAim.localPosition = new Vector3(0, 1.4f, 0);
+                pointToCheckClip.localPosition = new Vector3(0.2f, 1.6f, 0);
+                targetPointForAim.localPosition = new Vector3(0, 1.4f, 0);
                 _animatorController.Crouch(_isCrouch);
                 _playerCharacterController.height = _playerSettings.DefaultHeight;
                 _playerCharacterController.center = _playerSettings.DefaultCenter;
@@ -124,7 +124,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                 cameraF.normalized * movementDirection.y + cameraR.normalized * movementDirection.x;
             moveDirectional = Vector3.ClampMagnitude(moveDirectional, 1);
 
-            Vector3 relativeVector = _playerTransform.InverseTransformDirection(moveDirectional);
+            Vector3 relativeVector = transform.InverseTransformDirection(moveDirectional);
 
             _speedBlendX = Mathf.Lerp(_speedBlendX, relativeVector.x, Time.deltaTime * _playerSettings.SpeedBlendAim);
             _speedBlendY = Mathf.Lerp(_speedBlendY, relativeVector.z, Time.deltaTime * _playerSettings.SpeedBlendAim);
@@ -136,12 +136,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 
         private void MoveForwardDirection()
         {
-            float rotation = Mathf.SmoothDampAngle(_playerTransform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
+            float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity,
                 _playerSettings.RotationSmoothTime);
 
             // повернуться лицом в соответствии с заданым направлением левым стиком относительно камеры,
             // если в данный момент не нажата кнопка "прицелиться"
-            _playerTransform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
 
             // update animator if using character
             _animatorController.Move(_speedBlend);
@@ -271,7 +271,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         private void GroundedCheck()
         {
             // set sphere position, with offset
-            var position = _playerTransform.position;
+            var position = transform.position;
             Vector3 spherePosition = new Vector3(position.x,
                 position.y - _playerSettings.GroundedOffset,
                 position.z);

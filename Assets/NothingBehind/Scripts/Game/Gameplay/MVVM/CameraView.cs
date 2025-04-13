@@ -1,4 +1,5 @@
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using Unity.Cinemachine;
 using UnityEngine;
 

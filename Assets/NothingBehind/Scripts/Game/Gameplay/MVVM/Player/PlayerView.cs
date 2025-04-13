@@ -1,10 +1,13 @@
 using System.Linq;
+using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
+using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
+namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
 {
     [RequireComponent(typeof(CharacterController), typeof(PlayerInput))]
     public class PlayerView : MonoBehaviour
@@ -13,10 +16,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
         [SerializeField] private Transform _pistolParent;
         [SerializeField] private Transform _rifleParent;
         [SerializeField] private Transform _unarmedParent;
+        
+        public PlayerSettings PlayerSettings { get; private set; }
+        public GameplayInputManager InputManager { get; private set; }
+        
         private PlayerViewModel _viewModel;
+        private TurnController _turnController;
+        private MovementController _movementController;
         private ArsenalView _arsenalView;
         private GameplayUIManager _gameplayUIManager;
-        private bool _inventoruIsOpened;
+        private bool _inventoryIsOpened;
 
         public void Bind(PlayerViewModel viewModel, GameplayUIManager gameplayUIManager)
         {
@@ -24,16 +33,20 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             var currentMap = viewModel.CurrentMapId.CurrentValue;
             var currentPosOnMap = viewModel.PositionOnMaps.First(posOnMap => posOnMap.MapId == currentMap);
             transform.position = currentPosOnMap.Position.Value;
-            var mainCamera = Camera.main;
-            viewModel.SetPlayerViewWithComponent(this, mainCamera);
-            _arsenalView = CreateArsenalView(viewModel.ArsenalViewModel);
             _gameplayUIManager = gameplayUIManager;
+            InputManager = viewModel.InputManager;
+            PlayerSettings = viewModel.PlayerSettings;
+            _turnController = GetComponent<TurnController>();
+            _movementController = GetComponent<MovementController>();
+            
+            _arsenalView = CreateArsenalView(viewModel.ArsenalViewModel);
         }
 
         private void Update()
         {
-            _viewModel.Move();
-            _viewModel.Look();
+            _movementController.Move();
+            _viewModel.UpdatePlayerPosition(transform.position);
+            _turnController.Look();
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 _arsenalView.WeaponSwitch(_arsenalView.WeaponSlot1);
@@ -45,15 +58,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
 
             if (Input.GetKeyDown(KeyCode.I))
             {
-                if (!_inventoruIsOpened)
+                if (!_inventoryIsOpened)
                 {
                     _gameplayUIManager.OpenInventory(_viewModel.Id);
-                    _inventoruIsOpened = true;
+                    _inventoryIsOpened = true;
                 }
                 else
                 {
                     _gameplayUIManager.CloseInventory();
-                    _inventoruIsOpened = false;
+                    _inventoryIsOpened = false;
                 }
             }
 
@@ -70,7 +83,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
 
         public bool IsInteractiveActionPressed()
         {
-            return _viewModel.InteractiveActionPressed();
+            return InputManager.IsInteract.CurrentValue;
         }
 
         private ArsenalView CreateArsenalView(ArsenalViewModel arsenalViewModel)

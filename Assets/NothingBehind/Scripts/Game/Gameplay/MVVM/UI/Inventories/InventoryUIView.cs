@@ -16,7 +16,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         [SerializeField] private RectTransform _lootInventoryContainer;
 
         private List<ItemView> _itemViews = new ();
-        private int _openInventoryId; // Id открытого инвентаря (противника, ящика или инвентаря на земле
+        private int _openInventoryId; // Id открытого инвентаря (противника, ящика или инвентаря на земле)
 
         protected override void OnBind(InventoryUIViewModel viewModel)
         {

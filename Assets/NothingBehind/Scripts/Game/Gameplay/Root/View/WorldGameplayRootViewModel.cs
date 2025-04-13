@@ -5,6 +5,7 @@ using NothingBehind.Scripts.Game.Gameplay.MVVM;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Maps;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Storages;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings;

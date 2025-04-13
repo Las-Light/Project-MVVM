@@ -1,7 +1,9 @@
 using System.Linq;
+using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Entities.Player;
 using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
@@ -9,7 +11,7 @@ using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
+namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
 {
     public class PlayerViewModel
     {
@@ -19,24 +21,23 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
         public ReadOnlyReactiveProperty<float> Health { get; }
         public ReadOnlyReactiveProperty<Vector3> Position { get; }
         public readonly ArsenalViewModel ArsenalViewModel;
+        public readonly GameplayInputManager InputManager;
+        public readonly PlayerSettings PlayerSettings;
         
         private ObservableList<PositionOnMap> _positionOnMaps { get; }
         
-        private readonly Player _player;
+        private readonly State.Entities.Player.Player _player;
         private readonly PlayerService _playerService;
-        private readonly PlayerMovementManager _playerMovementManager;
-        private readonly PlayerTurnManager _playerTurnManager;
         private PlayerView _playerView;
         private CharacterController _playerCharacterController;
         private PlayerInput _playerInput;
 
 
-        public PlayerViewModel(
-            Player player, 
-            PlayerService playerService, 
-            PlayerMovementManager playerMovementManager,
-            PlayerTurnManager playerTurnManager,
-            ArsenalViewModel arsenalViewModel)
+        public PlayerViewModel(State.Entities.Player.Player player,
+            PlayerService playerService,
+            GameplayInputManager inputManager,
+            ArsenalViewModel arsenalViewModel, 
+            PlayerSettings playerSettings)
         {
             Id = player.Id;
             CurrentMapId = player.CurrentMapId;
@@ -45,10 +46,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             
             _player = player;
             _playerService = playerService;
-            _playerMovementManager = playerMovementManager;
-            _playerTurnManager = playerTurnManager;
             ArsenalViewModel = arsenalViewModel;
+            InputManager = inputManager;
+            PlayerSettings = playerSettings;
 
+            //Инициализируем позицию игрока из данных 
             var currentPosOnMap = _positionOnMaps.FirstOrDefault(map => map.MapId == CurrentMapId.CurrentValue);
             if (currentPosOnMap != null) Position = currentPosOnMap.Position;
         }
@@ -56,27 +58,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
         public void SetPlayerViewWithComponent(PlayerView playerView, Camera camera)
         {
             _playerView = playerView;
-            _playerCharacterController = playerView.GetComponent<CharacterController>();
-            _playerInput = playerView.GetComponent<PlayerInput>();
-            _playerMovementManager.BindPlayerViewComponent(playerView, camera, _playerCharacterController);
-            _playerTurnManager.BindPlayerViewComponent(playerView, camera, _playerInput);
         }
 
-        public void Move()
+        public void UpdatePlayerPosition(Vector3 position)
         {
-            _playerMovementManager.Move();
-            _playerService.UpdatePlayerPosOnMap(_playerView.transform.position, CurrentMapId.CurrentValue);
-        }
-
-        public void Look()
-        {
-            _playerTurnManager.LookGamepad();
-            _playerTurnManager.LookMouse();
-        }
-
-        public bool InteractiveActionPressed()
-        {
-            return _playerMovementManager.InteractiveActionPressed();
+            _playerService.UpdatePlayerPosOnMap(position, CurrentMapId.CurrentValue);
         }
     }
 }

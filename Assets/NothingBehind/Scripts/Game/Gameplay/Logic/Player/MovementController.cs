@@ -12,9 +12,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         [Header("Aim")] 
         [Tooltip("TargetAimPoint")]
         [SerializeField] private Transform targetPointForAim;
-        [Header("Clip Prevention")] 
-        [Tooltip("ViewPoint")][SerializeField]
-        private Transform pointToCheckClip;
         
         private PlayerSettings _playerSettings;
         private GameplayInputManager _inputManager;
@@ -22,6 +19,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         private PlayerView _playerView;
         private CharacterController _playerCharacterController;
         private Transform _mainCameraTransform;
+        private Transform _pointToCheckClip;
         private AnimatorController _animatorController;
         private readonly CompositeDisposable _disposables = new();
 
@@ -39,6 +37,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         private void Start()
         {
             _playerView = GetComponent<PlayerView>();
+            _pointToCheckClip = _playerView.pointToCheckClip;
             _animatorController = GetComponent<AnimatorController>();
             if (Camera.main != null) _mainCameraTransform = Camera.main.transform;
             _playerCharacterController = GetComponent<CharacterController>();
@@ -93,7 +92,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 
             if (_isCrouch)
             {
-                pointToCheckClip.localPosition = new Vector3(0.2f, 0.95f, 0);
+                _pointToCheckClip.localPosition = new Vector3(0.2f, 0.95f, 0);
                 targetPointForAim.localPosition = new Vector3(0, 0.9f, 0);
                 _animatorController.Crouch(_isCrouch);
                 _playerCharacterController.height = _playerSettings.CrouchHeight;
@@ -101,7 +100,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             }
             else
             {
-                pointToCheckClip.localPosition = new Vector3(0.2f, 1.6f, 0);
+                _pointToCheckClip.localPosition = new Vector3(0.2f, 1.6f, 0);
                 targetPointForAim.localPosition = new Vector3(0, 1.4f, 0);
                 _animatorController.Crouch(_isCrouch);
                 _playerCharacterController.height = _playerSettings.DefaultHeight;

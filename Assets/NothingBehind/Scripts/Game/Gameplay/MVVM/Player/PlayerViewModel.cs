@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
@@ -24,6 +25,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
         public readonly GameplayInputManager InputManager;
         public readonly PlayerSettings PlayerSettings;
         
+        public GameObject CurrentEnemy { get; set; }
+        public bool IsAim;
+        public bool IsCrouch;
+        public bool IsSprint;
+        public bool IsCheckWall;
+        public bool IsReloading;
+
+        public List<GameObject> VisibleTargets = new List<GameObject>();
+        
         private ObservableList<PositionOnMap> _positionOnMaps { get; }
         
         private readonly State.Entities.Player.Player _player;
@@ -31,7 +41,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
         private PlayerView _playerView;
         private CharacterController _playerCharacterController;
         private PlayerInput _playerInput;
-
 
         public PlayerViewModel(State.Entities.Player.Player player,
             PlayerService playerService,
@@ -53,11 +62,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
             //Инициализируем позицию игрока из данных 
             var currentPosOnMap = _positionOnMaps.FirstOrDefault(map => map.MapId == CurrentMapId.CurrentValue);
             if (currentPosOnMap != null) Position = currentPosOnMap.Position;
-        }
-
-        public void SetPlayerViewWithComponent(PlayerView playerView, Camera camera)
-        {
-            _playerView = playerView;
         }
 
         public void UpdatePlayerPosition(Vector3 position)

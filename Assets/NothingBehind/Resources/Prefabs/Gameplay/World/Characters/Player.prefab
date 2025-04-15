@@ -2419,6 +2419,7 @@ GameObject:
   - component: {fileID: -8395793422330477699}
   - component: {fileID: 8928115981657201790}
   - component: {fileID: 4742491386177922945}
+  - component: {fileID: 48585013242117425}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -2713,6 +2714,16 @@ MonoBehaviour:
   _pistolParent: {fileID: 8678475033698858683}
   _rifleParent: {fileID: 2007782248383581385}
   _unarmedParent: {fileID: 736360188}
+  pointToCheckClip: {fileID: 1257487148}
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 128
+  IsAim: 0
+  IsCrouch: 0
+  IsSprint: 0
+  IsCheckWall: 0
+  IsReloading: 0
+  VisibleTargets: []
 --- !u!114 &-7389191185619032852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2794,7 +2805,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetPointForAim: {fileID: 4553101830911908853}
-  pointToCheckClip: {fileID: 1257487148}
 --- !u!114 &4742491386177922945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2807,6 +2817,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8607aeb190a40e8b3492e6c369ed355, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &48585013242117425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2542824441387841026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69f38c1bae1c4a96b73254539dcc7ead, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AimAssistON: 1
+  AimPoint: {fileID: 8744427353123666590}
+  minDistToTargetSqrt: 9
 --- !u!1 &3123658247557856806
 GameObject:
   m_ObjectHideFlags: 0
@@ -4396,7 +4421,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7006918863364015223, guid: f7da1e404ac07b24290f0735ef962ba0, type: 3}
       propertyPath: m_Name
-      value: AimTargetPoint
+      value: AimPoint
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 7006918863364015220, guid: 713bd2f69d178fe459a942e65afa52d4, type: 3}

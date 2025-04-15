@@ -14,6 +14,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         private Camera _mainCamera;
         private PlayerInput _playerInput;
         private AnimatorController _animatorController;
+        private AimController _aimController;
 
         private Vector3 _mouseWorldPosition;
         private float _turnRotation;
@@ -27,6 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             _animatorController = GetComponent<AnimatorController>();
             _inputManager = GetComponent<PlayerView>().InputManager;
             _playerSettings = GetComponent<PlayerView>().PlayerSettings;
+            _aimController = GetComponent<AimController>();
         }
         
         public void Look()
@@ -68,7 +70,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                     transform.rotation = Quaternion.RotateTowards(transform.rotation,
                         Quaternion.LookRotation(aimDirection),
                         _playerSettings.MouseRotationSpeed * Time.deltaTime);
-                    //_aimController.AimPointTargetMouse(raycastHit, _mouseWorldPosition, _weaponController.ActiveGun);
+                    _aimController.AimPointTargetMouse(raycastHit, _mouseWorldPosition);
                 }
 
                 //анимация поворота на месте
@@ -119,7 +121,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                     _playerSettings.GamepadRotationSpeed * Time.deltaTime);
                 //StartCoroutine(RotationToSkewedInput(skewedInput));
 
-                //_aimController.AimPointTargetGamepad(_weaponController.ActiveGun);
+                _aimController.AimPointTargetGamepad();
 
                 // выбор скорости вращения игрока стиком с учетом на какрй угол происходит поворот
                 // чем меньше угол тем плавнее поворачивается игрок

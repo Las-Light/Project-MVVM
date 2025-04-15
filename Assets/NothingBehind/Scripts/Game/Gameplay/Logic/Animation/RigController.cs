@@ -64,7 +64,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Animation
         public void AimRifleRig(bool takeAim)
         {
             if (takeAim)
+            {
                 StartCoroutine(SetWeightRig(1, rifleAimRig));
+            }
             //rifleAimRig.weight = Mathf.Lerp(rifleAimRig.weight, 1, Time.deltaTime * 15f);
             else
                 StartCoroutine(SetWeightRig(0, rifleAimRig));

@@ -1,4 +1,5 @@
 using NothingBehind.Scripts.Game.Gameplay.Root;
+using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.MVVM.UI;
@@ -10,12 +11,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.ScreenGameplay
     {
         private readonly GameplayUIManager _uiManager;
         private readonly Subject<GameplayExitParams> _exitSceneRequest;
+        public readonly PlayerService PlayerService;
         public override string Id => "ScreenGameplay";
 
-        public ScreenGameplayViewModel(GameplayUIManager uiManager, Subject<GameplayExitParams> exitSceneRequest)
+        public ScreenGameplayViewModel(GameplayUIManager uiManager, Subject<GameplayExitParams> exitSceneRequest,
+            PlayerService playerService)
         {
             _uiManager = uiManager;
             _exitSceneRequest = exitSceneRequest;
+            PlayerService = playerService;
         }
 
         public void RequestOpenInventory(int ownerId)

@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
+using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Sound;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Weapons.TypeData;
@@ -18,14 +20,20 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         public IReadOnlyObservableList<WeaponViewModel> AllWeaponViewModels;
         public IReadOnlyObservableDictionary<SlotType, Item> EquippedItems;
         public bool IsReloading => _reloading;
+        public WeaponView WeaponSlot1 => _weaponSlot1;
+        public WeaponView WeaponSlot2 => _weaponSlot2;
+        public WeaponView ActiveGun => _activeGun;
 
-        public WeaponView WeaponSlot1;
-        public WeaponView WeaponSlot2;
-        private WeaponView _unarmedView;
+        private WeaponView _weaponSlot1;
+        private WeaponView _weaponSlot2;
         private WeaponView _activeGun;
+        private WeaponView _unarmedView;
         private Transform _pistolParent;
         private Transform _rifleParent;
         private Transform _unarmedParent;
+        private Transform _pointToCheckClip;
+        private PlayerView _playerView;
+        private LayerMask _obstacleMask;
         private bool autoReload = false;
 
         private readonly Dictionary<int, WeaponView> _weaponViewMap = new();
@@ -40,23 +48,32 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         private RigController _rigController;
         private AnimatorController _animatorController;
         private SoundController _soundController;
+        private AimController _aimController;
         private Transform _gunParent;
 
         private bool _isShootTimerStart;
         private float _shootTimer;
         private bool _reloading;
+        private bool _shootEnable;
 
         private CompositeDisposable _disposables = new();
 
-        public void Bind(ArsenalViewModel viewModel, Transform pistolParent, Transform rifleParent,
+        public void Bind(PlayerView playerView,
+            ArsenalViewModel viewModel,
+            Transform pistolParent,
+            Transform rifleParent,
             Transform unarmedParent)
         {
             AllWeaponViewModels = viewModel.AllWeaponViewModels;
             EquippedItems = viewModel.EquipmentItems;
+            _playerView = playerView;
+            _pointToCheckClip = playerView.pointToCheckClip;
+            _obstacleMask = playerView.obstacleMask;
 
             _animatorController = GetComponentInParent<AnimatorController>();
             _rigController = GetComponentInParent<RigController>();
             _soundController = GetComponentInParent<SoundController>();
+            _aimController = GetComponentInParent<AimController>();
             _pistolParent = pistolParent;
             _rifleParent = rifleParent;
             _unarmedParent = unarmedParent;
@@ -82,10 +99,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                         switch (kvp.Key)
                         {
                             case SlotType.Weapon1:
-                                WeaponSlot1 = weaponView;
+                                _weaponSlot1 = weaponView;
                                 break;
                             case SlotType.Weapon2:
-                                WeaponSlot2 = weaponView;
+                                _weaponSlot2 = weaponView;
                                 break;
                         }
                     }
@@ -118,12 +135,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                         switch (kvp.Key)
                         {
                             case SlotType.Weapon1:
-                                if (_activeGun == WeaponSlot1) WeaponSwitch(weaponView);
-                                WeaponSlot1 = weaponView;
+                                if (_activeGun == _weaponSlot1) WeaponSwitch(weaponView);
+                                _weaponSlot1 = weaponView;
                                 break;
                             case SlotType.Weapon2:
-                                if (_activeGun == WeaponSlot2) WeaponSwitch(weaponView);
-                                WeaponSlot2 = weaponView;
+                                if (_activeGun == _weaponSlot2) WeaponSwitch(weaponView);
+                                _weaponSlot2 = weaponView;
                                 break;
                         }
                     }
@@ -140,12 +157,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                 switch (kvp.Key)
                 {
                     case SlotType.Weapon1:
-                        if (_activeGun == WeaponSlot1) WeaponSwitch(_unarmedView);
-                        WeaponSlot1 = _unarmedView;
+                        if (_activeGun == _weaponSlot1) WeaponSwitch(_unarmedView);
+                        _weaponSlot1 = _unarmedView;
                         break;
                     case SlotType.Weapon2:
-                        if (_activeGun == WeaponSlot2) WeaponSwitch(_unarmedView);
-                        WeaponSlot2 = _unarmedView;
+                        if (_activeGun == _weaponSlot2) WeaponSwitch(_unarmedView);
+                        _weaponSlot2 = _unarmedView;
                         break;
                 }
             }));
@@ -181,33 +198,38 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         //метод который стреляет при нажатии на кнопку "Стрелять"
         public bool Shoot()
         {
-            if (ShouldAutoReload())
+            if (_shootEnable)
             {
-                Reload();
-                return false;
+                if (ShouldAutoReload())
+                {
+                    Reload();
+                    return false;
+                }
+
+                _activeGun.Tick(!_reloading && _activeGun != null);
+                if (_activeGun.WeaponType == WeaponType.Rifle)
+                {
+                    _animatorController.RifleShootRecoil();
+                }
+
+                if (_activeGun.WeaponType == WeaponType.Pistol)
+                {
+                    _animatorController.PistolShootRecoil();
+                }
+
+                //_soundController.MakeSoundSelf(ActiveGun.GetRaycastOrigin(), SoundType.Shoot);
+
+                return true;
             }
 
-            _activeGun.Tick(!_reloading && _activeGun != null);
-            if (_activeGun.WeaponType == WeaponType.Rifle)
-            {
-                _animatorController.RifleShootRecoil();
-            }
-
-            if (_activeGun.WeaponType == WeaponType.Pistol)
-            {
-                _animatorController.PistolShootRecoil();
-            }
-
-            //_soundController.MakeSoundSelf(ActiveGun.GetRaycastOrigin(), SoundType.Shoot);
-
-            return true;
+            return false;
         }
 
         public void WeaponSwitch(WeaponView targetWeapon)
         {
             if (_activeGun == targetWeapon)
                 return;
-            
+
             switch (targetWeapon.WeaponType)
             {
                 case WeaponType.Unarmed:
@@ -223,6 +245,49 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        //проверяет лучом есть ли перед игроком препятствие, если есть то поднимает оружие и не дает стрелять
+        //точка откуда выходит луч находится на уровне шеи, задается через инспектор (подумать как можно заменить без инспектора)
+        public void ClipPrevention()
+        {
+            Vector3 aimDirection = (_aimController.AimPoint.position - _pointToCheckClip.position).normalized;
+            if (Physics.Raycast(
+                    _pointToCheckClip.position,
+                    aimDirection,
+                    _activeGun.CheckDistanceToWall, _obstacleMask) &&
+                _activeGun.WeaponType != WeaponType.Unarmed)
+            {
+                _playerView.IsCheckWall = true;
+                if (_playerView.IsAim)
+                {
+                    if (_activeGun.WeaponType == WeaponType.Pistol)
+                        _rigController.AimPistolRig(false);
+                    else if (_activeGun.WeaponType == WeaponType.Rifle)
+                    {
+                        _rigController.AimRifleRig(false);
+                        _rigController.ClipWallRig(_playerView.IsCheckWall);
+                    }
+                }
+
+                _shootEnable = false;
+            }
+            else
+            {
+                _shootEnable = true;
+                _playerView.IsCheckWall = false;
+                if (_playerView.IsAim)
+                {
+                    if (_activeGun.WeaponType == WeaponType.Pistol)
+                        _rigController.AimPistolRig(true);
+
+                    if (_activeGun.WeaponType == WeaponType.Rifle)
+                    {
+                        _rigController.AimRifleRig(true);
+                        _rigController.ClipWallRig(_playerView.IsCheckWall);
+                    }
+                }
             }
         }
 
@@ -409,30 +474,30 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     return;
                 }
 
-                if (WeaponSlot1 != null)
+                if (_weaponSlot1 != null)
                 {
-                    if (WeaponSlot2 == null)
+                    if (_weaponSlot2 == null)
                     {
-                        WeaponSlot2 = _unarmedView;
+                        _weaponSlot2 = _unarmedView;
                     }
 
-                    SetBehaviorByWeaponType(WeaponSlot1.WeaponType);
-                    _activeGun = WeaponSlot1;
+                    SetBehaviorByWeaponType(_weaponSlot1.WeaponType);
+                    _activeGun = _weaponSlot1;
                     _activeGun.Spawn();
                     return;
                 }
 
-                if (WeaponSlot2 != null)
+                if (_weaponSlot2 != null)
                 {
-                    WeaponSlot1 = _unarmedView;
-                    SetBehaviorByWeaponType(WeaponSlot2.WeaponType);
-                    _activeGun = WeaponSlot2;
+                    _weaponSlot1 = _unarmedView;
+                    SetBehaviorByWeaponType(_weaponSlot2.WeaponType);
+                    _activeGun = _weaponSlot2;
                     _activeGun.Spawn();
                     return;
                 }
 
-                WeaponSlot1 = _unarmedView;
-                WeaponSlot2 = _unarmedView;
+                _weaponSlot1 = _unarmedView;
+                _weaponSlot2 = _unarmedView;
                 SetBehaviorByWeaponType(WeaponType.Unarmed);
                 _activeGun = _unarmedView;
             }

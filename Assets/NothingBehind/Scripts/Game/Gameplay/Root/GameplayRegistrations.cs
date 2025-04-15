@@ -71,11 +71,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             container.RegisterFactory(c => new GameplayInputManager()).AsSingle();
             var inputManager = container.Resolve<GameplayInputManager>();
             
-            container.RegisterFactory(c => new CameraManager(
+            container.RegisterFactory(c => new CameraService(
                 inputManager,
-                coroutines,
                 gameplayCameraSettings)).AsSingle();
-            var cameraService = container.Resolve<CameraManager>();
+            var cameraService = container.Resolve<CameraService>();
 
             // регистрируем сервисы
             container.RegisterFactory(c => new EquipmentService(gameState.Equipments, itemsSettings,

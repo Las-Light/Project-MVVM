@@ -12,7 +12,6 @@ namespace NothingBehind.Scripts.Game.State.Entities.Player
         public PlayerData Origin { get; }
         public ReactiveProperty<float> Health { get; }
         public ReactiveProperty<MapId> CurrentMapId { get; }
-
         public ObservableList<PositionOnMap> PositionOnMaps { get; } = new();
 
         public Player(PlayerData playerData)

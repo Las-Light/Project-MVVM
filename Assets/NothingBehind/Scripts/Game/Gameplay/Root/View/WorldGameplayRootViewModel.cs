@@ -30,7 +30,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly PlayerService _playerService;
         private readonly ResourcesService _resourcesService;
         private readonly GameplayInputManager _gameplayInputManager;
-        private readonly CameraManager _cameraManager;
+        private readonly CameraService _cameraService;
         private readonly InventoryService _inventoryService;
 
         public readonly ReadOnlyReactiveProperty<PlayerViewModel> Player;
@@ -51,7 +51,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             SpawnService spawnService,
             MapTransferService mapService,
             GameplayInputManager gameplayInputManager,
-            CameraManager cameraManager,
+            CameraService cameraService,
             InventoryService inventoryService)
         {
             _settingsProvider = settingsProvider;
@@ -61,10 +61,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _playerService = playerService;
             _resourcesService = resourcesService;
             _gameplayInputManager = gameplayInputManager;
-            _cameraManager = cameraManager;
+            _cameraService = cameraService;
             _inventoryService = inventoryService;
 
-            CameraViewModel = cameraManager.CameraViewModel;
+            CameraViewModel = cameraService.CameraViewModel;
             Player = playerService.PlayerViewModel;
             AllCharacters = charactersService.AllCharacters;
             AllStorages = storageService.AllStorages;

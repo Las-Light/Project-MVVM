@@ -10,6 +10,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
     {
         public WeaponType WeaponType;
         public int CurrentAmmo;
+        public float CheckDistanceToWall { get; private set; }
+        public float AimRange { get; private set; }
 
         private AudioSource ShootingAudioSource;
         private GameObject Model;
@@ -32,7 +34,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
             _viewModel = viewModel;
             WeaponType = viewModel.WeaponType;
             CurrentAmmo = viewModel.FeedSystem.MagazinesItem.Value.Magazines.CurrentAmmo.Value;
+            CheckDistanceToWall = viewModel.CheckDistanceToWall;
+            AimRange = viewModel.AimingRange;
         }
+
 
         /// <summary>
         /// Spawns the Gun Model into the scene

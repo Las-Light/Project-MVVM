@@ -1,5 +1,7 @@
+using System;
 using NothingBehind.Scripts.MVVM.UI;
 using R3;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +13,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.ScreenGameplay
         [SerializeField] private Button _btnPopupB;
         [SerializeField] private Button _btnGoToMenu;
         [SerializeField] private Button _btnInventory;
+        [SerializeField] private TMP_Text _ammoCount;
 
+        protected override void OnBind(ScreenGameplayViewModel viewModel)
+        {
+        }
         private void OnEnable()
         {
             _btnPopupA.onClick.AddListener(OnPopupAButtonClicked);

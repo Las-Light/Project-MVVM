@@ -34,7 +34,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
 
         public ScreenGameplayViewModel OpenScreenGameplay()
         {
-            var viewModel = new ScreenGameplayViewModel(this, _exitSceneRequest);
+            var viewModel = new ScreenGameplayViewModel(this, _exitSceneRequest, _playerService);
             var rootUI = Container.Resolve<UIGameplayRootViewModel>();
 
             rootUI.OpenSreen(viewModel);

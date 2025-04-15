@@ -159,7 +159,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                _viewModel.HandleTestInput();
+                //_viewModel.HandleTestInput();
+                Debug.Log(_playerView.ArsenalView.ActiveGun.WeaponType);
             }
 
             if (Input.GetKeyDown(KeyCode.Tab))

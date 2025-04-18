@@ -1,6 +1,7 @@
 using System.Collections;
 using NothingBehind.Scripts.Game.Gameplay.Logic.WeaponSystem;
 using NothingBehind.Scripts.Game.State.Weapons.TypeData;
+using R3;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -8,8 +9,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 {
     public class WeaponView : MonoBehaviour
     {
+        public int Id;
         public WeaponType WeaponType;
-        public int CurrentAmmo;
+        public ReactiveProperty<int> CurrentAmmo;
+        public int ClipSize;
         public float CheckDistanceToWall { get; private set; }
         public float AimRange { get; private set; }
 
@@ -32,8 +35,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         public void Bind(WeaponViewModel viewModel)
         {
             _viewModel = viewModel;
+            Id = viewModel.Id;
             WeaponType = viewModel.WeaponType;
-            CurrentAmmo = viewModel.FeedSystem.MagazinesItem.Value.Magazines.CurrentAmmo.Value;
+            CurrentAmmo = viewModel.FeedSystem.MagazinesItem.Value.Magazines.CurrentAmmo;
+            ClipSize = viewModel.FeedSystem.MagazinesItem.Value.Magazines.ClipSize;
             CheckDistanceToWall = viewModel.CheckDistanceToWall;
             AimRange = viewModel.AimingRange;
         }
@@ -262,7 +267,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         }
 
         /// <summary>
-        /// Returns the proper Origin point for raycasting based on <see cref="ShootConfigScriptableObject.ShootType"/>
+        /// Returns the proper Origin point for raycasting based on <see cref="ShootType"/>
         /// </summary>
         /// <returns></returns>
         public Vector3 GetRaycastOrigin()

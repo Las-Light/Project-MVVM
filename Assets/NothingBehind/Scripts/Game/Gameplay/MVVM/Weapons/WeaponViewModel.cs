@@ -10,6 +10,7 @@ using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using ObservableCollections;
 using R3;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 {
@@ -33,12 +34,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 
         public TrailData Trail { get; }
         public AudioWeapon AudioWeapon { get; }
+        public readonly ReactiveProperty<int> AppropriateMagazinesCount = new();
+        public readonly ReactiveProperty<int> AppropriateAmmoCount = new();
 
         private readonly ObservableDictionary<InventoryGridViewModel, ObservableList<AmmoItem>>
-            _appropriateAmmo = new ();
+            _appropriateAmmo = new();
 
         private readonly ObservableDictionary<InventoryGridViewModel, ObservableList<MagazinesItem>>
-            _appropriateMagazines = new ();
+            _appropriateMagazines = new();
 
         private IReadOnlyObservableDictionary<InventoryGridViewModel, ObservableList<MagazinesItem>> _allMagazines;
         private IReadOnlyObservableDictionary<InventoryGridViewModel, ObservableList<AmmoItem>> _allAmmo;
@@ -81,11 +84,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     {
                         if (ammoItem.Caliber == Caliber)
                         {
+                            AppropriateAmmoCount.Value += ammoItem.CurrentStack.Value;
                             _appropriateAmmo[kvp.Key].Add(ammoItem);
                         }
                     }
                 }
-                
+
                 _disposables.Add(kvp.Value.ObserveAdd().Subscribe(e =>
                 {
                     var addedAmmo = e.Value;
@@ -93,20 +97,23 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     {
                         if (addedAmmo.Caliber == Caliber)
                         {
+                            AppropriateAmmoCount.Value += addedAmmo.CurrentStack.Value;
                             ammoItems.Add(addedAmmo);
                         }
                     }
                     else
                     {
+                        AppropriateAmmoCount.Value += addedAmmo.CurrentStack.Value;
                         _appropriateAmmo[kvp.Key] = new ObservableList<AmmoItem> { addedAmmo };
                     }
                 }));
-                
+
                 _disposables.Add(kvp.Value.ObserveRemove().Subscribe(e =>
                 {
                     var removedAmmo = e.Value;
                     if (_appropriateAmmo.TryGetValue(kvp.Key, out var ammoItems))
                     {
+                        //AppropriateAmmoCount.Value -= removedAmmo.CurrentStack.Value;
                         ammoItems.Remove(removedAmmo);
                     }
                 }));
@@ -121,6 +128,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     {
                         if (magazinesItem.Magazines.Caliber == Caliber)
                         {
+                            AppropriateMagazinesCount.Value++;
                             _appropriateMagazines[kvp.Key].Add(magazinesItem);
                         }
                     }
@@ -133,31 +141,28 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     {
                         if (addedMagazines.Magazines.Caliber == Caliber)
                         {
+                            AppropriateMagazinesCount.Value++;
                             magazinesItems.Add(addedMagazines);
                         }
                     }
                     else
                     {
+                        AppropriateMagazinesCount.Value++;
                         _appropriateMagazines[kvp.Key] = new ObservableList<MagazinesItem> { addedMagazines };
                     }
                 }));
-                
+
                 _disposables.Add(kvp.Value.ObserveRemove().Subscribe(e =>
                 {
                     var removedMagazines = e.Value;
-                    if (_appropriateMagazines.TryGetValue(kvp.Key, out var magazinesItems))
+                    if (removedMagazines.Magazines.Caliber == Caliber)
                     {
-                        magazinesItems.Remove(removedMagazines);
+                        if (_appropriateMagazines.TryGetValue(kvp.Key, out var magazinesItems))
+                        {
+                            AppropriateMagazinesCount.Value--;
+                            magazinesItems.Remove(removedMagazines);
+                        }
                     }
-                }));
-                
-                _disposables.Add(_allAmmo.ObserveAdd().Subscribe(e =>
-                {
-                    Debug.Log($"Added to _allAmmo: key {e.Value.Key} - value {e.Value.Value}");
-                }));
-                _disposables.Add(_allAmmo.ObserveRemove().Subscribe(e =>
-                {
-                    Debug.Log($"Removed at _allAmmo: key {e.Value.Key} - value {e.Value.Value}");
                 }));
             }
         }
@@ -184,21 +189,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         public bool LoadMagazines()
         {
             var magazines = FeedSystem.MagazinesItem.Value.Magazines;
-            if (_appropriateAmmo.Count > 0)
+            if (AppropriateAmmoCount.Value > 0)
             {
                 foreach (var kvp in _appropriateAmmo)
                 {
                     if (kvp.Value.Count > 0)
                     {
-                        foreach (var ammoItem in kvp.Value)
+                        for (int i = kvp.Value.Count - 1; i >= 0; i--)
                         {
-                            var addedAmmoResult = magazines.AddAmmo(ammoItem);
+                            var addedAmmoResult = magazines.AddAmmo(kvp.Value[i]);
+                            AppropriateAmmoCount.Value -= addedAmmoResult.ItemsAddedAmount;
                             if (addedAmmoResult.NeedRemove)
                             {
-                                kvp.Key.RemoveItem(ammoItem.Id);
+                                kvp.Key.RemoveItem(kvp.Value[i].Id);
                             }
 
-                            if (magazines.CurrentAmmo.Value == magazines.ClipSize)
+                            if (magazines.CurrentAmmo.Value == magazines.ClipSize || AppropriateAmmoCount.Value <= 0)
                             {
                                 return true;
                             }
@@ -230,9 +236,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                                     kvp.Key.RemoveItem(magazinesItem.Id);
                                     kvp.Key.AddItems(magazinesInWeapon, replaceItemPos.Value,
                                         magazinesItem.CurrentStack.Value);
+                                    _appropriateMagazines[kvp.Key].Remove(magazinesItem);
+                                    FeedSystem.MagazinesItem.Value = magazinesItem;
                                     return true;
                                 }
-                                
                             }
                         }
                     }
@@ -244,14 +251,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 
         public bool CanReload()
         {
-            if (_appropriateMagazines.Count > 0)
+            bool isHaveFullMagazines = false;
+            if (AppropriateMagazinesCount.Value > 0)
             {
-                return _appropriateMagazines
+                isHaveFullMagazines = _appropriateMagazines
                     .Where(kvp => kvp.Value.Count > 0)
                     .SelectMany(kvp => kvp.Value)
                     .Any(magazinesItem => !magazinesItem.Magazines.IsEmpty.Value);
             }
-            return _appropriateAmmo.Count > 0 && _appropriateAmmo.Any(kvp => kvp.Value.Count > 0);
+
+            return AppropriateAmmoCount.Value > 0 || isHaveFullMagazines;
         }
 
         private AudioWeapon CreateAudioWeaponData(AudioWeaponSettings audioSettings)

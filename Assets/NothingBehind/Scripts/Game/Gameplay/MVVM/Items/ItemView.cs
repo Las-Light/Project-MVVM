@@ -18,7 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
 
 
         private Item _item;
-
+        private ItemViewModel _itemViewModel;
         private float _cellSize;
         private int _id;
         private ItemType _itemType;
@@ -43,10 +43,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
         private readonly CompositeDisposable _disposables = new();
         private List<ItemView> _itemViews;
 
-        public void Bind(Item item, float cellSize, 
+        public void Bind(Item item, ItemViewModel itemViewModel, float cellSize,
             List<ItemView> openedViews)
         {
             _item = item;
+            _itemViewModel = itemViewModel;
             _itemType = item.ItemType;
             _currentStack = item.CurrentStack;
             _width = item.Width;
@@ -60,6 +61,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             _rectTransform = GetComponent<RectTransform>();
             _canvasGroup = GetComponent<CanvasGroup>();
             _itemImage = GetComponent<Image>();
+            _itemImage.color = itemViewModel.ItemSettings.Color;
             _currentView = _startView = GetComponentInParent<IView>();
             _mainCanvas = GetComponentInParent<Canvas>();
             _canvasRectTransform = _mainCanvas.transform as RectTransform;
@@ -167,7 +169,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
                 {
                     //TODO: здесь может быть ситуация когда экипированный предмет врага сразу экипируется на игрока
                     //TODO: куда положить предмет который был экипирован???
-                    TryEquipAtEquipmentSlot(slotView, startView);
+                    TryEquipAtEquipmentSlot(slotView);
 
                     return;
                 }
@@ -206,11 +208,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
 
         private void ClearHighlight()
         {
-            _itemImage.color = Color.red;
+            _itemImage.color = _itemViewModel.ItemSettings.Color;
             _isHighlight = false;
         }
 
-        private void TryEquipAtEquipmentSlot(EquipmentSlotView slotView, EquipmentSlotView startView)
+        private void TryEquipAtEquipmentSlot(EquipmentSlotView slotView)
         {
             if (!slotView.TryEquip(_item))
             {

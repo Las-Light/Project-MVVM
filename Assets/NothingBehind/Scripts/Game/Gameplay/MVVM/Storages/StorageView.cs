@@ -11,7 +11,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Storages
         public bool IsEmpty { get; set; }
         
         private StorageViewModel _storageViewModel;
-        private int _ownerId;
+        private int _storageId;
         private bool _triggered;
         private GameplayUIManager _gameplayUIManager;
         
@@ -23,7 +23,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Storages
             transform.position = storageViewModel.Position.CurrentValue;
             _storageViewModel = storageViewModel;
             _gameplayUIManager = gameplayUIManager;
-            _ownerId = storageViewModel.Id;
+            _storageId = storageViewModel.Id;
             IsEmpty = storageViewModel.IsEmptyInventory();
         }
 
@@ -42,7 +42,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Storages
             {
                 if (playerView.IsInteractiveActionPressed())
                 {
-                    _gameplayUIManager.OpenInventory(_ownerId);
+                    _gameplayUIManager.OpenInventory(_storageId, 
+                        playerView.PlayerId, 
+                        playerView.transform.position);
                     _triggered = true;
                 }
             }

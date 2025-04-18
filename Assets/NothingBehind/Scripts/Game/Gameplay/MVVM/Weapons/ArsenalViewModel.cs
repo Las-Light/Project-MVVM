@@ -25,9 +25,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         public int OwnerId { get; }
         public IReadOnlyObservableDictionary<SlotType, Item> EquipmentItems { get; }
         public IReadOnlyObservableDictionary<InventoryGridViewModel, ObservableList<AmmoItem>> AllAmmo => _allAmmo;
+
         public IReadOnlyObservableDictionary<InventoryGridViewModel, ObservableList<MagazinesItem>> AllMagazines =>
             _allMagazines;
+
         public IReadOnlyObservableList<WeaponViewModel> AllWeaponViewModels => _allWeaponViewModels;
+        public ReactiveProperty<int> ActiveGunId = new();
+        public ReactiveProperty<WeaponViewModel> ActiveGunVM = new();
 
         private readonly ObservableList<WeaponViewModel> _allWeaponViewModels = new();
         private readonly Dictionary<int, WeaponViewModel> _weaponViewModelMap = new();
@@ -75,7 +79,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
             }
 
             // Проверяем какие в инвентаре есть патроны и магазины полсе чего добавляем их в арсенал с указанием в какой сетке лежал предмет 
-            
+
             foreach (var inventoryGrid in inventoryViewModel.AllInventoryGrids)
             {
                 var magazinesCollection = new List<MagazinesItem>();
@@ -92,6 +96,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                         ammoCollection.Add(ammoItem);
                     }
                 }
+
                 _allMagazines.Add(inventoryGrid, new ObservableList<MagazinesItem>());
                 _allMagazines[inventoryGrid].AddRange(magazinesCollection);
                 _allAmmo.Add(inventoryGrid, new ObservableList<AmmoItem>());
@@ -140,7 +145,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     RemoveWeaponFromArsenal(weaponItem.Id);
                 }
             }));
-            
+
             _disposables.Add(EquipmentItems.ObserveAdd().Subscribe(e =>
             {
                 var addedItem = e.Value;
@@ -163,11 +168,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                 var removedWeapon = e.Value;
                 RemoveWeaponViewModel(removedWeapon);
             }));
-            
+
             _disposables.Add(arsenal.Weapons.ObserveAdd().Subscribe(e =>
             {
                 var addedWeapon = e.Value;
                 CreateWeaponViewModel(addedWeapon, this);
+            }));
+
+            _disposables.Add(ActiveGunId.Subscribe(id =>
+            {
+                if (_weaponViewModelMap.TryGetValue(id, out var gunViewModel))
+                {
+                    ActiveGunVM.OnNext(gunViewModel);
+                }
             }));
         }
 

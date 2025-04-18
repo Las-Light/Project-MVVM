@@ -6,8 +6,10 @@ using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Items;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.ArmorItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.MagazinesItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.WeaponItems;
 using ObservableCollections;
 using UnityEngine;
@@ -22,6 +24,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         public int OwnerId { get; }
 
         public IReadOnlyObservableDictionary<SlotType, Item> AllEquippedItems => _equippedItemsMap;
+        public IReadOnlyObservableDictionary<int, ItemViewModel> ItemViewModelsMap => _itemViewModelsMap;
         public IReadOnlyObservableDictionary<SlotType, EquipmentSlot> SlotsMap => _slotsMap;
 
         private readonly ObservableDictionary<SlotType, Item> _equippedItemsMap = new();
@@ -40,9 +43,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             {
                 if (slot.EquippedItem.Value != null)
                 {
+                    CreateItemViewModel(slot.EquippedItem.Value, itemsSettings);
                     _equippedItemsMap[slot.SlotType] = slot.EquippedItem.Value;
                     _itemSlotsMap[slot.EquippedItem.Value.Id] = slot;
-                    CreateItemViewModel(slot.EquippedItem.Value, itemsSettings);
                 }
 
                 _slotsMap[slot.SlotType] = slot;
@@ -61,10 +64,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
                         {
                             TryUnequipItem(oldSlot.SlotType);
                         }
+                        CreateItemViewModel(item, _itemsSettings);
                         slot.Equip(item);
                         _equippedItemsMap[slotType] = item;
                         _itemSlotsMap[item.Id] = slot;
-                        CreateItemViewModel(item, _itemsSettings);
                         return true;
                     }
                 }
@@ -120,7 +123,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
 
         private void CreateItemViewModel(Item item, ItemsSettings itemsSettings)
         {
-            var itemSettings = itemsSettings.Items.FirstOrDefault(itemConfig => itemConfig.ItemType == item.ItemType);
+            var itemSettings = itemsSettings.Items.FirstOrDefault(itemConfig =>
+            {
+                switch (item)
+                {
+                    case AmmoItem ammoItem:
+                        return itemConfig.Caliber == ammoItem.Caliber;
+                    case GridItem gridItem:
+                        return itemConfig.GridType == gridItem.GridType;
+                    case MagazinesItem magazinesItem:
+                        return itemConfig.MagazinesCaliber == magazinesItem.Magazines.Caliber;
+                    case WeaponItem weaponItem:
+                        return itemConfig.WeaponName == weaponItem.Weapon.WeaponName;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(item));
+                }
+            });
             if (itemSettings == null)
             {
                 Debug.LogError($"ItemSettings with type {item.ItemType} not found");

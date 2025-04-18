@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
@@ -25,6 +26,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
         public PlayerSettings PlayerSettings { get; private set; }
         public GameplayInputManager InputManager { get; private set; }
         public ArsenalView ArsenalView { get; private set; }
+        public int PlayerId { get; private set; }
         
         public GameObject CurrentEnemy { get; private set; }
         public bool IsAim;
@@ -47,6 +49,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
         public void Bind(PlayerViewModel viewModel, GameplayUIManager gameplayUIManager)
         {
             _viewModel = viewModel;
+            PlayerId = viewModel.Id;
             var currentMap = viewModel.CurrentMapId.CurrentValue;
             var currentPosOnMap = viewModel.PositionOnMaps.First(posOnMap => posOnMap.MapId == currentMap);
             transform.position = currentPosOnMap.Position.Value;
@@ -98,7 +101,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
             {
                 if (!_inventoryIsOpened)
                 {
-                    _gameplayUIManager.OpenInventory(_viewModel.Id);
+                    _gameplayUIManager.OpenInventory(_viewModel.Id, _viewModel.Id, transform.position);
                     _inventoryIsOpened = true;
                 }
                 else
@@ -113,7 +116,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
                 ArsenalView.Reload();
             }
         }
-        
+
+        private void OnDestroy()
+        {
+            _disposables.Dispose();
+        }
+
         //этот метод для RootMotion, без него игрок не движется
         private void OnAnimatorMove()
         {

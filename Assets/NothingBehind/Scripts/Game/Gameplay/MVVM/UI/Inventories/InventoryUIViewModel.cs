@@ -12,27 +12,28 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
     public class InventoryUIViewModel : WindowViewModel
     {
         public override string Id => "InventoryUI";
-        public readonly int PlayerId;
+        public readonly int OwnerId;
 
         private readonly InventoryService _inventoryService;
         private readonly EquipmentService _equipmentService;
         private readonly StorageService _storageService;
         public readonly int TargetOwnerId;
         private readonly Subject<ExitInventoryRequestResult> _exitInventoryRequest;
-        private readonly Vector3 _playerPosition;
+        private readonly Vector3 _ownerPosition;
 
         public InventoryUIViewModel(InventoryService inventoryService,
             EquipmentService equipmentService,
             StorageService storageService,
-            PlayerService playerService,
+            int ownerId,
+            Vector3 ownerPosition,
             int targetOwnerId, 
             Subject<ExitInventoryRequestResult> exitInventoryRequest)
         {
             _inventoryService = inventoryService;
             _equipmentService = equipmentService;
             _storageService = storageService;
-            _playerPosition = playerService.PlayerViewModel.CurrentValue.Position.CurrentValue;
-            PlayerId = playerService.PlayerViewModel.CurrentValue.Id;
+            _ownerPosition = ownerPosition;
+            OwnerId = ownerId;
             TargetOwnerId = targetOwnerId;
             _exitInventoryRequest = exitInventoryRequest;
         }
@@ -60,7 +61,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
 
         public CommandResult CreateStorage()
         {
-            return _storageService.CreateStorage(EntityType.Storage, _playerPosition);
+            return _storageService.CreateStorage(EntityType.Storage, _ownerPosition);
         }
 
         public void GetExitInventoryRequest(int ownerId)

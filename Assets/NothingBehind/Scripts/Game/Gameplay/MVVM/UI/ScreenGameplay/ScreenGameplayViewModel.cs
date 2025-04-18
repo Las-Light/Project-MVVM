@@ -24,7 +24,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.ScreenGameplay
 
         public void RequestOpenInventory(int ownerId)
         {
-            _uiManager.OpenInventory(ownerId);
+            //_uiManager.OpenInventory(ownerId);
         }
 
         public void RequestOpenPopupA()

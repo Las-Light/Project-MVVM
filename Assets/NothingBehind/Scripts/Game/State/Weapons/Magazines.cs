@@ -1,6 +1,7 @@
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;
 using NothingBehind.Scripts.Utils;
 using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Weapons
 {
@@ -39,6 +40,7 @@ namespace NothingBehind.Scripts.Game.State.Weapons
             if (CurrentAmmo.Value + ammo.CurrentStack.Value > ClipSize)
             {
                 var addedAmmoAmount = ClipSize - CurrentAmmo.Value;
+                Debug.Log($"Ammo reload - {addedAmmoAmount}");
                 CurrentAmmo.Value = ClipSize;
                 ammo.CurrentStack.Value -= addedAmmoAmount;
                 var needRemove = ammo.CurrentStack.Value == 0;

@@ -110,13 +110,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         
         private void UpdateVisual(Item item)
         {
-            var itemGameObject = Instantiate(_itemPrefab, transform);
-            itemGameObject.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-            var itemView = itemGameObject.GetComponent<ItemView>();
-            _itemViews.Add(itemView);
-            itemView.Bind(item, _cellSize, _itemViews);
-            itemGameObject.transform.SetAsLastSibling();
-            _itemView = itemView;
+            if (_viewModel.ItemViewModelsMap.TryGetValue(item.Id, out var viewModel))
+            {
+                var itemGameObject = Instantiate(_itemPrefab, transform);
+                itemGameObject.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                var itemView = itemGameObject.GetComponent<ItemView>();
+                _itemViews.Add(itemView);
+                itemView.Bind(item, viewModel, _cellSize, _itemViews);
+                itemGameObject.transform.SetAsLastSibling();
+                _itemView = itemView;
+            }
         }
     }
 }

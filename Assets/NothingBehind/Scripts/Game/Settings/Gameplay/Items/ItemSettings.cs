@@ -19,6 +19,7 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Items
         public bool IsStackable;
         public int MaxStackSize;
         public int CurrentStack;
+        public Color Color;
 
         [Space(5)]
         [Header("InventoryGridItem")] 
@@ -32,8 +33,9 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Items
 
         [Space(5)] [Header("AmmoItem")] 
         public string Caliber;
-        
+
         [Space(5)] [Header("MagazinesItem")] 
+        public string MagazinesCaliber;
         public MagazinesSettings MagazinesSettings;
     }
 }

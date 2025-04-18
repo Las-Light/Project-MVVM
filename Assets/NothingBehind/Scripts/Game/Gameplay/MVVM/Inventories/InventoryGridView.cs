@@ -192,12 +192,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         // Добавление предмета в UI
         private void AddItemView(Item item, Vector2 cellPosition)
         {
-            var itemGameObject = Instantiate(_itemPrefab, GridContainer.transform);
-            itemGameObject.GetComponent<RectTransform>().anchoredPosition = cellPosition;
-            var itemView = itemGameObject.GetComponent<ItemView>();
-            _itemViews.Add(itemView);
-            itemView.Bind(item, CellSize, _itemViews);
-            _itemsViewMap[item] = itemView;
+            if (_viewModel.ItemViewModelsMap.TryGetValue(item.Id, out var viewModel))
+            {
+                var itemGameObject = Instantiate(_itemPrefab, GridContainer.transform);
+                itemGameObject.GetComponent<RectTransform>().anchoredPosition = cellPosition;
+                var itemView = itemGameObject.GetComponent<ItemView>();
+                _itemViews.Add(itemView);
+                itemView.Bind(item, viewModel, CellSize, _itemViews);
+                _itemsViewMap[item] = itemView;
+            }
         }
     }
 }

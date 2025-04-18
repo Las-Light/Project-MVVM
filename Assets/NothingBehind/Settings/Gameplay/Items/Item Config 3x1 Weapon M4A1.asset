@@ -21,6 +21,7 @@ MonoBehaviour:
   IsStackable: 0
   MaxStackSize: 1
   CurrentStack: 1
+  Color: {r: 1, g: 0.0141509175, b: 0.0141509175, a: 1}
   GridType: 0
   GridSettings: {fileID: 0}
   WeaponType: 1

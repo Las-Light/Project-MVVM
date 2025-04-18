@@ -10,6 +10,7 @@ using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.MVVM.UI;
 using NothingBehind.Scripts.Utils;
 using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
 {
@@ -42,12 +43,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
             return viewModel;
         }
 
-        public InventoryUIViewModel OpenInventory(int targetOwnerId)
+        public InventoryUIViewModel OpenInventory(int targetOwnerId, int ownerId, Vector3 position)
         {
             var inventoryUI = new InventoryUIViewModel(_inventoryService,
                 _equipmentService, 
                 _storageService, 
-                _playerService, 
+                ownerId,
+                position,
                 targetOwnerId,
                 _exitInventoryRequest);
             var rootUI = Container.Resolve<UIGameplayRootViewModel>();

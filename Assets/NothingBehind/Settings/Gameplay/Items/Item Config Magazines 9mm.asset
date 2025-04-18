@@ -21,9 +21,11 @@ MonoBehaviour:
   IsStackable: 0
   MaxStackSize: 0
   CurrentStack: 1
+  Color: {r: 1, g: 0.9628099, b: 0, a: 1}
   GridType: 0
   GridSettings: {fileID: 0}
   WeaponType: 0
   WeaponName: 0
   Caliber: 
+  MagazinesCaliber: 9mm
   MagazinesSettings: {fileID: 11400000, guid: d3997b26fd8dc8d4f93a96897a2f92a3, type: 2}

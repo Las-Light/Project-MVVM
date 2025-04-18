@@ -21,16 +21,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         protected override void OnBind(InventoryUIViewModel viewModel)
         {
             base.OnBind(viewModel);
-            if (viewModel.PlayerId == viewModel.TargetOwnerId)
+            if (viewModel.OwnerId == viewModel.TargetOwnerId)
             {
-                CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.PlayerId), _itemViews);
-                CreateEquipmentView(viewModel.GetEquipmentViewModel(viewModel.PlayerId), _itemViews);
+                CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.OwnerId), _itemViews);
+                CreateEquipmentView(viewModel.GetEquipmentViewModel(viewModel.OwnerId), _itemViews);
                 CreateEmptyInventoryView();
             }
             else
             {
-                CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.PlayerId), _itemViews);
-                CreateEquipmentView(viewModel.GetEquipmentViewModel(viewModel.PlayerId), _itemViews);
+                CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.OwnerId), _itemViews);
+                CreateEquipmentView(viewModel.GetEquipmentViewModel(viewModel.OwnerId), _itemViews);
                 CreateLootInventoryView(viewModel.GetInventoryViewModel(viewModel.TargetOwnerId), _itemViews);
             }
         }

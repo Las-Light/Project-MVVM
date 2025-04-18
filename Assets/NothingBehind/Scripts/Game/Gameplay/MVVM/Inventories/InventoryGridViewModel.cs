@@ -6,7 +6,11 @@ using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.ArmorItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.MagazinesItems;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.WeaponItems;
 using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
@@ -24,6 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         public bool IsSubGrid { get; }
 
         public IReadOnlyObservableDictionary<int, Item> ItemsMap => _itemsMap;
+        public IReadOnlyObservableDictionary<int, ItemViewModel> ItemViewModelsMap => _itemViewModelsMap;
         public IReadOnlyObservableDictionary<Item, Vector2Int> ItemsPositionsMap => _itemsPositionsMap;
 
         private readonly ObservableDictionary<Item, Vector2Int> _itemsPositionsMap;
@@ -308,7 +313,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         public Vector2Int? GetItemPosition(int itemId)
         {
             if (!_itemsMap.TryGetValue(itemId, out var item))
-                throw new Exception("Item not found in the grid.");
+                throw new Exception($"Item with id {itemId} not found in the grid.");
 
             return _itemsPositionsMap.TryGetValue(item, out var position) ? position : null;
         }
@@ -421,6 +426,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             }
 
             _itemsPositionsMap[item] = position;
+            Debug.Log($"Added item {item.Id}");
         }
 
 
@@ -536,7 +542,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
 
         private void CreateItemViewModel(Item item, ItemsSettings itemsSettings)
         {
-            var itemSettings = itemsSettings.Items.FirstOrDefault(itemConfig => itemConfig.ItemType == item.ItemType);
+            var itemSettings = itemsSettings.Items.FirstOrDefault(itemConfig =>
+            {
+                switch (item)
+                {
+                    case AmmoItem ammoItem:
+                        return itemConfig.Caliber == ammoItem.Caliber;
+                    case GridItem gridItem:
+                        return itemConfig.GridType == gridItem.GridType;
+                    case MagazinesItem magazinesItem:
+                        return itemConfig.MagazinesCaliber == magazinesItem.Magazines.Caliber;
+                    case WeaponItem weaponItem:
+                        return itemConfig.WeaponName == weaponItem.Weapon.WeaponName;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(item));
+                }
+            });
             if (itemSettings == null)
             {
                 Debug.LogError($"ItemSettings with type {item.ItemType} not found");

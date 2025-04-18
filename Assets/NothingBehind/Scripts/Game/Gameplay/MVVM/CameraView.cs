@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Settings.Gameplay;
@@ -45,7 +46,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM
                 }
             }));
         }
-        
+
+        private void OnDestroy()
+        {
+            _disposables.Dispose();
+        }
+
         //метод смещает камеру в направлении прицеливания с помощью установления смещения Транспозера Синемашины
 
         public void FollowCameraToAimDirection(float aimingRange, Transform playerTransform)

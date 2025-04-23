@@ -3,6 +3,7 @@ using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Math = System.Math;
@@ -16,7 +17,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         private AnimatorController _animatorController;
         private AimController _aimController;
 
-        private Vector3 _mouseWorldPosition;
+        public ReactiveProperty<Vector3> MouseWorldPosition = new();
         private float _turnRotation;
         private GameplayInputManager _inputManager;
         private PlayerSettings _playerSettings;
@@ -50,15 +51,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             if ((_inputManager.MouseIsActive && moveDirection == Vector2.zero) ||
                 _inputManager.IsAim.CurrentValue)
             {
-                _mouseWorldPosition = Vector3.zero;
+                MouseWorldPosition.Value = Vector3.zero;
 
                 Ray ray = _mainCamera.ScreenPointToRay(_inputManager.LookMouse.CurrentValue);
                 if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, _playerSettings.AimColliderLayerMask))
                 {
-                    _mouseWorldPosition =
+                    MouseWorldPosition.Value =
                         CalculateAimMousePosition(raycastHit.point, _inputManager.LookMouse.CurrentValue);
 
-                    Vector3 worldAimTarget = _mouseWorldPosition;
+                    Vector3 worldAimTarget = MouseWorldPosition.Value;
                     var position = transform.position;
                     worldAimTarget.y = position.y;
                     Vector3 aimDirection = (worldAimTarget - position).normalized;
@@ -70,7 +71,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                     transform.rotation = Quaternion.RotateTowards(transform.rotation,
                         Quaternion.LookRotation(aimDirection),
                         _playerSettings.MouseRotationSpeed * Time.deltaTime);
-                    _aimController.AimPointTargetMouse(raycastHit, _mouseWorldPosition);
+                    _aimController.AimPointTargetMouse(MouseWorldPosition.Value);
                 }
 
                 //анимация поворота на месте

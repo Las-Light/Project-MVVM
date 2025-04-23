@@ -29,7 +29,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 
         private bool LastFrameWantedToShoot;
 
-        private WeaponViewModel _viewModel;
+        public WeaponViewModel _viewModel;
 
 
         public void Bind(WeaponViewModel viewModel)
@@ -124,10 +124,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
             _viewModel.AudioWeapon.PlayReloadClip(ShootingAudioSource);
         }
 
-        //TODO: сделать AmmoView???
         /// <summary>
         /// Handle ammo after a reload animation.
-        /// ScriptableObjects can't catch Animation Events, which is how we're determining when the
+        /// Which is how we're determining when the
         /// reload has completed, instead of using a timer
         /// </summary>
         public void EndReload()

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
@@ -29,11 +30,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Maps
             Triggered = enemySpawn.Triggered;
         }
 
-        public void SpawnEnemies()
+        public IEnumerator SpawnEnemies()
         {
+            Triggered.Value = true;
             foreach (var character in Characters)
             {
                 _charactersService.CreateCharacter(character.EntityType, character.LevelSettings.Level, character.Position);
+                yield return null;
             }
         }
 

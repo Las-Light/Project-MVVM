@@ -7,8 +7,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
 {
     public class GameplayInputManager : IDisposable
     {
-        public event Action ReloadInputReceived;
-        public event Action SwitchWeaponInputReceived;
+        public ReadOnlyReactiveProperty<bool> IsReload => _isReload;
+        public ReadOnlyReactiveProperty<bool> IsSwitchSlot1 => _isSwitchSlot1;
+        public ReadOnlyReactiveProperty<bool> IsSwitchSlot2 => _isSwitchSlot2;
 
         public ReadOnlyReactiveProperty<Vector2> Move => _move;
         public ReadOnlyReactiveProperty<bool> IsInteract => _isInteract;
@@ -23,6 +24,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
         public bool MouseIsActive => _inputController.Player.Look.WasPerformedThisFrame();
         
         private readonly ReactiveProperty<bool> _isInteract = new();
+        private readonly ReactiveProperty<bool> _isReload = new();
+        private readonly ReactiveProperty<bool> _isSwitchSlot1 = new();
+        private readonly ReactiveProperty<bool> _isSwitchSlot2 = new();
         private readonly ReactiveProperty<bool> _isAttack = new();
         private readonly ReactiveProperty<bool> _isSprint = new();
         private readonly ReactiveProperty<bool> _isAim = new();
@@ -64,7 +68,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
             _gameplayInput.AttackInputReceived += OnAttackInputReceived;
             _gameplayInput.ReloadInputReceived += OnReloadInputReceived;
             _gameplayInput.SprintInputReceived += OnSprintInputReceived;
-            _gameplayInput.SwitchWeaponInputReceived += OnSwitchWeaponInputReceived;
+            _gameplayInput.SwitchWeaponSlot2InputReceived += OnSwitchWeaponSlot2InputReceived;
+            _gameplayInput.SwitchWeaponSlot1InputReceived += OnSwitchWeaponSlot1InputReceived;
         }
 
         private void OnAimInputReceived(bool pressed)
@@ -72,14 +77,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
             _isAim.OnNext(pressed);
         }
 
-        private void OnSwitchWeaponInputReceived()
+        private void OnSwitchWeaponSlot2InputReceived(bool pressed)
         {
-            SwitchWeaponInputReceived?.Invoke();
+            _isSwitchSlot2?.OnNext(pressed);
+        }
+        
+        private void OnSwitchWeaponSlot1InputReceived(bool pressed)
+        {
+            _isSwitchSlot1?.OnNext(pressed);
         }
 
-        private void OnReloadInputReceived()
+        private void OnReloadInputReceived(bool pressed)
         {
-            ReloadInputReceived?.Invoke();
+            _isReload?.OnNext(pressed);
         }
 
         private void OnCrouchInputReceived(bool pressed)
@@ -138,6 +148,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
             _disposables.Add(_move);
             _disposables.Add(_lookGamepad);
             _disposables.Add(_lookMouse);
+            _disposables.Add(_isReload);
+            _disposables.Add(_isSwitchSlot1);
+            _disposables.Add(_isSwitchSlot2);
         }
 
         public void Dispose()
@@ -153,7 +166,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
             _gameplayInput.AttackInputReceived -= OnAttackInputReceived;
             _gameplayInput.ReloadInputReceived -= OnReloadInputReceived;
             _gameplayInput.SprintInputReceived -= OnSprintInputReceived;
-            _gameplayInput.SwitchWeaponInputReceived -= OnSwitchWeaponInputReceived;
+            _gameplayInput.SwitchWeaponSlot2InputReceived -= OnSwitchWeaponSlot2InputReceived;
+            _gameplayInput.SwitchWeaponSlot1InputReceived -= OnSwitchWeaponSlot1InputReceived;
             _inputController.Disable();
             _disposables.Dispose();
         }

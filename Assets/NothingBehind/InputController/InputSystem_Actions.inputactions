@@ -78,9 +78,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SwitchWeapon",
+                    "name": "SwitchWeaponSlot1",
                     "type": "Button",
                     "id": "886ee001-ff3a-411f-842c-1e7798e71e70",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "SwitchWeaponSlot2",
+                    "type": "Button",
+                    "id": "d50739a6-6a53-4b44-87b7-2baf50e37421",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -294,22 +303,44 @@
                 {
                     "name": "",
                     "id": "3d423a9f-fc96-4b2c-8952-501ab475d484",
-                    "path": "<Keyboard>/leftAlt",
+                    "path": "<Keyboard>/1",
                     "interactions": "",
                     "processors": "",
                     "groups": "KeyboardMouse;Keyboard&Mouse",
-                    "action": "SwitchWeapon",
+                    "action": "SwitchWeaponSlot1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
                     "id": "811b7e60-0a4a-4563-a17a-e03e578d24da",
-                    "path": "<Gamepad>/buttonNorth",
+                    "path": "<Gamepad>/dpad/left",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
-                    "action": "SwitchWeapon",
+                    "action": "SwitchWeaponSlot1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6a4fb922-1aae-4108-8373-b318d7051dee",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardMouse;Keyboard&Mouse",
+                    "action": "SwitchWeaponSlot2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "35ab9fef-9433-45b1-8d25-c869c5438d89",
+                    "path": "<Gamepad>/dpad/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "SwitchWeaponSlot2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -327,7 +358,7 @@
                 {
                     "name": "",
                     "id": "fb20fac5-7c99-4d02-91e6-4e9c491166fc",
-                    "path": "<Gamepad>/buttonSouth",
+                    "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",

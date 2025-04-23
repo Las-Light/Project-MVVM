@@ -7,8 +7,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
 {
     public class PlayerGameplayInput : IDisposable
     {
-        public event Action ReloadInputReceived;
-        public event Action SwitchWeaponInputReceived;
+        public event Action<bool> ReloadInputReceived;
+        public event Action<bool> SwitchWeaponSlot1InputReceived;
+        public event Action<bool> SwitchWeaponSlot2InputReceived;
         public event Action<bool> CameraRotateRightInputReceived;
         public event Action<bool> CameraRotateLeftInputReceived;
         public event Action<bool> InteractInputReceived;
@@ -39,7 +40,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
             _inputController.Player.Attack.performed += OnAttackPerformed;
             _inputController.Player.Reload.performed += OnReloadPerformed;
             _inputController.Player.Sprint.performed += OnSprintPerformed;
-            _inputController.Player.SwitchWeapon.performed += OnSwitchWeaponPerformed;
+            _inputController.Player.SwitchWeaponSlot1.performed += OnSwitchWeaponSlot1Performed;
+            _inputController.Player.SwitchWeaponSlot2.performed += OnSwitchWeaponSlot2Performed;
         }
 
         private void OnInteract(InputAction.CallbackContext context)
@@ -52,9 +54,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
             AimInputReceived?.Invoke(context.ReadValueAsButton());
         }
 
-        private void OnSwitchWeaponPerformed(InputAction.CallbackContext context)
+        private void OnSwitchWeaponSlot2Performed(InputAction.CallbackContext context)
         {
-            SwitchWeaponInputReceived?.Invoke();
+            SwitchWeaponSlot2InputReceived?.Invoke(context.ReadValueAsButton());
+        }
+        
+        private void OnSwitchWeaponSlot1Performed(InputAction.CallbackContext context)
+        {
+            SwitchWeaponSlot1InputReceived?.Invoke(context.ReadValueAsButton());
         }
 
         private void OnSprintPerformed(InputAction.CallbackContext context)
@@ -64,7 +71,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
 
         private void OnReloadPerformed(InputAction.CallbackContext context)
         {
-            ReloadInputReceived?.Invoke();
+            ReloadInputReceived?.Invoke(context.ReadValueAsButton());
         }
 
         private void OnAttackPerformed(InputAction.CallbackContext context)
@@ -117,7 +124,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
             _inputController.Player.Attack.performed -= OnAttackPerformed;
             _inputController.Player.Reload.performed -= OnReloadPerformed;
             _inputController.Player.Sprint.performed -= OnSprintPerformed;
-            _inputController.Player.SwitchWeapon.performed -= OnSwitchWeaponPerformed;
+            _inputController.Player.SwitchWeaponSlot1.performed -= OnSwitchWeaponSlot1Performed;
+            _inputController.Player.SwitchWeaponSlot2.performed -= OnSwitchWeaponSlot2Performed;
 
             _inputController.Player.Disable();
         }

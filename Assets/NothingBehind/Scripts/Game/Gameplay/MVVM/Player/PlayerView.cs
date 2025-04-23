@@ -69,32 +69,42 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
             
             ArsenalView = CreateArsenalView(viewModel.ArsenalViewModel);
             
-            _disposables.Add(viewModel.InputManager.IsAim.Skip(1).Subscribe(isAim =>
+            _disposables.Add(InputManager.IsAim.Skip(1).Subscribe(isAim =>
             {
                 if (isAim)
                     _aimController.Aim();
                 else
                     _aimController.RemoveAim();
             }));
+            _disposables.Add(InputManager.IsReload.Skip(1).Subscribe(_ =>
+            {
+                ArsenalView.Reload();
+            }));
+            _disposables.Add(InputManager.IsSwitchSlot1.Skip(1).Subscribe(_ =>
+            {
+                if (!InputManager.IsAim.CurrentValue)
+                {
+                    ArsenalView.WeaponSwitch(ArsenalView.WeaponSlot1);
+                }
+            }));
+            _disposables.Add(InputManager.IsSwitchSlot2.Skip(1).Subscribe(_ =>
+            {
+                if (!InputManager.IsAim.CurrentValue)
+                {
+                    ArsenalView.WeaponSwitch(ArsenalView.WeaponSlot2);
+                }
+            }));
         }
 
         private void Update()
         {
             _movementController.Move();
-            //_viewModel.UpdatePlayerPosition(transform.position);
             _turnController.Look();
+            //_viewModel.UpdatePlayerPosition(transform.position);
             PressShoot();
             if (ArsenalView.ActiveGun.WeaponType != WeaponType.Unarmed)
             {
                 ArsenalView.ClipPrevention();
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                ArsenalView.WeaponSwitch(ArsenalView.WeaponSlot1);
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                ArsenalView.WeaponSwitch(ArsenalView.WeaponSlot2);
             }
 
             if (Input.GetKeyDown(KeyCode.I))
@@ -109,11 +119,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
                     _gameplayUIManager.CloseInventory();
                     _inventoryIsOpened = false;
                 }
-            }
-
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                ArsenalView.Reload();
             }
         }
 

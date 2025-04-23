@@ -65,7 +65,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         {
             var entityType = storageViewModel.EntityType;
             var prefabCharacterLevelPath =
-                $"Prefabs/Gameplay/World/Storages/{entityType}";
+                $"Prefabs/Gameplay/World/Entities/Storages/{entityType}";
             var characterPrefab = Resources.Load<StorageView>(prefabCharacterLevelPath);
 
             var createdStorage = Instantiate(characterPrefab);
@@ -86,7 +86,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
         private void CreateCamera(CameraViewModel cameraViewModel, PlayerView hero)
         {
-            var prefabCameraPath = "Prefabs/Gameplay/World/Camera/VirtualCamera";
+            var prefabCameraPath = "Prefabs/Gameplay/World/Entities/Camera/VirtualCamera";
             var cameraPrefab = Resources.Load<CameraView>(prefabCameraPath);
 
             var cameraBinder = Instantiate(cameraPrefab);
@@ -96,7 +96,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
 
         private void CreatePlayer(PlayerViewModel playerViewModel, GameplayUIManager gameplayUIManager)
         {
-            var prefabHeroPath = "Prefabs/Gameplay/World/Characters/Player";
+            var prefabHeroPath = "Prefabs/Gameplay/World/Entities/Characters/Player";
             var heroPrefab = Resources.Load<PlayerView>(prefabHeroPath);
 
             var heroBinder = Instantiate(heroPrefab);
@@ -112,7 +112,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             //
             var characterType = characterViewModel.Type;
             var prefabCharacterLevelPath =
-                $"Prefabs/Gameplay/World/Characters/{characterType}_{characterLevel}";
+                $"Prefabs/Gameplay/World/Entities/Characters/{characterType}_{characterLevel}";
             var characterPrefab = Resources.Load<CharacterView>(prefabCharacterLevelPath);
 
             var createdCharacter = Instantiate(characterPrefab);
@@ -134,7 +134,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             Subject<GameplayExitParams> exitSceneSignal)
         {
             var transferId = transferViewModel.MapId;
-            var prefabMapTransferPath = "Prefabs/Gameplay/World/MapTransfers/MapTransfer";
+            var prefabMapTransferPath = "Prefabs/Gameplay/World/Entities/MapTransfers/MapTransfer";
             var mapTransferPrefab = Resources.Load<MapTransferBinder>(prefabMapTransferPath);
 
             var createdMapTransfer = Instantiate(mapTransferPrefab);
@@ -146,7 +146,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private void CreateSpawnTrigger(EnemySpawnViewModel spawnViewModel)
         {
             var spawnId = spawnViewModel.Id;
-            var prefabSpawnPath = "Prefabs/Gameplay/World/Spawns/SpawnTrigger";
+            var prefabSpawnPath = "Prefabs/Gameplay/World/Entities/Spawns/SpawnTrigger";
             var spawnPrefab = Resources.Load<EnemySpawnView>(prefabSpawnPath);
 
             var createdSpawn = Instantiate(spawnPrefab);

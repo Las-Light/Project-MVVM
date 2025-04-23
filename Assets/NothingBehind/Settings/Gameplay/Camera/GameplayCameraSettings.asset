@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: GameplayCameraSettings
   m_EditorClassIdentifier: 
   RotationSpeed: 60
-  FollowSpeed: 0.5
+  FollowSpeed: 1.22

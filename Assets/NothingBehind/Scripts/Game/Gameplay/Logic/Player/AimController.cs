@@ -65,6 +65,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         //устанавливает позицию AimPointa на цель
         public void SetAimPointPosition(Vector3 aimPosition, WeaponView gun)
         {
+            
             float disToTarget = (transform.position - new Vector3(aimPosition.x, transform.position.y, aimPosition.z))
                 .sqrMagnitude;
             if (disToTarget >= gun.CheckDistanceToWall)
@@ -107,7 +108,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                 SetAimPointForward();
         }
 
-        public void AimPointTargetMouse(RaycastHit raycastHit, Vector3 mouseWorldPosition)
+        public void AimPointTargetMouse(Vector3 mouseWorldPosition)
         {
             if (AimAssistON)
             {

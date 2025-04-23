@@ -152,7 +152,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                         break;
                 }
             }).AddTo(_disposables);
-            
+
             _disposables.Add(AllWeaponViewModels.ObserveAdd().Subscribe(e =>
             {
                 var addedWeapon = e.Value;
@@ -166,12 +166,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     if (_activeGun.Value == weaponView)
                     {
                         // в случае удаления оружия которое сейчас активно, переход в безоружное состояние происходит без анимации 
-                        GoStateUnarmedWithoutDelay(_unarmedView); 
+                        GoStateUnarmedWithoutDelay(_unarmedView);
                         DestroyWeaponView(removedWeapon.Id);
                     }
                 }
             }));
-            
+
             _disposables.Add(_activeGun.Skip(1).Subscribe(value =>
             {
                 ActiveGun = value;
@@ -415,8 +415,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
             if (ShouldManualReload() || ShouldAutoReload())
             {
                 _activeGun.Value.StartReloading();
-                _reloading = true;
                 _animatorController.Reload();
+                _reloading = true;
+
                 _rigController.SetRigLayerLeftHandIK(0, _activeGun.Value.WeaponType);
             }
         }
@@ -434,6 +435,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 
             _animatorController.RigGetPistol();
             _rigController.SetRigWeightGetPistol();
+            _rigController.SetRigLayerLeftHandIK(0, WeaponType.Pistol);
             _animatorController.GetPistol();
 
             yield return new WaitWhile(() => _animatorController.State == AnimatorState.SwitchWeapon);
@@ -545,6 +547,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                 case WeaponType.Pistol:
 
                     _rigController.SetRigWeightGetPistol();
+                    _rigController.SetRigLayerLeftHandIK(0, WeaponType.Pistol);
                     _animatorController.GetPistol();
 
                     break;

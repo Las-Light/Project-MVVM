@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -22,151 +23,112 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Animation
         [SerializeField] private TwoBoneIKConstraint pistolLeftHandRig;
         [SerializeField] private Rig clipWallRig;
 
+        private Dictionary<Rig, Coroutine> _activeWeightRoutines = new Dictionary<Rig, Coroutine>();
 
-        //устанавливает веса рига если основное и второстепенное оружие убрано
+        private const float LERP_SPEED_FAST = 200f;
+        private const float LERP_SPEED_NORMAL = 15f;
+        private const float WEIGHT_THRESHOLD = 0.01f;
+
+        // Общие настройки для всех ригов
         public void SetRigWeightUnarmed()
         {
-            clipWallRig.weight = 0;
-            riflePoseRig.weight = 0;
-            pistolPoseRig.weight = 0;
-            rifleAimRig.weight = 0;
-            pistolAimRig.weight = 0;
-            pistolHandRig.weight = 0;
-            rifleHandRig.weight = 0;
+            SetAllRigWeights(0f);
         }
 
-        //устанавливает веса рига если выбрано оружие пистолет
         public void SetRigWeightGetPistol()
         {
-            clipWallRig.weight = 0;
-            riflePoseRig.weight = 0;
-            rifleAimRig.weight = 0;
-            rifleHandRig.weight = 0;
-            pistolAimRig.weight = 0;
-            pistolPoseRig.weight = 1;
-            pistolHandRig.weight = 1;
+            SetAllRigWeights(0f);
+            pistolPoseRig.weight = 1f;
+            pistolHandRig.weight = 1f;
         }
 
-        //устанавливает веса рига если выбрано оружие ружье
         public void SetRigWeightGetRifle()
         {
-            clipWallRig.weight = 0;
-            pistolPoseRig.weight = 0;
-            pistolAimRig.weight = 0;
-            pistolHandRig.weight = 0;
-            rifleAimRig.weight = 0;
-            riflePoseRig.weight = 1;
-            rifleHandRig.weight = 1;
+            SetAllRigWeights(0f);
+            riflePoseRig.weight = 1f;
+            rifleHandRig.weight = 1f;
         }
 
-
-        //задает вес рига rifleAimRig, если нужно прицелиться
-        public void AimRifleRig(bool takeAim)
+        private void SetAllRigWeights(float weight)
         {
-            if (takeAim)
-            {
-                StartCoroutine(SetWeightRig(1, rifleAimRig));
-            }
-            //rifleAimRig.weight = Mathf.Lerp(rifleAimRig.weight, 1, Time.deltaTime * 15f);
-            else
-                StartCoroutine(SetWeightRig(0, rifleAimRig));
-            //rifleAimRig.weight = Mathf.Lerp(rifleAimRig.weight, 0, Time.deltaTime * 15f);
+            clipWallRig.weight = weight;
+            riflePoseRig.weight = weight;
+            pistolPoseRig.weight = weight;
+            rifleAimRig.weight = weight;
+            pistolAimRig.weight = weight;
+            pistolHandRig.weight = weight;
+            rifleHandRig.weight = weight;
         }
 
-        //задает вес рига pistolAimRig, если нужно прицелиться
-        public void AimPistolRig(bool takeAim)
+        // Методы для прицеливания
+        public void AimRifleRig(bool takeAim) => StartCoroutine(SetWeightRig(takeAim ? 1 : 0, rifleAimRig));
+        public void AimPistolRig(bool takeAim) => StartCoroutine(SetWeightRig(takeAim ? 1 : 0, pistolAimRig));
+
+        public void SetRigAim(WeaponType weaponType)
         {
-            if (takeAim)
-            {
-                StartCoroutine(SetWeightRig(1, pistolAimRig));
-            }
-            else
-            {
-                StartCoroutine(SetWeightRig(0, pistolAimRig));
-            }
+            if (weaponType == WeaponType.Pistol) AimPistolRig(true);
+            else if (weaponType == WeaponType.Rifle) AimRifleRig(true);
         }
 
-
-        //метод задает вес ригу ClipWallRig, если перед игроком стена, то поднимает оружие вверх
+        // Метод для обработки стены
         public void ClipWallRig(bool checkWall)
         {
-            if (checkWall)
-            {
-                clipWallRig.weight = Mathf.Lerp(clipWallRig.weight, 1, Time.deltaTime * 15f);
-            }
-            else
-            {
-                clipWallRig.weight = Mathf.Lerp(clipWallRig.weight, 0, Time.deltaTime * 15f);
-            }
+            float targetWeight = checkWall ? 1f : 0f;
+            clipWallRig.weight = Mathf.Lerp(clipWallRig.weight, targetWeight, Time.deltaTime * LERP_SPEED_NORMAL);
         }
 
-        //метод который отвязвает руки в инверскинематик от ружья 
-        public void SetRigLayerHandIK(float value)
-        {
-            rifleHandRig.weight = value;
-            //rifleHandRig.weight = Mathf.Lerp(rifleHandRig.weight, value, Time.deltaTime * 20f);
-        }
+        // Методы для управления руками
+        public void SetRigLayerHandIK(float value) => rifleHandRig.weight = value;
 
-        public void SetRigLayerRightHandIK(float value)
-        {
-            rifleHandRig.weight = Mathf.Lerp(rifleHandRig.weight, value, Time.deltaTime * 200f);
-        }
-        
-        //TODO: раскоментировать после реализации Weapon System
+        public void SetRigLayerRightHandIK(float value) => rifleHandRig.weight =
+            Mathf.Lerp(rifleHandRig.weight, value, Time.deltaTime * LERP_SPEED_FAST);
 
         public void SetRigLayerLeftHandIK(float destinationValue, WeaponType weaponType)
         {
+            float lerpValue = Time.deltaTime * LERP_SPEED_FAST;
+
             if (weaponType == WeaponType.Rifle)
             {
-                rifleLeftHandRig.data.targetPositionWeight = Mathf.Lerp(rifleLeftHandRig.data.targetPositionWeight,
-                     destinationValue, Time.deltaTime * 200f);
+                var data = rifleLeftHandRig.data;
+                data.targetPositionWeight = Mathf.Lerp(data.targetPositionWeight, destinationValue, lerpValue);
+                rifleLeftHandRig.data = data; // Важно: присваиваем обратно!
             }
-        
-            if (weaponType == WeaponType.Pistol)
+            else if (weaponType == WeaponType.Pistol)
             {
-                pistolLeftHandRig.data.targetPositionWeight = Mathf.Lerp(pistolLeftHandRig.data.targetPositionWeight,
-                    destinationValue, Time.deltaTime * 200f);
-                pistolLeftHandRig.data.hintWeight =
-                    Mathf.Lerp(pistolLeftHandRig.data.hintWeight, destinationValue, Time.deltaTime * 200f);
-                pistolLeftHandRig.data.targetRotationWeight = Mathf.Lerp(pistolLeftHandRig.data.targetRotationWeight,
-                    destinationValue, Time.deltaTime * 200f);
+                var data = pistolLeftHandRig.data;
+                data.targetPositionWeight = Mathf.Lerp(data.targetPositionWeight, destinationValue, lerpValue);
+                data.hintWeight = Mathf.Lerp(data.hintWeight, destinationValue, lerpValue);
+                data.targetRotationWeight = Mathf.Lerp(data.targetRotationWeight, destinationValue, lerpValue);
+                pistolLeftHandRig.data = data; // Применяем изменения
             }
         }
 
-        //устанавливает вес рига если игрок прицелился
-        public void SetRigAim(WeaponType weaponType)
-        {
-            if (weaponType == WeaponType.Pistol)
-            {
-                AimPistolRig(true);
-            }
-            else if (weaponType == WeaponType.Rifle)
-            {
-                AimRifleRig(true);
-            }
-        }
-        
         private IEnumerator SetWeightRig(float destinationWeight, Rig rig)
         {
-            while (Math.Abs(rig.weight - destinationWeight) > 0.01f)
+            // Если уже есть активная корутина для этого рига - останавливаем её
+            if (_activeWeightRoutines.TryGetValue(rig, out Coroutine runningRoutine))
             {
-                rig.weight = Mathf.Lerp(rig.weight, destinationWeight, Time.deltaTime * 15f);
+                if (runningRoutine != null)
+                    StopCoroutine(runningRoutine);
             }
 
-            yield return null;
+            // Запускаем новую корутину и сохраняем ссылку
+            Coroutine newRoutine = StartCoroutine(SetWeightRigRoutine(destinationWeight, rig));
+            _activeWeightRoutines[rig] = newRoutine;
+
+            yield return newRoutine;
         }
-        
-        private IEnumerator SetWeightRig(float destinationWeight, TwoBoneIKConstraint rig)
+
+        private IEnumerator SetWeightRigRoutine(float destinationWeight, Rig rig)
         {
-            yield return null;
-            while (Math.Abs(rig.data.targetPositionWeight - destinationWeight) > 0.01f)
+            while (Mathf.Abs(rig.weight - destinationWeight) > WEIGHT_THRESHOLD)
             {
-                rig.data.targetPositionWeight = Mathf.Lerp(rig.data.targetPositionWeight, destinationWeight, Time.deltaTime * 200f);
-                rig.data.hintWeight = Mathf.Lerp(rig.data.hintWeight, destinationWeight, Time.deltaTime * 200f);
-                rig.data.targetRotationWeight = Mathf.Lerp(rig.data.targetRotationWeight, destinationWeight, Time.deltaTime * 200f);
+                rig.weight = Mathf.Lerp(rig.weight, destinationWeight, Time.deltaTime * LERP_SPEED_NORMAL);
+                yield return null;
             }
 
-            yield return null;
+            rig.weight = destinationWeight; // Финализируем значение
+            _activeWeightRoutines.Remove(rig); // Удаляем завершенную корутину из словаря
         }
     }
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Logic.WeaponSystem;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
@@ -10,7 +9,6 @@ using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using ObservableCollections;
 using R3;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 {
@@ -169,7 +167,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 
         /// <summary>
         /// Reloads with the ammo conserving algorithm.
-        /// Meaning it will only subtract the delta between the ClipSize and CurrentClipAmmo from the CurrentAmmo.
         /// </summary>
         public bool Reload()
         {

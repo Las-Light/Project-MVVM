@@ -20,7 +20,7 @@ MonoBehaviour:
   SpawnPoint: {x: 0, y: 0, z: 0}
   SpawnRotation: {x: -180, y: -180, z: 180}
   CheckDistanceToWall: 0.8
-  AimingRange: 8
+  AimingRange: 6
   damageSettings: {fileID: 11400000, guid: d406fecab001403449540bde9f59e74a, type: 2}
   shootSettings: {fileID: 11400000, guid: c38e11f95d85ece4e9cac356f8c26161, type: 2}
   feedSystemSettings: {fileID: 11400000, guid: 8c6b4a146b714d447a76d0508f68d6d1, type: 2}

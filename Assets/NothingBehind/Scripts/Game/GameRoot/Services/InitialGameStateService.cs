@@ -182,6 +182,8 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
                 var slot = new EquipmentSlotData();
                 slot.SlotType = settingsSlot.SlotType;
                 slot.ItemType = settingsSlot.ItemType;
+                slot.Width = settingsSlot.Width;
+                slot.Height = settingsSlot.Height;
                 if (settingsSlot.EquippedItemSettings != null)
                 {
                     slot.EquippedItem = ItemsDataFactory.CreateItemData(gameState, gameSettings, settingsSlot.EquippedItemSettings);
@@ -192,7 +194,9 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             var equipment = new EquipmentData
             {
                 OwnerId = ownerId,
-                Slots = equipmentSlots
+                Slots = equipmentSlots,
+                Width = equipmentSettings.Width,
+                Height = equipmentSettings.Height
             };
             return equipment;
         }

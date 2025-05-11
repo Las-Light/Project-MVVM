@@ -1,6 +1,7 @@
 using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
+using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.PopupA;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.PopupB;
@@ -22,6 +23,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
         private readonly EquipmentService _equipmentService;
         private readonly StorageService _storageService;
         private readonly PlayerService _playerService;
+        private readonly GameplayInputManager _gameplayInputManager;
 
         public GameplayUIManager(DIContainer container) : base(container)
         {
@@ -31,6 +33,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
             _equipmentService = container.Resolve<EquipmentService>();
             _storageService = container.Resolve<StorageService>();
             _playerService = container.Resolve<PlayerService>();
+            _gameplayInputManager = container.Resolve<GameplayInputManager>();
         }
 
         public ScreenGameplayViewModel OpenScreenGameplay()
@@ -51,9 +54,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
                 ownerId,
                 position,
                 targetOwnerId,
-                _exitInventoryRequest);
+                _exitInventoryRequest,
+                _gameplayInputManager);
             var rootUI = Container.Resolve<UIGameplayRootViewModel>();
-
+            
+            _gameplayInputManager.UIInputEnabled();
             rootUI.OpenPopup(inventoryUI);
             return inventoryUI;
         }

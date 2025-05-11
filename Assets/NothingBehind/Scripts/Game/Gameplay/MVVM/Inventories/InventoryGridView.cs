@@ -25,21 +25,24 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         public int Width { get; private set; }
         public int Height { get; private set; }
         public InventoryGridType GridType { get; private set; }
-        public float CellSize; // Размер ячейки в пикселях
+        public float CellSize { get; private set; } // Размер ячейки в пикселях
+        public int GridIndex; // Индекс сетки
         public Dictionary<Item, ItemView> ItemsViewMap => _itemsViewMap;
+        public List<ItemView> ItemViews => _itemViews;
 
 
         private IReadOnlyObservableDictionary<Item, Vector2Int> _itemsPositionsMap;
         private List<ItemView> _itemViews;
-        private readonly Dictionary<Item, ItemView> _itemsViewMap = new Dictionary<Item, ItemView>();
-        private readonly CompositeDisposable _disposables = new();
+        private readonly Dictionary<Item, ItemView> _itemsViewMap = new();
+        private readonly Dictionary<int, Item> _itemsMap = new();
 
         private Image[,] _cellsImage;
         private InventoryGridViewModel _viewModel;
         private RectTransform _inventoryGridViewRectTransform;
 
+        private readonly CompositeDisposable _disposables = new();
 
-        public void Bind(InventoryGridViewModel viewModel, List<ItemView> itemViews)
+        public void Bind(InventoryGridViewModel viewModel, List<ItemView> itemViews, int gridIndex)
         {
             _viewModel = viewModel;
             GridId = viewModel.GridId;
@@ -49,6 +52,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             CellSize = viewModel.CellSize;
             _itemsPositionsMap = viewModel.ItemsPositionsMap;
             _itemViews = itemViews;
+            GridIndex = gridIndex;
 
             // Очистка сетки перед инициализацией
             foreach (Transform child in GridContainer) Destroy(child.gameObject);
@@ -110,6 +114,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                 if (_itemsViewMap.TryGetValue(e.Key, out var itemView))
                 {
                     _itemsViewMap.Remove(e.Key);
+                    _itemsMap.Remove(e.Key.Id);
                     Destroy(itemView.gameObject);
                 }
             }));
@@ -178,6 +183,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             }
         }
 
+        public RectTransform GetContainer()
+        {
+            return GridContainer;
+        }
+
         public void ClearHighlights()
         {
             for (int x = 0; x < _cellsImage.GetLength(0); x++)
@@ -187,6 +197,39 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                     _cellsImage[x, y].color = Color.white;
                 }
             }
+        }
+        
+        public ItemView GetItemViewAtPosition(Vector2Int slot)
+        {
+            var item = _viewModel.GetItemAtPosition(slot);
+            if (item != null)
+                if (_itemsViewMap.TryGetValue(item, out var itemView))
+                    return itemView;
+
+            return null;
+        }
+        
+        public Vector2 GetSlotWorldPosition(Vector2Int slotPos)
+        {
+            // Расчет позиции с учетом пивота и размера ячейки
+            return transform.TransformPoint(new Vector2(
+                slotPos.x * CellSize + CellSize * 0.5f,
+                -slotPos.y * CellSize - CellSize * 0.5f
+            ));
+        }
+
+        public bool CanPlaceItemView(ItemView itemView, Vector2Int position, bool isRotate)
+        {
+            var item = _itemsMap[itemView.Id];
+            return _viewModel.CanPlaceItem(item, position, item.IsRotated.Value);
+        }
+
+        public Vector2 GetSlotPosition(Vector2Int positionAtGrid)
+        {
+            return new Vector2(
+                positionAtGrid.x * CellSize + CellSize / 2,
+                -positionAtGrid.y * CellSize - CellSize / 2
+            );
         }
 
         // Добавление предмета в UI
@@ -200,6 +243,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                 _itemViews.Add(itemView);
                 itemView.Bind(item, viewModel, CellSize, _itemViews);
                 _itemsViewMap[item] = itemView;
+                _itemsMap[item.Id] = item;
             }
         }
     }

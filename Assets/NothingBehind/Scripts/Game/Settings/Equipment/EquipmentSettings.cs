@@ -9,6 +9,8 @@ namespace NothingBehind.Scripts.Game.Settings.Equipment
     public class EquipmentSettings: ScriptableObject
     {
         public EntityType EntityType;
+        public int Width;
+        public int Height;
         public List<EquipmentSlotSettings> Slots;
     }
 }

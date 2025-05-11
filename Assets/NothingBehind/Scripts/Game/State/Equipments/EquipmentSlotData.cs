@@ -9,6 +9,8 @@ namespace NothingBehind.Scripts.Game.State.Equipments
     {
         public SlotType SlotType;
         public ItemType ItemType;
+        public int Width;
+        public int Height;
         [CanBeNull] public ItemData EquippedItem;
     }
 }

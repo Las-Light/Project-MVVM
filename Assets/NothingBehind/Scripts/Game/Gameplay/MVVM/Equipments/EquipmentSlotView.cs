@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Items;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Items;
@@ -11,13 +10,15 @@ using UnityEngine.UI;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
 {
-    public class EquipmentSlotView : MonoBehaviour, IView
+    public class EquipmentSlotView : MonoBehaviour
     {
         [SerializeField] private GameObject _itemPrefab;
         [SerializeField] private float _cellSize;
 
         public SlotType SlotType;
-        
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+
         private EquipmentViewModel _viewModel;
         private ReadOnlyReactiveProperty<Item> _equippedItem;
         private IDisposable _disposable;
@@ -32,6 +33,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             SlotType = equipmentSlot.SlotType;
             _equippedItem = equipmentSlot.EquippedItem;
             _viewModel = viewModel;
+            Width = equipmentSlot.Width;
+            Height = equipmentSlot.Height;
             _itemViews = itemViews;
             _slotImage = GetComponent<Image>();
             _baseSlotColor = _slotImage.color;
@@ -45,7 +48,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             {
                 _cellSize /= 1.5f;
             }
-            
+
             _disposable = _equippedItem.Subscribe(item =>
             {
                 if (item != null)
@@ -97,17 +100,27 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         public void UpdateHighlight(SlotType slotType, Item item)
         {
             ClearHighlights();
-            
+
             var canEquip = CanEquipItem(slotType, item);
             var itemAtSlot = _viewModel.GetItemAtSlot(SlotType);
-            _slotImage.color = canEquip && itemAtSlot==null ? Color.green : Color.red;
+            _slotImage.color = canEquip && itemAtSlot == null ? Color.green : Color.red;
         }
 
         public void ClearHighlights()
         {
             _slotImage.color = _baseSlotColor;
         }
-        
+
+        public bool HasItemView(ItemView itemView)
+        {
+            return itemView == _itemView;
+        }
+
+        public ItemView GetItemViewAtSlot()
+        {
+            return _itemView;
+        }
+
         private void UpdateVisual(Item item)
         {
             if (_viewModel.ItemViewModelsMap.TryGetValue(item.Id, out var viewModel))

@@ -28,7 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             StoragesSettings storagesSettings,
             InventoryService inventoryService,
             ICommandProcessor commandProcessor,
-            Subject<ExitInventoryRequestResult> exitInventorRequest)
+            Subject<ExitInventoryRequestResult> exitInventoryRequest)
         {
             _inventoryService = inventoryService;
             _commandProcessor = commandProcessor;
@@ -48,7 +48,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             storages.ObserveRemove().Subscribe(e => { RemoveStorageViewModel(e.Value); });
 
             // Когда приходит реквест, то StorageService удаляет из GameState этот Storage (реквест приходит из InventoryUIView при его удалении)
-            exitInventorRequest.Where(result => result.IsEmptyInventory && result.EntityType == EntityType.Storage)
+            exitInventoryRequest.Where(result => result.IsEmptyInventory && result.EntityType == EntityType.Storage)
                 .Subscribe(result =>
             {
                 RemoveStorage(result.OwnerId);

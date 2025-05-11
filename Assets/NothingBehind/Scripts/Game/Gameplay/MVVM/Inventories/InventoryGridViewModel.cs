@@ -426,7 +426,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             }
 
             _itemsPositionsMap[item] = position;
-            Debug.Log($"Added item {item.Id}");
         }
 
 

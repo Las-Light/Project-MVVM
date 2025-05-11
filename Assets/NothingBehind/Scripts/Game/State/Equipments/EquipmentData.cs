@@ -7,6 +7,8 @@ namespace NothingBehind.Scripts.Game.State.Equipments
     public class EquipmentData
     {
         public int OwnerId;
+        public int Width;
+        public int Height;
         public List<EquipmentSlotData> Slots;
     }
 }

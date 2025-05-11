@@ -14,4 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SlotType: 3
   ItemType: 3
+  Width: 1
+  Height: 1
   EquippedItemSettings: {fileID: 11400000, guid: 08b3103b7b2bc624c99905478b54a749, type: 2}

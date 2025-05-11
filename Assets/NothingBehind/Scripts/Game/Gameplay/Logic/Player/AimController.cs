@@ -11,6 +11,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         public bool AimAssistON;
         public Transform AimPoint;
         [SerializeField] private float minDistToTargetSqrt = 9f;
+        [SerializeField] private Transform pistolWeaponPose;
+        [SerializeField] private Transform rifleWeaponPose;
 
         private PlayerView _playerView;
         private ArsenalView _arsenalView;
@@ -30,6 +32,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         {
             //устанавливаем поле isAim если нажата кнопка "Прицелиться"
             _playerView.IsAim = true;
+            pistolWeaponPose.rotation.SetLookRotation(Vector3.forward);
+            rifleWeaponPose.rotation.SetLookRotation(Vector3.forward);
 
             //устанавливаем триггер для аниматора в зависимости от нажатия кнопки "прицеливание"
             _animatorController.Aim(_playerView.IsAim);
@@ -49,6 +53,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         {
             //устанавливаем поле isAim false, если отпущена кнопка "Прицелиться"
             _playerView.IsAim = false;
+            
+            //после прицеливания оружия может выкручиваться в руках, поэтому сбрасываем ротацию
+            pistolWeaponPose.rotation = Quaternion.LookRotation(Vector3.forward);
+            rifleWeaponPose.rotation = Quaternion.LookRotation(Vector3.forward);
 
             //задаём анимацию прицеливания
             _animatorController.Aim(_playerView.IsAim);

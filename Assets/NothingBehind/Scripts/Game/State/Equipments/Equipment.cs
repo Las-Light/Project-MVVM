@@ -6,6 +6,8 @@ namespace NothingBehind.Scripts.Game.State.Equipments
     public class Equipment
     {
         public int OwnerId { get; }
+        public int Width { get; }
+        public int Height { get; }
         public EquipmentData Origin { get; }
         public ObservableList<EquipmentSlot> Slots = new ();
 
@@ -13,6 +15,8 @@ namespace NothingBehind.Scripts.Game.State.Equipments
         {
             Origin = equipmentData;
             OwnerId = equipmentData.OwnerId;
+            Width = equipmentData.Width;
+            Height = equipmentData.Height;
             equipmentData.Slots.ForEach(data => Slots.Add(new EquipmentSlot(data)));
         }
     }

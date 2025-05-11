@@ -111,8 +111,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     var removedAmmo = e.Value;
                     if (_appropriateAmmo.TryGetValue(kvp.Key, out var ammoItems))
                     {
-                        //AppropriateAmmoCount.Value -= removedAmmo.CurrentStack.Value;
-                        ammoItems.Remove(removedAmmo);
+                        if (removedAmmo.Caliber == Caliber)
+                        {
+                            AppropriateAmmoCount.Value -= removedAmmo.CurrentStack.Value;
+                            ammoItems.Remove(removedAmmo);    
+                        }
                     }
                 }));
             }
@@ -195,10 +198,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                         for (int i = kvp.Value.Count - 1; i >= 0; i--)
                         {
                             var addedAmmoResult = magazines.AddAmmo(kvp.Value[i]);
-                            AppropriateAmmoCount.Value -= addedAmmoResult.ItemsAddedAmount;
                             if (addedAmmoResult.NeedRemove)
                             {
                                 kvp.Key.RemoveItem(kvp.Value[i].Id);
+                            }
+                            else
+                            {
+                                AppropriateAmmoCount.Value -= addedAmmoResult.ItemsAddedAmount;
                             }
 
                             if (magazines.CurrentAmmo.Value == magazines.ClipSize || AppropriateAmmoCount.Value <= 0)

@@ -1,3 +1,4 @@
+using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.Services;
@@ -13,10 +14,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
     {
         public override string Id => "InventoryUI";
         public readonly int OwnerId;
+        public GameplayInputManager GameplayInputManager => _gameplayInputManager;
 
         private readonly InventoryService _inventoryService;
         private readonly EquipmentService _equipmentService;
         private readonly StorageService _storageService;
+        private readonly GameplayInputManager _gameplayInputManager;
         public readonly int TargetOwnerId;
         private readonly Subject<ExitInventoryRequestResult> _exitInventoryRequest;
         private readonly Vector3 _ownerPosition;
@@ -26,8 +29,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             StorageService storageService,
             int ownerId,
             Vector3 ownerPosition,
-            int targetOwnerId, 
-            Subject<ExitInventoryRequestResult> exitInventoryRequest)
+            int targetOwnerId,
+            Subject<ExitInventoryRequestResult> exitInventoryRequest, 
+            GameplayInputManager gameplayInputManager)
         {
             _inventoryService = inventoryService;
             _equipmentService = equipmentService;
@@ -36,6 +40,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             OwnerId = ownerId;
             TargetOwnerId = targetOwnerId;
             _exitInventoryRequest = exitInventoryRequest;
+            _gameplayInputManager = gameplayInputManager;
+            _gameplayInputManager.PlayerInputDisabled();
         }
 
 
@@ -45,7 +51,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             {
                 return viewModel;
             }
-            Debug.Log("Create InventoryViewModel");
             return CreateInventoryViewModel(ownerId);
         }
         
@@ -79,6 +84,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         private InventoryViewModel CreateInventoryViewModel(int ownerId)
         {
             return _inventoryService.CreateInventoryViewModel(ownerId);
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            _gameplayInputManager.PlayerInputEnabled();
+            _gameplayInputManager.UIInputDisabled();
         }
     }
 }

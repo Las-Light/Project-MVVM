@@ -37,6 +37,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandler
                 var slot = new EquipmentSlotData();
                 slot.SlotType = settingsSlot.SlotType;
                 slot.ItemType = settingsSlot.ItemType;
+                slot.Width = settingsSlot.Width;
+                slot.Height = settingsSlot.Height;
                 if (settingsSlot.EquippedItemSettings != null)
                 {
                     slot.EquippedItem = ItemsDataFactory.CreateItemData(_gameState.GameState, 
@@ -48,7 +50,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandler
             var equipment = new EquipmentData
             {
                 OwnerId = command.OwnerId,
-                Slots = equipmentSlots
+                Slots = equipmentSlots,
+                Width = equipmentSettings.Width,
+                Height = equipmentSettings.Height
             };
 
             _gameState.Equipments.Add(new Equipment(equipment));

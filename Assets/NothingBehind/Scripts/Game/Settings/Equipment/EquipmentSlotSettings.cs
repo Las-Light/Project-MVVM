@@ -11,6 +11,8 @@ namespace NothingBehind.Scripts.Game.Settings.Equipment
     {
         public SlotType SlotType;
         public ItemType ItemType;
+        public int Width;
+        public int Height;
         public ItemSettings EquippedItemSettings;
     }
 }

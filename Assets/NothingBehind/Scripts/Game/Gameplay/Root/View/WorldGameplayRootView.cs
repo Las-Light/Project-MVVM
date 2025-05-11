@@ -78,8 +78,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         {
             if (_createStoragesMap.TryGetValue(storageViewModel.Id, out var storageView))
             {
-                Debug.Log(storageView.IsEmpty);
-                Destroy(storageView.gameObject);
+                if (storageView != null)
+                {
+                    Destroy(storageView.gameObject);
+                }
                 _createCharactersMap.Remove(storageViewModel.Id);
             }
         }

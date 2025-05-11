@@ -6,8 +6,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
     {
         // Если захотим что-то свое, то оверайдим OnBind
         
-        // protected override void OnBind(UIRootViewModel uiRootViewModel)
-        // {
-        // }
+        protected override void OnBind(UIRootViewModel uiRootViewModel)
+        {
+        }
     }
 }

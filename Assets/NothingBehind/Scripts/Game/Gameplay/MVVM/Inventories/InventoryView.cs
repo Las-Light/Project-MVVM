@@ -19,7 +19,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         private int OwnerId { get; set; }
 
         private InventoryViewModel _inventoryViewModel;
-
+        private int _gridIndex;
 
         private IObservableCollection<InventoryGridViewModel> _inventoryGridViewModels;
         private List<ItemView> _itemViews;
@@ -75,8 +75,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         {
             var grid = Instantiate(_gridPrefab, _gridContainer);
             var gridView = grid.GetComponent<InventoryGridView>();
+            _gridIndex++;
             grid.name = new string($"{inventoryGridViewModel.GridType} {inventoryGridViewModel.GridId}");
-            gridView.Bind(inventoryGridViewModel, itemViews);
+            gridView.Bind(inventoryGridViewModel, itemViews, _gridIndex);
             _gridViewsMap[inventoryGridViewModel] = gridView;
             InventoryGridViews.Add(gridView);
         }
@@ -86,8 +87,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         {
             var subGrid = Instantiate(_subGridPrefab, _subGridContainer);
             var subGridView = subGrid.GetComponent<InventoryGridView>();
+            _gridIndex++;
             subGrid.name = new string($"{inventoryGridViewModel.GridType} {inventoryGridViewModel.GridId}");
-            subGridView.Bind(inventoryGridViewModel, itemViews);
+            subGridView.Bind(inventoryGridViewModel, itemViews, _gridIndex);
             _gridViewsMap[inventoryGridViewModel] = subGridView;
             InventoryGridViews.Add(subGridView);
         }
@@ -97,6 +99,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             _gridViewsMap.TryGetValue(inventoryGridViewModel, out var gridView);
             if (gridView != null)
             {
+                InventoryGridViews.Remove(gridView);
                 Destroy(gridView.gameObject);
             }
         }

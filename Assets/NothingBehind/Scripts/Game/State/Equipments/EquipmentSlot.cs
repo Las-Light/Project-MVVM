@@ -8,12 +8,16 @@ namespace NothingBehind.Scripts.Game.State.Equipments
     {
         public SlotType SlotType { get; }
         public ItemType ItemType { get; }
+        public int Width { get; }
+        public int Height { get; }
         public ReactiveProperty<Item?> EquippedItem { get; }
 
         public EquipmentSlot(EquipmentSlotData equipmentSlotData)
         {
             SlotType = equipmentSlotData.SlotType;
             ItemType = equipmentSlotData.ItemType;
+            Width = equipmentSlotData.Width;
+            Height = equipmentSlotData.Height;
 
             EquippedItem = new ReactiveProperty<Item?>(ItemsFactory.CreateItem(equipmentSlotData.EquippedItem));
 

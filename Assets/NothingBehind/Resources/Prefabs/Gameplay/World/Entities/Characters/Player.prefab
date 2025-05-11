@@ -2832,6 +2832,8 @@ MonoBehaviour:
   AimAssistON: 1
   AimPoint: {fileID: 8744427353123666590}
   minDistToTargetSqrt: 9
+  pistolWeaponPose: {fileID: 2452801733734556050}
+  rifleWeaponPose: {fileID: 7295696491304227331}
 --- !u!1 &3123658247557856806
 GameObject:
   m_ObjectHideFlags: 0

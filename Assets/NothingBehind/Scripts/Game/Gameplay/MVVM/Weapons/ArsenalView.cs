@@ -29,11 +29,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         private WeaponView _weaponSlot2;
         private readonly ReactiveProperty<WeaponView> _activeGun = new();
         private WeaponView _unarmedView;
+        
         private Transform _pistolParent;
         private Transform _rifleParent;
         private Transform _unarmedParent;
         private Transform _pointToCheckClip;
         private PlayerView _playerView;
+        
         private LayerMask _obstacleMask;
         private bool autoReload = false;
 

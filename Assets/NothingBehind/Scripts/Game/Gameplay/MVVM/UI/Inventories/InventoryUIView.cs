@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Items;
@@ -15,12 +16,20 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         [SerializeField] private RectTransform _playerEquipmentContainer;
         [SerializeField] private RectTransform _lootInventoryContainer;
 
+        public InventoryView PlayerInventoryView;
+        public EquipmentView PlayerEquipmentView;
+        public InventoryView LootInventoryView;
+
+        public GameplayInputManager GameplayInputManager;
+        public List<ItemView> ItemViews => _itemViews;
+
         private List<ItemView> _itemViews = new ();
         private int _openInventoryId; // Id открытого инвентаря (противника, ящика или инвентаря на земле)
 
         protected override void OnBind(InventoryUIViewModel viewModel)
         {
             base.OnBind(viewModel);
+            GameplayInputManager = viewModel.GameplayInputManager;
             if (viewModel.OwnerId == viewModel.TargetOwnerId)
             {
                 CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.OwnerId), _itemViews);
@@ -47,6 +56,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             var inventoryUI = Instantiate(_inventoryPrefab, _playerInventoryContainer);
             var inventoryView = inventoryUI.GetComponent<InventoryView>();
             inventoryView.Bind(inventoryViewModel, itemViews);
+            PlayerInventoryView = inventoryView;
         }
 
         private void CreateEmptyInventoryView()
@@ -57,6 +67,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             var inventoryUI = Instantiate(_inventoryPrefab, _lootInventoryContainer);
             var inventoryView = inventoryUI.GetComponent<InventoryView>();
             inventoryView.Bind(inventoryViewModel, _itemViews);
+            LootInventoryView = inventoryView;
         }
 
         private void CreateLootInventoryView(InventoryViewModel inventoryViewModel,
@@ -66,13 +77,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             var inventoryUI = Instantiate(_inventoryPrefab, _lootInventoryContainer);
             var inventoryView = inventoryUI.GetComponent<InventoryView>();
             inventoryView.Bind(inventoryViewModel, itemViews);
+            LootInventoryView = inventoryView;
         }
 
         private void CreateEquipmentView(EquipmentViewModel equipmentViewModel, 
             List<ItemView> itemViews)
         {
-            var equipmentView = Instantiate(_equipmentPrefab, _playerEquipmentContainer);
-            equipmentView.GetComponent<EquipmentView>().Bind(equipmentViewModel, itemViews);
+            var equipmentGO = Instantiate(_equipmentPrefab, _playerEquipmentContainer);
+            var equipmentView = equipmentGO.GetComponent<EquipmentView>();
+            equipmentView.Bind(equipmentViewModel, itemViews);
+            PlayerEquipmentView = equipmentView;
         }
     }
 }

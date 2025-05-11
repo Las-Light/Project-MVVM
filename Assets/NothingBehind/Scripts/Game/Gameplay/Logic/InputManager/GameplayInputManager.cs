@@ -23,6 +23,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
         public ReadOnlyReactiveProperty<Vector2> LookMouse => _lookMouse;
         public bool MouseIsActive => _inputController.Player.Look.WasPerformedThisFrame();
         
+        public ReadOnlyReactiveProperty<bool> IsSubmit => _isSubmit;
+        public ReadOnlyReactiveProperty<bool> IsCancel => _isCancel;
+        public ReadOnlyReactiveProperty<Vector2> Navigation => _navigation;
+        
         private readonly ReactiveProperty<bool> _isInteract = new();
         private readonly ReactiveProperty<bool> _isReload = new();
         private readonly ReactiveProperty<bool> _isSwitchSlot1 = new();
@@ -36,12 +40,17 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
         private readonly ReactiveProperty<Vector2> _move = new();
         private readonly ReactiveProperty<Vector2> _lookGamepad = new();
         private readonly ReactiveProperty<Vector2> _lookMouse = new();
+        
+        private readonly ReactiveProperty<bool> _isSubmit = new();
+        private readonly ReactiveProperty<bool> _isCancel = new();
+        private readonly ReactiveProperty<Vector2> _navigation = new();
 
         private readonly CompositeDisposable _disposables = new();
 
 
         private readonly InputControl _inputController;
-        private PlayerGameplayInput _gameplayInput;
+        private PlayerGameplayInput _playerGameplayInput;
+        private UIGameplayInput _uiGameplayInput;
 
         public GameplayInputManager()
         {
@@ -50,26 +59,70 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
             _inputController.Enable();
 
             InitPlayerInput(_inputController);
+            InitUIInput(_inputController);
             AddDisposables();
         }
 
         private void InitPlayerInput(InputControl inputController)
         {
-            _gameplayInput = new PlayerGameplayInput(inputController);
+            _playerGameplayInput = new PlayerGameplayInput(inputController);
+            PlayerInputEnabled();
 
-            _gameplayInput.LookGamepadInputReceived += OnLookGamepadInputReceived;
-            _gameplayInput.LookMouseInputReceived += OnLookMouseInputReceived;
-            _gameplayInput.MoveInputReceived += OnMoveInputReceived;
-            _gameplayInput.AimInputReceived += OnAimInputReceived;
-            _gameplayInput.CameraRotateRightInputReceived += OnCameraRotateRightInputReceived;
-            _gameplayInput.CameraRotateLeftInputReceived += OnCameraRotateLeftInputReceived;
-            _gameplayInput.CrouchInputReceived += OnCrouchInputReceived;
-            _gameplayInput.InteractInputReceived += OnInteractInputReceived;
-            _gameplayInput.AttackInputReceived += OnAttackInputReceived;
-            _gameplayInput.ReloadInputReceived += OnReloadInputReceived;
-            _gameplayInput.SprintInputReceived += OnSprintInputReceived;
-            _gameplayInput.SwitchWeaponSlot2InputReceived += OnSwitchWeaponSlot2InputReceived;
-            _gameplayInput.SwitchWeaponSlot1InputReceived += OnSwitchWeaponSlot1InputReceived;
+            _playerGameplayInput.LookGamepadInputReceived += OnLookGamepadInputReceived;
+            _playerGameplayInput.LookMouseInputReceived += OnLookMouseInputReceived;
+            _playerGameplayInput.MoveInputReceived += OnMoveInputReceived;
+            _playerGameplayInput.AimInputReceived += OnAimInputReceived;
+            _playerGameplayInput.CameraRotateRightInputReceived += OnCameraRotateRightInputReceived;
+            _playerGameplayInput.CameraRotateLeftInputReceived += OnCameraRotateLeftInputReceived;
+            _playerGameplayInput.CrouchInputReceived += OnCrouchInputReceived;
+            _playerGameplayInput.InteractInputReceived += OnInteractInputReceived;
+            _playerGameplayInput.AttackInputReceived += OnAttackInputReceived;
+            _playerGameplayInput.ReloadInputReceived += OnReloadInputReceived;
+            _playerGameplayInput.SprintInputReceived += OnSprintInputReceived;
+            _playerGameplayInput.SwitchWeaponSlot2InputReceived += OnSwitchWeaponSlot2InputReceived;
+            _playerGameplayInput.SwitchWeaponSlot1InputReceived += OnSwitchWeaponSlot1InputReceived;
+        }
+
+        private void InitUIInput(InputControl inputController)
+        {
+            _uiGameplayInput = new UIGameplayInput(inputController);
+            UIInputEnabled();
+
+            _uiGameplayInput.SubmitInputReceived += OnSubmitInputReceived;
+            _uiGameplayInput.CancelInputReceived += OnCancelInputReceived;
+            _uiGameplayInput.NavigationInputReceived += OnNavigationInputReceived;
+        }
+
+        private void OnCancelInputReceived(bool pressed)
+        {
+            _isCancel.OnNext(pressed);
+        }
+        
+        private void OnNavigationInputReceived(Vector2 direction)
+        {
+            _navigation.OnNext(direction);
+        }
+
+        private void OnSubmitInputReceived(bool pressed)
+        {
+            _isSubmit.OnNext(pressed);
+        }
+
+        public void PlayerInputEnabled()
+        {
+            _inputController.Player.Enable();
+        }
+        public void UIInputEnabled()
+        {
+            _inputController.UI.Enable();
+        }
+        public void PlayerInputDisabled()
+        {
+            _inputController.Player.Disable();
+        }
+        public void UIInputDisabled()
+        {
+            _inputController.UI.Disable();
         }
 
         private void OnAimInputReceived(bool pressed)
@@ -151,23 +204,29 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InputManager
             _disposables.Add(_isReload);
             _disposables.Add(_isSwitchSlot1);
             _disposables.Add(_isSwitchSlot2);
+            _disposables.Add(_isSubmit);
+            _disposables.Add(_isCancel);
+            _disposables.Add(_navigation);
         }
 
         public void Dispose()
         {
-            _gameplayInput.LookGamepadInputReceived -= OnLookGamepadInputReceived;
-            _gameplayInput.LookMouseInputReceived -= OnLookMouseInputReceived;
-            _gameplayInput.MoveInputReceived -= OnMoveInputReceived;
-            _gameplayInput.AimInputReceived -= OnAimInputReceived;
-            _gameplayInput.CameraRotateRightInputReceived -= OnCameraRotateRightInputReceived;
-            _gameplayInput.CameraRotateLeftInputReceived -= OnCameraRotateLeftInputReceived;
-            _gameplayInput.CrouchInputReceived -= OnCrouchInputReceived;
-            _gameplayInput.InteractInputReceived -= OnInteractInputReceived;
-            _gameplayInput.AttackInputReceived -= OnAttackInputReceived;
-            _gameplayInput.ReloadInputReceived -= OnReloadInputReceived;
-            _gameplayInput.SprintInputReceived -= OnSprintInputReceived;
-            _gameplayInput.SwitchWeaponSlot2InputReceived -= OnSwitchWeaponSlot2InputReceived;
-            _gameplayInput.SwitchWeaponSlot1InputReceived -= OnSwitchWeaponSlot1InputReceived;
+            _playerGameplayInput.LookGamepadInputReceived -= OnLookGamepadInputReceived;
+            _playerGameplayInput.LookMouseInputReceived -= OnLookMouseInputReceived;
+            _playerGameplayInput.MoveInputReceived -= OnMoveInputReceived;
+            _playerGameplayInput.AimInputReceived -= OnAimInputReceived;
+            _playerGameplayInput.CameraRotateRightInputReceived -= OnCameraRotateRightInputReceived;
+            _playerGameplayInput.CameraRotateLeftInputReceived -= OnCameraRotateLeftInputReceived;
+            _playerGameplayInput.CrouchInputReceived -= OnCrouchInputReceived;
+            _playerGameplayInput.InteractInputReceived -= OnInteractInputReceived;
+            _playerGameplayInput.AttackInputReceived -= OnAttackInputReceived;
+            _playerGameplayInput.ReloadInputReceived -= OnReloadInputReceived;
+            _playerGameplayInput.SprintInputReceived -= OnSprintInputReceived;
+            _playerGameplayInput.SwitchWeaponSlot2InputReceived -= OnSwitchWeaponSlot2InputReceived;
+            _playerGameplayInput.SwitchWeaponSlot1InputReceived -= OnSwitchWeaponSlot1InputReceived;
+            _uiGameplayInput.SubmitInputReceived -= OnSubmitInputReceived;
+            _uiGameplayInput.CancelInputReceived -= OnCancelInputReceived;
+            _uiGameplayInput.NavigationInputReceived -= OnNavigationInputReceived;
             _inputController.Disable();
             _disposables.Dispose();
         }

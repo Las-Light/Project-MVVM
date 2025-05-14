@@ -1,10 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Items;
-using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
 {
@@ -33,36 +32,28 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             _inventoryGridViewModels = viewModel.AllInventoryGrids;
             _itemViews = itemViews;
             OwnerId = viewModel.OwnerId;
+    
+            // Инициализация сеток
             foreach (var inventoryGridViewModel in _inventoryGridViewModels)
             {
-                if (inventoryGridViewModel.IsSubGrid)
-                {
-                    CreateInventorSubGridView(inventoryGridViewModel, _itemViews);
-                }
-                else
-                {
-                    CreateInventorGridView(inventoryGridViewModel, _itemViews);
-                }
+                CreateGridView(inventoryGridViewModel, itemViews);
             }
 
-            _disposables.Add(_inventoryGridViewModels.ObserveAdd().Subscribe(e =>
+            // Подписки на изменения
+            _disposables.Add(_inventoryGridViewModels.ObserveAdd().Subscribe(e => 
             {
-                if (e.Value.IsSubGrid)
-                {
-                    CreateInventorSubGridView(e.Value, itemViews);
-                }
-                else
-                {
-                    CreateInventorGridView(e.Value, itemViews);
-                }
+                CreateGridView(e.Value, itemViews);
+                UpdateGridIndices(); // Обновляем индексы после добавления
             }));
-            _disposables.Add(_inventoryGridViewModels.ObserveRemove().Subscribe(e => { RemoveGridView(e.Value); }));
+    
+            _disposables.Add(_inventoryGridViewModels.ObserveRemove().Subscribe(e => 
+            {
+                RemoveGridView(e.Value);
+                UpdateGridIndices(); // Обновляем индексы после удаления
+            }));
 
-            // Задаем размер инвентаря в соответствии с размером экрана
-            var viewScreenSize = new Vector2(Screen.width / 3, Screen.height);
-            transform.parent.GetComponent<RectTransform>().sizeDelta = viewScreenSize;
-            GetComponent<RectTransform>().sizeDelta = viewScreenSize;
-            _gridContainer.GetComponent<RectTransform>().sizeDelta = viewScreenSize;
+            // Настройка размеров
+            UpdateViewSize();
         }
 
         private void OnDestroy()
@@ -70,28 +61,52 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             _disposables.Dispose();
         }
 
-        private void CreateInventorGridView(InventoryGridViewModel inventoryGridViewModel,
-            List<ItemView> itemViews)
+        private void UpdateGridIndices()
         {
-            var grid = Instantiate(_gridPrefab, _gridContainer);
+            // Сортируем все сетки по GridId для сохранения порядка
+            var sortedGrids = _inventoryGridViewModels
+                .OrderBy(g => g.GridId)
+                .ToList();
+
+            // Обновляем индексы
+            for (int i = 0; i < sortedGrids.Count; i++)
+            {
+                var viewModel = sortedGrids[i];
+                if (_gridViewsMap.TryGetValue(viewModel, out var gridView))
+                {
+                    gridView.GridIndex = i;
+                }
+            }
+
+            // Обновляем локальный счетчик
+            _gridIndex = sortedGrids.Count;
+        }
+        
+        private void CreateGridView(InventoryGridViewModel viewModel, List<ItemView> itemViews)
+        {
+            GameObject prefab = viewModel.IsSubGrid ? _subGridPrefab : _gridPrefab;
+            Transform parent = viewModel.IsSubGrid ? _subGridContainer : _gridContainer;
+    
+            var grid = Instantiate(prefab, parent);
             var gridView = grid.GetComponent<InventoryGridView>();
-            _gridIndex++;
-            grid.name = new string($"{inventoryGridViewModel.GridType} {inventoryGridViewModel.GridId}");
-            gridView.Bind(inventoryGridViewModel, itemViews, _gridIndex);
-            _gridViewsMap[inventoryGridViewModel] = gridView;
+            grid.name = $"{viewModel.GridType} {viewModel.GridId}";
+    
+            // Временный индекс, будет обновлен в UpdateGridIndices
+            gridView.Bind(viewModel, itemViews, -1); 
+    
+            _gridViewsMap[viewModel] = gridView;
             InventoryGridViews.Add(gridView);
+    
+            // Первоначальное обновление индекса
+            UpdateGridIndices();
         }
 
-        private void CreateInventorSubGridView(InventoryGridViewModel inventoryGridViewModel,
-            List<ItemView> itemViews)
+        private void UpdateViewSize()
         {
-            var subGrid = Instantiate(_subGridPrefab, _subGridContainer);
-            var subGridView = subGrid.GetComponent<InventoryGridView>();
-            _gridIndex++;
-            subGrid.name = new string($"{inventoryGridViewModel.GridType} {inventoryGridViewModel.GridId}");
-            subGridView.Bind(inventoryGridViewModel, itemViews, _gridIndex);
-            _gridViewsMap[inventoryGridViewModel] = subGridView;
-            InventoryGridViews.Add(subGridView);
+            var viewScreenSize = new Vector2(Screen.width / 10 * 4, Screen.height);
+            transform.parent.GetComponent<RectTransform>().sizeDelta = viewScreenSize;
+            GetComponent<RectTransform>().sizeDelta = viewScreenSize;
+            _gridContainer.GetComponent<RectTransform>().sizeDelta = viewScreenSize;
         }
 
         private void RemoveGridView(InventoryGridViewModel inventoryGridViewModel)

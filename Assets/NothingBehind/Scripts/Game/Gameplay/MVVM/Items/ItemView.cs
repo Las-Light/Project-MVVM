@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
 {
-    public class ItemView : MonoBehaviour, ISelectHandler, 
+    public class ItemView : MonoBehaviour, ISelectHandler,
         IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private TMP_Text stackText;
@@ -46,7 +46,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
 
         private readonly CompositeDisposable _disposables = new();
         private List<ItemView> _itemViews;
-        
+
         private InventoryGridView _currentGrid;
 
         public void Bind(Item item, ItemViewModel itemViewModel, float cellSize,
@@ -97,6 +97,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             {
                 _canvasGroup = gameObject.AddComponent<CanvasGroup>();
             }
+
             _canvasGroup.alpha = 0.8f;
             // Отключаем блокировку raycast, чтобы предмет можно было перетаскивать
             _canvasGroup.blocksRaycasts = false;
@@ -105,7 +106,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
 
             // Перемещаем предмет на верхний слой
             RectTransform.SetAsLastSibling();
-            
+
             LMotion.Create(transform.localScale, Vector3.one * 1.1f, 0.15f)
                 .WithEase(Ease.OutBack)
                 .BindToLocalScale(transform)
@@ -117,7 +118,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             _currentView?.ClearHighlights();
             // Перемещаем предмет за курсором
             RectTransform.anchoredPosition += eventData.delta / _mainCanvas.scaleFactor;
-            
+
             // Получаем целевую вьюху
             var targetViews = GetTargetInventoryView(eventData);
 
@@ -181,6 +182,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
                     {
                         TryPlaceToGridAtEquipmentSlot(targetGridView, gridPos, slotView);
                     }
+
                     return;
                 }
             }
@@ -188,7 +190,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             if (targetViews is EquipmentView equipmentView)
             {
                 _currentView = equipmentView;
-                
+
                 var equipPos = CalculateGridPosition(eventData.position, equipmentView);
                 var slotView = equipmentView.GetSlotAt(equipPos);
 
@@ -252,12 +254,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             // Сохранение исходных данных
             _startPosition = RectTransform.anchoredPosition;
             _startParent = RectTransform.parent;
-            
+
             // Визуальные изменения
             if (_canvasGroup == null)
             {
                 _canvasGroup = gameObject.AddComponent<CanvasGroup>();
             }
+
             _canvasGroup.alpha = 0.8f;
             // Отключаем блокировку raycast, чтобы предмет можно было перетаскивать
             _canvasGroup.blocksRaycasts = false;
@@ -279,9 +282,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             Vector2 targetPosition = new Vector2(
                 slotPosition.x * _cellSize,
                 -slotPosition.y * _cellSize);
-    
-            LMotion.Create(RectTransform.anchoredPosition, 
-                    targetPosition, 
+
+            LMotion.Create(RectTransform.anchoredPosition,
+                    targetPosition,
                     0.1f)
                 .WithEase(Ease.OutQuad)
                 .BindToAnchoredPosition(RectTransform)
@@ -303,10 +306,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
                     slotView.UpdateHighlight(slotView.SlotType, _item);
                 }
             }
-    
         }
 
-        public void EndDragGamepad(Vector2Int slotPosition,
+        public bool EndDragGamepad(Vector2Int slotPosition,
             IView targetView, bool isCancellation)
         {
             // 1. Восстановление визуальных параметров
@@ -315,7 +317,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
                 _canvasGroup.alpha = 1f;
                 _canvasGroup.blocksRaycasts = true;
             }
-            
+
             _currentView?.ClearHighlights();
             _currentView = targetView;
 
@@ -331,12 +333,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
                         //пытаемся положить предмет в предмет-сетку
                         if (TryPlaceToItem(targetGridView, slotPosition, startGridView))
                         {
-                            //MovementAnimation(targetPosition);
-                            return;
+                            return true;
                         }
-                        TryPlaceToGridAtGrid(startGridView, targetGridView, slotPosition);
-                        //MovementAnimation(targetPosition);
-                        return;
+
+                        if (TryPlaceToGridAtGrid(startGridView, targetGridView, slotPosition))
+                        {
+                            return true;
+                        }
                     }
 
                     if (_startView is EquipmentView startEquipmentView)
@@ -344,10 +347,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
                         var equipmentSlot = startEquipmentView.GetSlotViewHasItemView(this);
                         if (equipmentSlot != null)
                         {
-                            TryPlaceToGridAtEquipmentSlot(targetGridView, slotPosition, equipmentSlot);
+                            if (TryPlaceToGridAtEquipmentSlot(targetGridView, slotPosition, equipmentSlot))
+                            {
+                                return true;
+                            }
                         }
-                        //MovementAnimation(targetPosition);
-                        return;
+
+                        return false;
                     }
                 }
 
@@ -359,28 +365,34 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
                     var itemAtSlot = slotView.GetItemAtSlot(slotView.SlotType);
                     if (_startView is InventoryGridView startGridView)
                     {
-                        TryEquipAtGrid(itemAtSlot, slotView, startGridView);
-                        //MovementAnimation(targetPosition);
-                        return;
+                        if (TryEquipAtGrid(itemAtSlot, slotView, startGridView))
+                        {
+                            return true;
+                        }
+                        return false;
                     }
 
                     if (_startView is EquipmentView)
                     {
                         if (TryEquipAtEquipmentSlot(itemAtSlot, slotView))
                         {
-                            // MovementAnimation(targetPosition);
+                            return true;
                         }
                         else
                         {
                             ReturnToStartPosition();
+                            return false;
                         }
                     }
                 }
+
+                return false;
             }
             else
             {
                 // Возврат с bounce-эффектом
                 ReturnToStartPosition();
+                return false;
             }
         }
 
@@ -425,22 +437,24 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             {
                 return false;
             }
+
             return slotView.TryEquip(_item);
         }
 
-        private void TryEquipAtGrid(Item itemAtSlot, EquipmentSlotView slotView, InventoryGridView startGridView)
+        private bool TryEquipAtGrid(Item itemAtSlot, EquipmentSlotView slotView, InventoryGridView startGridView)
         {
             if (itemAtSlot == null && slotView.CanEquipItem(slotView.SlotType, _item))
             {
                 startGridView.RemoveItem(Id);
                 slotView.TryEquip(_item);
-                return;
+                return true;
             }
 
             ReturnToStartPosition();
+            return false;
         }
 
-        private void TryPlaceToGridAtEquipmentSlot(InventoryGridView targetGridView, Vector2Int gridPos,
+        private bool TryPlaceToGridAtEquipmentSlot(InventoryGridView targetGridView, Vector2Int gridPos,
             EquipmentSlotView startSlotView)
         {
             var addedItemResult = targetGridView.AddItems(_item, gridPos, _currentStack.CurrentValue);
@@ -448,14 +462,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             if (addedItemResult.Success)
             {
                 startSlotView.Unequip();
+                return true;
             }
             else
             {
                 ReturnToStartPosition();
+                return false;
             }
         }
 
-        private void TryPlaceToGridAtGrid(InventoryGridView atGridView, InventoryGridView targetGridView,
+        private bool TryPlaceToGridAtGrid(InventoryGridView atGridView, InventoryGridView targetGridView,
             Vector2Int gridPos)
         {
             var oldPosition = atGridView.GetItemPosition(Id);
@@ -486,10 +502,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
                     RectTransform.anchoredPosition = cellPosition;
                     RectTransform.SetAsLastSibling();
                     _startView = targetGridView;
+                    return true;
                 }
                 else
                 {
                     Destroy(gameObject);
+                    return true;
                 }
             }
             else
@@ -505,6 +523,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
                 }
 
                 ReturnToStartPosition();
+                return false;
             }
         }
 
@@ -529,12 +548,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
 
         private void ReturnToStartPosition()
         {
-            // Если передача не удалась, возвращаем предмет на исходную позицию
-            // _rectTransform.SetParent(_startParent);
-            // _rectTransform.anchoredPosition = _startPosition;
             // Возврат с bounce-эффектом
-            Debug.Log(_startPosition);
-            
             RectTransform.SetParent(_startParent);
             LMotion.Create(RectTransform.anchoredPosition, _startPosition, 0.05f)
                 .WithEase(Ease.OutBounce)

@@ -19,6 +19,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         public int Width { get; private set; }
         public int Height { get; private set; }
 
+        private RectTransform _rectTransform;
         private EquipmentViewModel _viewModel;
         private ReadOnlyReactiveProperty<Item> _equippedItem;
         private IDisposable _disposable;
@@ -38,6 +39,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             _itemViews = itemViews;
             _slotImage = GetComponent<Image>();
             _baseSlotColor = _slotImage.color;
+            _rectTransform = GetComponent<RectTransform>();
+            _rectTransform.sizeDelta = new Vector2(Width * _cellSize*2, Height * _cellSize*2);
 
             if (equipmentSlot.SlotType == SlotType.Backpack)
             {
@@ -90,6 +93,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         public Item GetItemAtSlot(SlotType slotType)
         {
             return _viewModel.GetItemAtSlot(slotType);
+        }
+
+        public RectTransform GetRectTransform()
+        {
+            return _rectTransform;
         }
 
         public bool CanEquipItem(SlotType slotType, Item item)

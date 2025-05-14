@@ -4,7 +4,6 @@ using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Items;
 using NothingBehind.Scripts.Game.State.Equipments;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
 {
@@ -19,7 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
 
         public float CellSize => 100f;
 
-        public float Spacing;
+        public float Spacing = 30f;
 
         public List<EquipmentSlotView> AllSlotViews => _allSlotViews;
 
@@ -27,6 +26,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         private readonly Dictionary<EquipmentSlotView, Vector2Int> _slotViewPositionMap = new();
         private EquipmentViewModel _viewModel;
         private List<ItemView> _itemViews;
+        private bool[] _grid;
 
         public void Bind(EquipmentViewModel viewModel, List<ItemView> itemViews)
         {
@@ -35,22 +35,44 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             OwnerId = viewModel.OwnerId;
             Width = viewModel.Width;
             Height = viewModel.Height;
+            _grid = new bool[Height * Width];
 
-            foreach (var kvp in _viewModel.SlotsMap)
+            // foreach (var kvp in _viewModel.SlotsMap)
+            // {
+            //     var slotView = CreateSlotView(kvp.Key, kvp.Value);
+            //     _allSlotViews.Add(slotView);
+            //     SetSlotPosition(kvp.Key, slotView);
+            // }
+
+            for (int i = 0; i < _viewModel.Slots.Count; i++)
             {
-                var slotView = CreateSlotView(kvp.Key, kvp.Value);
-                _allSlotViews.Add(slotView);
-                SetSlotPosition(kvp.Key, slotView);
+                var position = FindFreePosition(_viewModel.Slots[i]);
+                if (position.HasValue)
+                {
+                    PlaceSlot(_viewModel.Slots[i], position.Value);
+                    var slotView = CreateSlotView(_viewModel.Slots[i].SlotType, _viewModel.Slots[i]);
+                    slotView.GetComponent<RectTransform>().anchoredPosition =
+                        CalculateSlotAnchoredPosition(position.Value);
+                    _allSlotViews.Add(slotView);
+                    _slotViewPositionMap[slotView] = position.Value;
+                }
             }
 
             // _viewModel.SlotsMap.ObserveReplace().Subscribe(e=>UpdateSlot(e.NewValue));
             // Задаем размер инвентаря в соответствии с размером экрана
-            var viewScreenSize = new Vector2(Screen.width / 3, Screen.height);
+            var viewScreenSize = new Vector2(Screen.width / 10*2, Screen.height);
             transform.parent.GetComponent<RectTransform>().sizeDelta = viewScreenSize;
             GetComponent<RectTransform>().sizeDelta = viewScreenSize;
-            Spacing = _slotsContainer.GetComponent<VerticalLayoutGroup>().spacing;
+            //Spacing = _slotsContainer.GetComponent<VerticalLayoutGroup>().spacing;
             _slotsContainer.sizeDelta =
                 new Vector2(Width * CellSize + Width * Spacing, Height * CellSize + Height * Spacing);
+        }
+
+        private Vector2 CalculateSlotAnchoredPosition(Vector2Int gridPosition)
+        {
+            float x = gridPosition.x * CellSize + Spacing * (gridPosition.x);
+            float y = -gridPosition.y * CellSize - Spacing * (gridPosition.y);
+            return new Vector2(x, y);
         }
 
         public EquipmentSlotView GetSlotAt(Vector2Int position)
@@ -79,6 +101,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             {
                 return position;
             }
+
             return Vector2Int.zero;
         }
 
@@ -113,7 +136,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
 
             return null;
         }
-        
+
         public Vector2 GetSlotWorldPosition(Vector2Int slotPos)
         {
             var slot = GetSlotAt(slotPos);
@@ -132,7 +155,50 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             }
 
             return null;
+        }
 
+        private void PlaceSlot(EquipmentSlot slot, Vector2Int position)
+        {
+            for (int i = position.x; i < position.x + slot.Width; i++)
+            {
+                for (int j = position.y; j < position.y + slot.Height; j++)
+                {
+                    _grid[i * Height + j] = true;
+                }
+            }
+        }
+
+        private bool CanPlaceItem(EquipmentSlot slot, Vector2Int position)
+        {
+            if (position.x < 0 || position.y < 0 || position.x + slot.Width > Width ||
+                position.y + slot.Height > Height)
+                return false;
+
+            for (int i = position.x; i < position.x + slot.Width; i++)
+            {
+                for (int j = position.y; j < position.y + slot.Height; j++)
+                {
+                    if (_grid[i * Height + j]) return false;
+                }
+            }
+
+            return true;
+        }
+
+        private Vector2Int? FindFreePosition(EquipmentSlot slot)
+        {
+            for (int y = 0; y < Height - slot.Height + 1; y++)
+            {
+                for (int x = 0; x < Width - slot.Width + 1; x++)
+                {
+                    if (CanPlaceItem(slot, new Vector2Int(x, y)))
+                    {
+                        return new Vector2Int(x, y);
+                    }
+                }
+            }
+
+            return null; // Нет свободного места
         }
 
         private void SetSlotPosition(SlotType slotType, EquipmentSlotView slotView)

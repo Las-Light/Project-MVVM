@@ -79,7 +79,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5824190690441605054}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
   m_Name: 
@@ -189,3 +189,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _slotPrefab: {fileID: 8217122136197608629, guid: f11ca87b51c934f4ca5f9101b7c85ad2, type: 3}
   _slotsContainer: {fileID: 3750119093396924412}
+  Spacing: 30

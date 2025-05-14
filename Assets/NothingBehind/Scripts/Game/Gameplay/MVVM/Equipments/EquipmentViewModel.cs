@@ -28,6 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         public IReadOnlyObservableDictionary<SlotType, Item> AllEquippedItems => _equippedItemsMap;
         public IReadOnlyObservableDictionary<int, ItemViewModel> ItemViewModelsMap => _itemViewModelsMap;
         public IReadOnlyObservableDictionary<SlotType, EquipmentSlot> SlotsMap => _slotsMap;
+        public IReadOnlyObservableList<EquipmentSlot> Slots;
 
         private readonly ObservableDictionary<SlotType, Item> _equippedItemsMap = new();
         private readonly ObservableDictionary<int, EquipmentSlot> _itemSlotsMap = new();
@@ -42,6 +43,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             OwnerId = equipment.OwnerId;
             Width = equipment.Width;
             Height = equipment.Height;
+            Slots = equipment.Slots;
 
             foreach (var slot in equipment.Slots)
             {

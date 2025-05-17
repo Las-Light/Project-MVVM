@@ -112,7 +112,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             // для примера:
             var characterLevel = characterViewModel.Level.CurrentValue;
             //
-            var characterType = characterViewModel.Type;
+            var characterType = characterViewModel.EntityType;
             var prefabCharacterLevelPath =
                 $"Prefabs/Gameplay/World/Entities/Characters/{characterType}_{characterLevel}";
             var characterPrefab = Resources.Load<CharacterView>(prefabCharacterLevelPath);

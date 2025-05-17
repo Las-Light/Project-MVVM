@@ -7,22 +7,23 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
     [Serializable]
     public class GridNavigationConfig
     {
-        [Serializable]
-        public class GridTransition
+        public List<GridTransition> Transitions;
+
+        public GridNavigationConfig()
         {
-            public InventoryGridType SourceType;
-            public NavigationDirection Direction;
-            public InventoryGridType TargetType;
-            public bool IsTransToAnotherType = true;
+            SetTransition();
         }
 
-        public List<GridTransition> Transitions = new()
+        private void SetTransition()
         {
-            // Стандартные переходы
-            new() { SourceType = InventoryGridType.ChestRig, Direction = NavigationDirection.Down, TargetType = InventoryGridType.Backpack, IsTransToAnotherType = true},
-            new() { SourceType = InventoryGridType.Backpack, Direction = NavigationDirection.Up, TargetType = InventoryGridType.ChestRig, IsTransToAnotherType = true},
-            new() { SourceType = InventoryGridType.ChestRig, Direction = NavigationDirection.Right, TargetType = InventoryGridType.ChestRig, IsTransToAnotherType = false },
-            new() { SourceType = InventoryGridType.ChestRig, Direction = NavigationDirection.Left, TargetType = InventoryGridType.ChestRig, IsTransToAnotherType = false }
-        };
+            Transitions = new()
+            {
+                // Стандартные переходы
+                new() { SourceType = InventoryGridType.ChestRig, Direction = NavigationDirection.Down, TargetType = InventoryGridType.Backpack, SameTypeTransition = false},
+                new() { SourceType = InventoryGridType.Backpack, Direction = NavigationDirection.Up, TargetType = InventoryGridType.ChestRig, SameTypeTransition = false},
+                new() { SourceType = InventoryGridType.ChestRig, Direction = NavigationDirection.Right, TargetType = InventoryGridType.ChestRig, SameTypeTransition = true },
+                new() { SourceType = InventoryGridType.ChestRig, Direction = NavigationDirection.Left, TargetType = InventoryGridType.ChestRig, SameTypeTransition = true },
+            };
+        }
     }
 }

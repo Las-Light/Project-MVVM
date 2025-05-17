@@ -12,6 +12,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         public ItemView GetItemViewAtPosition(Vector2Int position);
         public Vector2Int? GetItemPosition(int itemId);
         Vector2 GetSlotWorldPosition(Vector2Int slotPos);
+        Vector2 GetSlotScreenPosition(Vector2Int slotPos);
         public void ClearHighlights();
     }
 }

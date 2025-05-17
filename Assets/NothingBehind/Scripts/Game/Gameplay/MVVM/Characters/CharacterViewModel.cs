@@ -18,7 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
         private readonly Dictionary<int, CharacterLevelSettings> _levelSettingsMap = new();
 
         public readonly int CharacterEntityId;
-        public readonly EntityType Type;
+        public readonly EntityType EntityType;
         public ReadOnlyReactiveProperty<Vector3> Position { get; }
         public ReadOnlyReactiveProperty<int> Level { get; }
         public ReadOnlyReactiveProperty<float> Health { get; }
@@ -28,7 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             CharactersService charactersService, 
             InventoryViewModel inventoryViewModel)
         {
-            Type = character.EntityType;
+            EntityType = character.EntityType;
             CharacterEntityId = character.Id;
             Level = character.Level;
             Health = character.Health;

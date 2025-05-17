@@ -8,6 +8,7 @@ using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.PopupB;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.ScreenGameplay;
 using NothingBehind.Scripts.Game.Gameplay.Root;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.MVVM.UI;
 using NothingBehind.Scripts.Utils;
 using R3;
@@ -46,11 +47,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
             return viewModel;
         }
 
-        public InventoryUIViewModel OpenInventory(int targetOwnerId, int ownerId, Vector3 position)
+        public InventoryUIViewModel OpenInventory(EntityType targetType, int targetOwnerId, int ownerId, Vector3 position)
         {
             var inventoryUI = new InventoryUIViewModel(_inventoryService,
                 _equipmentService, 
                 _storageService, 
+                targetType,
                 ownerId,
                 position,
                 targetOwnerId,

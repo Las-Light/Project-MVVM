@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using LitMotion;
 using LitMotion.Extensions;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments;
@@ -24,8 +23,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
         [Header("References")] [SerializeField]
         private RectTransform _selectionIndicator;
 
-        private ReactiveProperty<Vector2> anchoredPosition = new();
-
         private IView _currentGridView;
         private IView _startGridView;
         private Vector2Int _currentSlotPos;
@@ -36,25 +33,24 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
         private bool _isDragging;
 
         private readonly CompositeDisposable _disposables = new();
-        private List<InventoryGridView> _playerInventoryViews;
-        private List<InventoryGridView> _lootInventoryViews;
-        private EquipmentView _equipmentView;
-        private Dictionary<InventoryGridView, Vector2[]> _gridWorldPositionsCache = new();
 
-        private Vector2Int _previousSlot;
+        private GridNavigationService _navigationService;
 
         private void Start()
         {
-            _lootInventoryViews = _inventoryUIView.LootInventoryView.InventoryGridViews;
-            _playerInventoryViews = _inventoryUIView.PlayerInventoryView.InventoryGridViews;
-            _equipmentView = _inventoryUIView.PlayerEquipmentView;
+            _navigationService = new GridNavigationService(
+                _inventoryUIView.PlayerInventoryView.InventoryGridViews,
+                _inventoryUIView.LootInventoryView.InventoryGridViews,
+                _inventoryUIView.PlayerEquipmentView,
+                _inventoryUIView.LootEquipmentView,
+                _navigationConfig
+            );
 
             // Выделяем первый доступный слот при открытии инвентаря
             _currentGridView =
                 _inventoryUIView.PlayerEquipmentView; // Начинаем с первой сетки (можно хранить текущую)
             _currentSlotPos = Vector2Int.zero;
             _selectionIndicator.SetParent(_currentGridView.GetContainer());
-            anchoredPosition.Subscribe(value => { _selectionIndicator.anchoredPosition = value; }).AddTo(_disposables);
             UpdateSelection();
 
             //Подписываемся на UI Input
@@ -107,6 +103,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
             // Вычисляем новую позицию для предмета
             Vector2Int newPosition = _currentSlotPos + direction;
 
+            if (_currentGridView is EquipmentView equipmentView)
+            {
+                newPosition = CalculateEquipSlotBoundary(equipmentView, newPosition, navDirection);
+            }
+
             if (TryToSwitchView(ref newPosition, navDirection)) return;
 
             // Обновляем позицию
@@ -123,23 +124,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
         {
             // Определяем направление навигации
             var navDirection = GetNavigationDirection(direction);
-
             var newPosition = _currentSlotPos + direction;
-            var newSlotPosition = newPosition;
-            if (_currentGridView is InventoryGridView)
+            
+            if (_currentGridView is InventoryGridView gridView)
             {
-                newSlotPosition = CalculateItemBoundary(_currentGridView, newPosition, navDirection);
+                newPosition = CalculateItemBoundary(gridView, newPosition, navDirection);
             }
 
             if (_currentGridView is EquipmentView equipmentView)
             {
-                newSlotPosition = CalculateEquipSlotBoundary(equipmentView, newPosition, navDirection);
+                newPosition = CalculateEquipSlotBoundary(equipmentView, newPosition, navDirection);
             }
 
-            if (TryToSwitchView(ref newSlotPosition, navDirection)) return;
+            if (TryToSwitchView(ref newPosition, navDirection)) return;
 
             // Локальное перемещение внутри текущей сетки
-            MoveLocalCursor(newSlotPosition);
+            MoveLocalCursor(newPosition);
             UpdateSelection();
         }
 
@@ -148,7 +148,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
             if (IsOutOfBounds(newSlotPosition))
             {
                 // Пытаемся найти следующий экран
-                var nextViewAndPos = GetNextView(navDirection);
+                var nextViewAndPos = _navigationService.GetNextView(navDirection,_currentSlotPos, _currentGridView);
                 if (nextViewAndPos.newView != null)
                 {
                     SwitchToView(nextViewAndPos.newView, nextViewAndPos.posAtNewView);
@@ -184,23 +184,23 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
                 {
                     _currentSlotPos = _selectedItemPos = itemPos.Value;
                 }
-
+                var targetPosition = Vector2.zero;
                 switch (_currentGridView)
                 {
                     case InventoryGridView inventoryGridView:
-                        _selectionIndicator.anchoredPosition = new Vector2(
+                        targetPosition = new Vector2(
                             _currentSlotPos.x * inventoryGridView.CellSize,
                             -_currentSlotPos.y * inventoryGridView.CellSize
                         );
                         break;
                     case EquipmentView equipmentView:
-                        _selectionIndicator.anchoredPosition = new Vector2(
+                        targetPosition = new Vector2(
                             _currentSlotPos.x * equipmentView.CellSize + equipmentView.Spacing * _currentSlotPos.x,
                             -_currentSlotPos.y * equipmentView.CellSize - equipmentView.Spacing * _currentSlotPos.y
                         );
                         break;
                 }
-
+                AnimationTransitionAnchorPos(targetPosition);
                 AnimationChangeSizeIndicator(newSelectedItem.RectTransform.sizeDelta);
             }
             else
@@ -291,76 +291,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
             }
         }
 
-        private (IView newView, Vector2Int posAtNewView) GetNextView(NavigationDirection direction)
-        {
-            switch (_currentGridView)
-            {
-                case InventoryGridView inventoryGridView:
-                    (IView, Vector2Int) nextViewAndPos = new();
-                    if (_lootInventoryViews.Contains(inventoryGridView))
-                    {
-                        nextViewAndPos =
-                            GetTargetInventorySection(inventoryGridView, _lootInventoryViews, direction);
-
-                        if (nextViewAndPos.Item1 == null && direction is NavigationDirection.Left)
-                        {
-                            nextViewAndPos =
-                                FindNearestInGridsCached(_currentGridView, _currentSlotPos, _playerInventoryViews);
-                            
-                            if (nextViewAndPos.Item1 == null)
-                            {
-                                nextViewAndPos = (_equipmentView,
-                                    FindNearestInEquipment(_currentGridView, _currentSlotPos, _equipmentView));
-                            }
-                        }
-                    }
-
-                    if (_playerInventoryViews.Contains(inventoryGridView))
-                    {
-                        nextViewAndPos =
-                            GetTargetInventorySection(inventoryGridView, _playerInventoryViews, direction);
-                        if (nextViewAndPos.Item1 == null)
-                        {
-                            if (direction is NavigationDirection.Right)
-                            {
-                                nextViewAndPos =
-                                    FindNearestInGridsCached(_currentGridView, _currentSlotPos, _lootInventoryViews);
-                            }
-
-                            if (direction is NavigationDirection.Left)
-                            {
-                                nextViewAndPos = (_equipmentView,
-                                    FindNearestInEquipment(_currentGridView, _currentSlotPos, _equipmentView));
-                            }
-                        }
-                    }
-
-                    if (nextViewAndPos.Item1 != null)
-                    {
-                        return nextViewAndPos;
-                    }
-
-                    break;
-
-                case EquipmentView:
-                    if (direction == NavigationDirection.Right)
-                    {
-                        (IView, Vector2Int) nextInventoryViewAndPos = FindNearestInGridsCached(_currentGridView, _currentSlotPos, _playerInventoryViews);
-                        if (nextInventoryViewAndPos.Item1 == null)
-                        {
-                            nextInventoryViewAndPos = FindNearestInGridsCached(_currentGridView, _currentSlotPos,
-                                _lootInventoryViews);
-                        }
-
-                        return nextInventoryViewAndPos;
-                    }
-
-                    break;
-            }
-
-            return (null, Vector2Int.zero);
-        }
-
         private NavigationDirection GetNavigationDirection(Vector2Int input)
         {
             if (input.x > 0) return NavigationDirection.Right;
@@ -395,91 +325,32 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
             _currentSlotPos = ClampPosition(newPosition, _currentGridView.Width, _currentGridView.Height);
         }
 
-        private Vector2Int CalculateItemBoundary(IView grid,
-            Vector2Int newPosition, NavigationDirection direction)
+        private Vector2Int CalculateItemBoundary(InventoryGridView grid, Vector2Int newPosition,
+            NavigationDirection direction)
         {
-            var itemAtCurrentSlot =
-                grid.GetItemViewAtPosition(_currentSlotPos); // Получаем предмет в текущей позиции
-            Vector2Int? itemPosition = null;
-            if (itemAtCurrentSlot != null)
-            {
-                itemPosition = grid.GetItemPosition(itemAtCurrentSlot.Id);
-            }
+            var item = grid.GetItemViewAtPosition(_currentSlotPos);
+            if (item == null || _isDragging) return newPosition;
 
-            // Если под курсором есть предмет (и не в режиме перетаскивания), учитываем его размер при перемещении
-            if (itemPosition.HasValue && !_isDragging)
-            {
-                _currentSlotPos = itemPosition.Value;
-                // Определяем границы предмета
-                int itemLeft = itemPosition.Value.x;
-                int itemRight = itemPosition.Value.x + itemAtCurrentSlot.Width - 1;
-                int itemTop = itemPosition.Value.y;
-                int itemBottom = itemPosition.Value.y + itemAtCurrentSlot.Height - 1;
+            var itemPos = grid.GetItemPosition(item.Id);
+            if (!itemPos.HasValue) return newPosition;
 
-                // Корректируем новую позицию в зависимости от направления
-                if (direction == NavigationDirection.Right) // Движение вправо
-                {
-                    newPosition.x = itemRight + 1;
-                    newPosition.y = Mathf.Clamp(_currentSlotPos.y, itemTop, itemBottom);
-                }
-                else if (direction == NavigationDirection.Left) // Движение влево
-                {
-                    newPosition.x = itemLeft - 1;
-                    newPosition.y = Mathf.Clamp(_currentSlotPos.y, itemTop, itemBottom);
-                }
-                else if (direction == NavigationDirection.Down) // Движение вниз (в Unity y увеличивается вниз)
-                {
-                    newPosition.x = Mathf.Clamp(_currentSlotPos.x, itemLeft, itemRight);
-                    newPosition.y = itemBottom + 1;
-                }
-                else if (direction == NavigationDirection.Up) // Движение вверх
-                {
-                    newPosition.x = Mathf.Clamp(_currentSlotPos.x, itemLeft, itemRight);
-                    newPosition.y = itemTop - 1;
-                }
-            }
-
-            return newPosition;
+            var (left, right, top, bottom) = GetBounds(itemPos.Value, item.Size);
+            return BoundaryCalculator.Calculate(newPosition, direction, left, right, top, bottom);
         }
 
         private Vector2Int CalculateEquipSlotBoundary(EquipmentView equipmentView,
             Vector2Int newPosition, NavigationDirection direction)
         {
             var slotView = equipmentView.GetSlotAt(_currentSlotPos);
-            if (slotView != null)
-            {
-                _currentSlotPos = equipmentView.GetSlotPosition(slotView);
-                //Определяем границы слота
-                int slotLeft = newPosition.x;
-                int slotRight = newPosition.x + slotView.Width - 1;
-                int slotTop = newPosition.y;
-                int slotBottom = newPosition.y + slotView.Height - 1;
-
-                // Корректируем новую позицию в зависимости от направления
-                if (direction == NavigationDirection.Right)
-                {
-                    newPosition.x = slotRight;
-                    newPosition.y = Mathf.Clamp(_currentSlotPos.y, slotTop, slotBottom);
-                }
-                else if (direction == NavigationDirection.Left) // Движение влево
-                {
-                    newPosition.x = slotLeft;
-                    newPosition.y = Mathf.Clamp(_currentSlotPos.y, slotTop, slotBottom);
-                }
-                else if (direction == NavigationDirection.Down) // Движение вниз (в Unity y увеличивается вниз)
-                {
-                    newPosition.x = Mathf.Clamp(_currentSlotPos.x, slotLeft, slotRight);
-                    newPosition.y = slotBottom;
-                }
-                else if (direction == NavigationDirection.Up) // Движение вверх
-                {
-                    newPosition.x = Mathf.Clamp(_currentSlotPos.x, slotLeft, slotRight);
-                    newPosition.y = slotTop;
-                }
-            }
-
-            return newPosition;
+            if (slotView == null) return newPosition;
+            
+            _currentSlotPos = equipmentView.GetSlotPosition(slotView);
+            var (left, right, top, bottom) = GetBounds(newPosition, slotView.Size);
+            return BoundaryCalculator.CalculateEquipBoundary(newPosition, direction, left, right, top, bottom);
         }
+
+        private (int left, int right, int top, int bottom) GetBounds(Vector2Int pos, Vector2Int size) =>
+            (pos.x, pos.x + size.x - 1, pos.y, pos.y + size.y - 1);
 
         private Vector2Int ClampPosition(Vector2Int position, int width, int height)
         {
@@ -487,178 +358,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
                 Mathf.Clamp(position.x, 0, width - 1),
                 Mathf.Clamp(position.y, 0, height - 1)
             );
-        }
-
-        private (IView newView, Vector2Int posAtNewView) GetTargetInventorySection(InventoryGridView currentGrid,
-            List<InventoryGridView> allInventoryGridViews,
-            NavigationDirection direction)
-        {
-            if (currentGrid == null) return (null, Vector2Int.zero);
-
-            // Ищем подходящее правило перехода
-            var transition = _navigationConfig.Transitions.FirstOrDefault(t =>
-                t.SourceType == currentGrid.GridType && t.Direction == direction);
-
-            if (transition == null) return (null, Vector2Int.zero);
-
-            // Фильтруем сетки по целевому типу
-            var targetGrids = allInventoryGridViews
-                .Where(g => g.GridType == transition.TargetType)
-                .OrderBy(g => g.GridIndex)
-                .ToList();
-
-            if (!targetGrids.Any()) return (null, Vector2Int.zero);
-
-            // Если переход между сетками одного типа с изменением индекса
-            if (!transition.IsTransToAnotherType && transition.SourceType == transition.TargetType)
-            {
-                int indexDelta = direction == NavigationDirection.Right ? 1 : -1;
-                int targetIndex = currentGrid.GridIndex + indexDelta;
-
-                // Проверяем границы допустимых индексов
-                if (targetIndex >= 0 && targetIndex < targetGrids.Count)
-                {
-                    var sourceWorldPos = currentGrid.GetSlotWorldPosition(_currentSlotPos);
-                    var targetPos = FindNearestInGrid(sourceWorldPos, targetGrids[targetIndex]);
-                    return (targetGrids[targetIndex], targetPos);
-                }
-
-                return (null, Vector2Int.zero);
-            }
-
-            // Для вертикальных переходов между разными типами
-            if (transition.IsTransToAnotherType)
-            {
-                return FindNearestInGridsCached(currentGrid, _currentSlotPos, targetGrids);
-            }
-
-            return (null, Vector2Int.zero);
-        }
-
-        private Vector2Int FindNearestInGrid(Vector2 sourceWorldPos,
-            InventoryGridView targetGrid)
-        {
-            float minDistance = float.MaxValue;
-            Vector2Int nearestSlot = Vector2Int.zero;
-
-            // Перебираем все слоты в целевой сетке
-            for (int y = 0; y < targetGrid.Height; y++)
-            {
-                for (int x = 0; x < targetGrid.Width; x++)
-                {
-                    Vector2Int slotPos = new Vector2Int(x, y);
-                    Vector2 slotWorldPos = targetGrid.GetSlotWorldPosition(slotPos);
-
-                    float distance = Vector2.Distance(sourceWorldPos, slotWorldPos);
-
-                    if (distance < minDistance)
-                    {
-                        minDistance = distance;
-                        nearestSlot = slotPos;
-                    }
-                }
-            }
-
-            return nearestSlot;
-        }
-
-        private Vector2Int FindNearestInEquipment(IView sourceView,
-            Vector2Int sourceSlotPos,
-            EquipmentView equipmentView)
-        {
-            float minDistance = float.MaxValue;
-            Vector2Int nearestSlot = Vector2Int.zero;
-            var sourceWorldPos = sourceView.GetSlotWorldPosition(sourceSlotPos);
-
-            // Получаем все слоты экипировки
-            var allSlots = equipmentView.AllSlotViews;
-
-            foreach (var slot in allSlots)
-            {
-                Vector2 slotWorldPos = slot.transform.position;
-                float distance = Vector2.Distance(sourceWorldPos, slotWorldPos);
-
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    nearestSlot = equipmentView.GetSlotPosition(slot);
-                }
-            }
-
-            return nearestSlot;
-        }
-
-        public (InventoryGridView grid, Vector2Int slotPos) FindNearestInGridsCached(IView sourceView,
-            Vector2Int sourceSlotPos,
-            List<InventoryGridView> targetGrids)
-        {
-            if (targetGrids == null || targetGrids.Count == 0)
-                return (null, Vector2Int.zero);
-
-            float minDistance = float.MaxValue;
-            InventoryGridView nearestGrid = targetGrids[0];
-            Vector2Int nearestSlot = Vector2Int.zero;
-            var sourceWorldPos = sourceView.GetSlotWorldPosition(sourceSlotPos);
-
-            foreach (var grid in targetGrids)
-            {
-                // Получаем или кэшируем мировые позиции слотов
-                if (!_gridWorldPositionsCache.TryGetValue(grid, out var worldPositions))
-                {
-                    worldPositions = PrecalculateGridPositions(grid);
-                    _gridWorldPositionsCache[grid] = worldPositions;
-                }
-
-                // Ищем ближайший слот в кэшированных позициях
-                var (slotPos, distance) = FindNearestInCachedGrid(sourceWorldPos, grid, worldPositions);
-
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    nearestGrid = grid;
-                    nearestSlot = slotPos;
-                }
-            }
-
-            return (nearestGrid, nearestSlot);
-        }
-
-        private Vector2[] PrecalculateGridPositions(InventoryGridView grid)
-        {
-            Vector2[] positions = new Vector2[grid.Width * grid.Height];
-
-            for (int y = 0; y < grid.Height; y++)
-            {
-                for (int x = 0; x < grid.Width; x++)
-                {
-                    positions[y * grid.Width + x] = grid.GetSlotWorldPosition(new Vector2Int(x, y));
-                }
-            }
-
-            return positions;
-        }
-
-        private (Vector2Int slotPos, float distance) FindNearestInCachedGrid(Vector2 sourcePos, InventoryGridView grid,
-            Vector2[] worldPositions)
-        {
-            int nearestIndex = 0;
-            float minDistance = float.MaxValue;
-
-            for (int i = 0; i < worldPositions.Length; i++)
-            {
-                float dist = Vector2.Distance(sourcePos, worldPositions[i]);
-                if (dist < minDistance)
-                {
-                    minDistance = dist;
-                    nearestIndex = i;
-                }
-            }
-
-            // Конвертируем индекс обратно в координаты
-            int width = grid.Width;
-            Vector2Int slotPos = new Vector2Int(nearestIndex % width, nearestIndex / width);
-
-            return (slotPos, minDistance);
         }
 
         private void AnimationChangeSizeIndicator(Vector2 targetSize)

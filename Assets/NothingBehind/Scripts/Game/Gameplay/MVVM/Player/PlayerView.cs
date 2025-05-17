@@ -111,7 +111,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
             {
                 if (!_inventoryIsOpened)
                 {
-                    _gameplayUIManager.OpenInventory(_viewModel.Id, _viewModel.Id, transform.position);
+                    _gameplayUIManager.OpenInventory(_viewModel.EntityType,
+                        _viewModel.Id,
+                        _viewModel.Id,
+                        transform.position);
                     _inventoryIsOpened = true;
                 }
                 else

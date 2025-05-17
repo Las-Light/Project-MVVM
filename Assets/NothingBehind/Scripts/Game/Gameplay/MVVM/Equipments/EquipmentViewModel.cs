@@ -127,6 +127,16 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             return false;
         }
 
+        public bool IsEmptyEquipmentSlots()
+        {
+            if (_itemSlotsMap.Count > 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private void CreateItemViewModel(Item item, ItemsSettings itemsSettings)
         {
             var itemSettings = itemsSettings.Items.FirstOrDefault(itemConfig =>

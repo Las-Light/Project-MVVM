@@ -143,6 +143,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             return slot?.transform.position ?? Vector2.zero;
         }
 
+        public Vector2 GetSlotScreenPosition(Vector2Int slotPos)
+        {
+            var slot = GetSlotAt(slotPos);
+            return slot.GetRectTransform().anchoredPosition;
+        }
+
         public Vector2Int? GetItemPosition(int itemId)
         {
             var itemView = _itemViews.FirstOrDefault(view => view.Id == itemId);

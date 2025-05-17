@@ -5,6 +5,7 @@ using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Player;
 using NothingBehind.Scripts.Game.State.Maps;
 using ObservableCollections;
@@ -17,6 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
     public class PlayerViewModel
     {
         public int Id { get; }
+        public EntityType EntityType;
         public IObservableCollection<PositionOnMap> PositionOnMaps => _positionOnMaps;
         public ReadOnlyReactiveProperty<MapId> CurrentMapId { get; }
         public ReadOnlyReactiveProperty<float> Health { get; }
@@ -49,6 +51,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
             PlayerSettings playerSettings)
         {
             Id = player.Id;
+            EntityType = player.EntityType;
             CurrentMapId = player.CurrentMapId;
             Health = player.Health;
             _positionOnMaps = player.PositionOnMaps;

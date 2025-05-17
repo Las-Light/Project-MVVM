@@ -12,9 +12,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
         private int _characterId;
 
         private CompositeDisposable _disposables = new ();
-        
+        private CharacterViewModel _viewModel;
+
         public void Bind(CharacterViewModel viewModel, GameplayUIManager gameplayUIManager)
         {
+            _viewModel = viewModel;
             transform.position = viewModel.Position.CurrentValue;
             _gameplayUIManager = gameplayUIManager;
             _characterId = viewModel.CharacterEntityId;
@@ -30,7 +32,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             {
                 if (playerView.IsInteractiveActionPressed())
                 {
-                    _gameplayUIManager.OpenInventory(_characterId, 
+                    _gameplayUIManager.OpenInventory(_viewModel.EntityType,
+                        _characterId, 
                         playerView.PlayerId,
                         playerView.transform.position);
                     _triggered = true;

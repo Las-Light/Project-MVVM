@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Equipment Config Character
   m_EditorClassIdentifier: 
   EntityType: 2
-  Width: 1
-  Height: 4
+  Width: 2
+  Height: 3
   Slots:
   - {fileID: 11400000, guid: c24dadb7d52141448b017fb06a58fa3e, type: 2}
   - {fileID: 11400000, guid: 3942969dfe8a8104d97253d5307e75a4, type: 2}
+  - {fileID: 11400000, guid: ace4fd956341e194dbdf2b1878a126e4, type: 2}
+  - {fileID: 11400000, guid: 467ab9a8269bff14daa75573b440fc2b, type: 2}

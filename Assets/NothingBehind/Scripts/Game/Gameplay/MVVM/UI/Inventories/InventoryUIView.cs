@@ -3,6 +3,7 @@ using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Items;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.MVVM.UI;
 using UnityEngine;
 
@@ -14,11 +15,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         [SerializeField] private GameObject _equipmentPrefab;
         [SerializeField] private RectTransform _playerInventoryContainer;
         [SerializeField] private RectTransform _playerEquipmentContainer;
+        [SerializeField] private RectTransform _lootEquipmentContainer;
         [SerializeField] private RectTransform _lootInventoryContainer;
 
         public InventoryView PlayerInventoryView;
         public EquipmentView PlayerEquipmentView;
         public InventoryView LootInventoryView;
+        public EquipmentView LootEquipmentView;
 
         public GameplayInputManager GameplayInputManager;
         public List<ItemView> ItemViews => _itemViews;
@@ -30,17 +33,25 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         {
             base.OnBind(viewModel);
             GameplayInputManager = viewModel.GameplayInputManager;
-            if (viewModel.OwnerId == viewModel.TargetOwnerId)
+            if (viewModel.TargetType == EntityType.Player)
             {
                 CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.OwnerId), _itemViews);
-                CreateEquipmentView(viewModel.GetEquipmentViewModel(viewModel.OwnerId), _itemViews);
+                CreatePlayerEquipmentView(viewModel.GetEquipmentViewModel(viewModel.OwnerId), _itemViews);
                 CreateEmptyInventoryView();
             }
-            else
+
+            if (viewModel.TargetType == EntityType.Storage)
             {
                 CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.OwnerId), _itemViews);
-                CreateEquipmentView(viewModel.GetEquipmentViewModel(viewModel.OwnerId), _itemViews);
+                CreatePlayerEquipmentView(viewModel.GetEquipmentViewModel(viewModel.OwnerId), _itemViews);
                 CreateLootInventoryView(viewModel.GetInventoryViewModel(viewModel.TargetOwnerId), _itemViews);
+            }
+            if (viewModel.TargetType == EntityType.Character)
+            {
+                CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.OwnerId), _itemViews);
+                CreatePlayerEquipmentView(viewModel.GetEquipmentViewModel(viewModel.OwnerId), _itemViews);
+                CreateLootInventoryView(viewModel.GetInventoryViewModel(viewModel.TargetOwnerId), _itemViews);
+                CreateLootEquipmentView(viewModel.GetEquipmentViewModel(viewModel.TargetOwnerId), _itemViews);
             }
         }
 
@@ -80,13 +91,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             LootInventoryView = inventoryView;
         }
 
-        private void CreateEquipmentView(EquipmentViewModel equipmentViewModel, 
+        private void CreatePlayerEquipmentView(EquipmentViewModel equipmentViewModel, 
             List<ItemView> itemViews)
         {
             var equipmentGO = Instantiate(_equipmentPrefab, _playerEquipmentContainer);
             var equipmentView = equipmentGO.GetComponent<EquipmentView>();
             equipmentView.Bind(equipmentViewModel, itemViews);
             PlayerEquipmentView = equipmentView;
+        }
+        
+        private void CreateLootEquipmentView(EquipmentViewModel equipmentViewModel, 
+            List<ItemView> itemViews)
+        {
+            var equipmentGO = Instantiate(_equipmentPrefab, _lootEquipmentContainer);
+            var equipmentView = equipmentGO.GetComponent<EquipmentView>();
+            equipmentView.Bind(equipmentViewModel, itemViews);
+            LootEquipmentView = equipmentView;
         }
     }
 }

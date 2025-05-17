@@ -42,7 +42,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Storages
             {
                 if (playerView.IsInteractiveActionPressed())
                 {
-                    _gameplayUIManager.OpenInventory(_storageId, 
+                    _gameplayUIManager.OpenInventory(_storageViewModel.EntityType,
+                        _storageId, 
                         playerView.PlayerId, 
                         playerView.transform.position);
                     _triggered = true;

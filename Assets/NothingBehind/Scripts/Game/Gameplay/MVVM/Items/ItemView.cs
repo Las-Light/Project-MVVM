@@ -21,6 +21,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
         public int Id;
         public int Width;
         public int Height;
+        public Vector2Int Size;
         public ReadOnlyReactiveProperty<bool> IsRotated;
         public RectTransform RectTransform;
 
@@ -58,8 +59,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             Height = itemViewModel.Height.Value;
             _itemType = item.ItemType;
             _currentStack = item.CurrentStack;
-            _width = item.Width;
-            _height = item.Height;
+            Size = new Vector2Int(Width, Height);
             IsRotated = item.IsRotated;
             Id = item.Id;
             _isStackable = item.IsStackable;
@@ -546,7 +546,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
             return false;
         }
 
-        private void ReturnToStartPosition()
+        public void ReturnToStartPosition()
         {
             // Возврат с bounce-эффектом
             RectTransform.SetParent(_startParent);
@@ -569,8 +569,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Items
         {
             // Устанавливаем размер предмета в соответствии с его шириной и высотой
             RectTransform.sizeDelta = new Vector2(
-                _width.CurrentValue * _cellSize,
-                _height.CurrentValue * _cellSize
+                Width * _cellSize,
+                Height * _cellSize
             );
 
             // Устанавливаем иконку предмета (предположим, что она хранится в ItemModel)

@@ -74,7 +74,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                 var viewModel = sortedGrids[i];
                 if (_gridViewsMap.TryGetValue(viewModel, out var gridView))
                 {
-                    gridView.GridIndex = i;
+                    gridView.UpdateGridIndex(i);
                 }
             }
 
@@ -103,7 +103,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
 
         private void UpdateViewSize()
         {
-            var viewScreenSize = new Vector2(Screen.width / 10 * 4, Screen.height);
+            var viewScreenSize = new Vector2(Screen.width / 10 * 3, Screen.height);
             transform.parent.GetComponent<RectTransform>().sizeDelta = viewScreenSize;
             GetComponent<RectTransform>().sizeDelta = viewScreenSize;
             _gridContainer.GetComponent<RectTransform>().sizeDelta = viewScreenSize;

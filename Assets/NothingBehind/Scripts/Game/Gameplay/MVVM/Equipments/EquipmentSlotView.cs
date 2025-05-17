@@ -18,6 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         public SlotType SlotType;
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public Vector2Int Size;
 
         private RectTransform _rectTransform;
         private EquipmentViewModel _viewModel;
@@ -36,6 +37,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             _viewModel = viewModel;
             Width = equipmentSlot.Width;
             Height = equipmentSlot.Height;
+            Size = new Vector2Int(Width, Height);
             _itemViews = itemViews;
             _slotImage = GetComponent<Image>();
             _baseSlotColor = _slotImage.color;

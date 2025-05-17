@@ -26,7 +26,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         public int Height { get; private set; }
         public InventoryGridType GridType { get; private set; }
         public float CellSize { get; private set; } // Размер ячейки в пикселях
-        public int GridIndex; // Индекс сетки
+        public int GridIndex => _gridIndex; // Индекс сетки
         public Dictionary<Item, ItemView> ItemsViewMap => _itemsViewMap;
         public List<ItemView> ItemViews => _itemViews;
 
@@ -37,6 +37,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
         private readonly Dictionary<int, Item> _itemsMap = new();
 
         private Image[,] _cellsImage;
+        private int _gridIndex;
         private InventoryGridViewModel _viewModel;
         private RectTransform _inventoryGridViewRectTransform;
 
@@ -52,7 +53,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             CellSize = viewModel.CellSize;
             _itemsPositionsMap = viewModel.ItemsPositionsMap;
             _itemViews = itemViews;
-            GridIndex = gridIndex;
+            _gridIndex = gridIndex;
 
             // Очистка сетки перед инициализацией
             foreach (Transform child in GridContainer) Destroy(child.gameObject);
@@ -159,6 +160,11 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
             return _viewModel.GetItemAtPosition(position);
         }
 
+        public void UpdateGridIndex(int newIndex)
+        {
+            _gridIndex = newIndex;
+        }
+
         public void UpdateHighlights(Item item, Vector2Int position)
         {
             // Сбрасываем подсветку всех ячеек
@@ -216,6 +222,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories
                 slotPos.x * CellSize + CellSize * 0.5f,
                 -slotPos.y * CellSize - CellSize * 0.5f
             ));
+        }
+
+        public Vector2 GetSlotScreenPosition(Vector2Int slotPos)
+        {
+            return new Vector2(
+                slotPos.x * CellSize,
+                -slotPos.y * CellSize);
         }
 
         public bool CanPlaceItemView(ItemView itemView, Vector2Int position, bool isRotate)

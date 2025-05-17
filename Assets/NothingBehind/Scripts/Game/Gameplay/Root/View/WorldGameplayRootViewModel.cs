@@ -87,14 +87,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             //
             var gameState = _gameStateProvider.GameState;
 
-            foreach (var equipment in gameState.Equipments)
-            {
-                foreach (var slot in equipment.Slots)
-                {
-                    Debug.Log($"{slot.SlotType} - {slot.EquippedItem.Value}");
-                }
-            }
-
             foreach (var inventoryViewModel in AllInventories)
             {
                 // if (inventoryViewModel.OwnerType != EntityType.Player)
@@ -113,13 +105,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                 }
             }
 
-            foreach (var inventory in gameState.Inventories)
+            foreach (var equipment in gameState.Equipments)
             {
-                Debug.Log(inventory.OwnerType);
+                Debug.Log(equipment.OwnerId);
 
-                foreach (var grid in inventory.InventoryGrids)
+                foreach (var slot in equipment.Slots)
                 {
-                    Debug.Log($"GridId - {grid.GridId} is subGrid - {grid is InventoryGridWithSubGrid}");
+                    Debug.Log($"Slot - {slot.SlotType} have item - {slot.EquippedItem.Value}");
                 }
             }
         }

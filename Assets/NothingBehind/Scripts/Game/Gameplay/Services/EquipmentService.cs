@@ -72,7 +72,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         {
             if (_equipmentsDataMap.TryGetValue(ownerId, out var equipment))
             {
-                var inventoryViewModel = new EquipmentViewModel(equipment, _itemsSettings, this);
+                var inventoryViewModel = new EquipmentViewModel(equipment, 
+                    _itemsSettings,
+                    this,
+                    _commandProcessor);
 
                 _allEquipmentViewModels.Add(inventoryViewModel);
                 _equipmentMap[equipment.OwnerId] = inventoryViewModel;

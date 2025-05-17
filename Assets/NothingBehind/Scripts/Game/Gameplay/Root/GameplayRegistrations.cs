@@ -1,6 +1,7 @@
 using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
+using NothingBehind.Scripts.Game.Gameplay.Commands.EquipmentCommands;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.CharactersHandlers;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandlers;
@@ -60,6 +61,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             commandProcessor.RegisterHandler(new CmdRemoveGridInventoryHandler(gameState));
             commandProcessor.RegisterHandler(new CmdCreateEquipmentHandler(gameState, equipmentsSettings, gameSettings));
             commandProcessor.RegisterHandler(new CmdRemoveEquipmentHandler(gameState));
+            commandProcessor.RegisterHandler(new CmdEquipItemHandler());
+            commandProcessor.RegisterHandler(new CmdUnequipItemHandler());
             commandProcessor.RegisterHandler(new CmdResourcesAddHandler(gameState));
             commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));
             commandProcessor.RegisterHandler(new CmdTriggeredEnemySpawnHandler(gameState));

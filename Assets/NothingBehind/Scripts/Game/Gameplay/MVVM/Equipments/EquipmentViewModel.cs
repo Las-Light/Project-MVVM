@@ -1,16 +1,21 @@
 using System;
 using System.Linq;
 using JetBrains.Annotations;
+using NothingBehind.Scripts.Game.Gameplay.Commands.EquipmentCommands;
+using NothingBehind.Scripts.Game.Gameplay.Commands.InventoriesCommands;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Items;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
+using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Equipments;
+using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.ArmorItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.MagazinesItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.WeaponItems;
+using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using UnityEngine;
 
@@ -34,9 +39,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
         private readonly ObservableDictionary<int, EquipmentSlot> _itemSlotsMap = new();
         private readonly ObservableDictionary<SlotType, EquipmentSlot> _slotsMap = new();
         private readonly ObservableDictionary<int, ItemViewModel> _itemViewModelsMap = new();
+        private ICommandProcessor _commandProcessor;
 
 
-        public EquipmentViewModel(Equipment equipment, ItemsSettings itemsSettings, EquipmentService equipmentService)
+        public EquipmentViewModel(Equipment equipment, 
+            ItemsSettings itemsSettings, 
+            EquipmentService equipmentService,
+            ICommandProcessor commandProcessor)
         {
             _equipment = equipment;
             _itemsSettings = itemsSettings;
@@ -44,6 +53,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             Width = equipment.Width;
             Height = equipment.Height;
             Slots = equipment.Slots;
+            _commandProcessor = commandProcessor;
 
             foreach (var slot in equipment.Slots)
             {
@@ -71,7 +81,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
                             TryUnequipItem(oldSlot.SlotType);
                         }
                         CreateItemViewModel(item, _itemsSettings);
-                        slot.Equip(item);
+                        //slot.Equip(item);
+                        EquipItem(OwnerId, slot, item);
                         _equippedItemsMap[slotType] = item;
                         _itemSlotsMap[item.Id] = slot;
                         return true;
@@ -91,7 +102,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
                 RemoveItemViewModel(slot.EquippedItem.Value);
                 _equippedItemsMap.Remove(slotType);
                 _itemSlotsMap.Remove(slot.EquippedItem.Value.Id);
-                slot.Unequip();
+                //slot.Unequip();
+                UnequipItem(OwnerId, slot);
                 return true;
             }
 
@@ -135,6 +147,24 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments
             }
 
             return true;
+        }
+        
+        // Добавляет InventorGrid в Inventory
+        public CommandResult EquipItem(int ownerId, EquipmentSlot slot, Item item)
+        {
+            var command = new CmdEquipItem(ownerId, slot, item);
+            var result = _commandProcessor.Process(command);
+
+            return result;
+        }
+
+        // Удаляет InventorGrid из Inventory
+        public CommandResult UnequipItem(int ownerId, EquipmentSlot slot)
+        {
+            var command = new CmdUnequipItem(ownerId, slot);
+            var result = _commandProcessor.Process(command);
+
+            return result;
         }
 
         private void CreateItemViewModel(Item item, ItemsSettings itemsSettings)

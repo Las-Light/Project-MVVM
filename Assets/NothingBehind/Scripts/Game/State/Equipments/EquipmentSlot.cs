@@ -1,6 +1,5 @@
 using NothingBehind.Scripts.Game.State.Items;
 using R3;
-using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Equipments
 {
@@ -32,12 +31,15 @@ namespace NothingBehind.Scripts.Game.State.Equipments
             EquippedItem.Value = item;
         }
 
-        public void Unequip()
+        public bool Unequip()
         {
             if (EquippedItem != null)
             {
                 EquippedItem.Value = null;
+                return true;
             }
+
+            return false;
         }
     }
 }

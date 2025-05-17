@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using LitMotion;
 using LitMotion.Extensions;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments;
@@ -106,6 +105,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
             if (_currentGridView is EquipmentView equipmentView)
             {
                 newPosition = CalculateEquipSlotBoundary(equipmentView, newPosition, navDirection);
+                newPosition = RecalculateSlotOffset(equipmentView, newPosition);
             }
 
             if (TryToSwitchView(ref newPosition, navDirection)) return;
@@ -134,6 +134,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
             if (_currentGridView is EquipmentView equipmentView)
             {
                 newPosition = CalculateEquipSlotBoundary(equipmentView, newPosition, navDirection);
+                newPosition = RecalculateSlotOffset(equipmentView, newPosition);
             }
 
             if (TryToSwitchView(ref newPosition, navDirection)) return;
@@ -325,6 +326,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
             _currentSlotPos = ClampPosition(newPosition, _currentGridView.Width, _currentGridView.Height);
         }
 
+        // Корректировка позиции слота с учетом его начальной позиции
+        private Vector2Int RecalculateSlotOffset(EquipmentView equipmentView, Vector2Int newPosition)
+        {
+            var nextSlot = equipmentView.GetSlotAt(newPosition);
+            if (nextSlot != null)
+            {
+                newPosition = equipmentView.GetSlotPosition(nextSlot);
+                return newPosition;
+            }
+
+            return newPosition;
+        }
+
         private Vector2Int CalculateItemBoundary(InventoryGridView grid, Vector2Int newPosition,
             NavigationDirection direction)
         {
@@ -344,7 +358,6 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
             var slotView = equipmentView.GetSlotAt(_currentSlotPos);
             if (slotView == null) return newPosition;
             
-            _currentSlotPos = equipmentView.GetSlotPosition(slotView);
             var (left, right, top, bottom) = GetBounds(newPosition, slotView.Size);
             return BoundaryCalculator.CalculateEquipBoundary(newPosition, direction, left, right, top, bottom);
         }

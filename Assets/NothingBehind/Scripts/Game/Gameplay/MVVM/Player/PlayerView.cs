@@ -19,7 +19,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
         [SerializeField] private Transform _rifleParent;
         [SerializeField] private Transform _unarmedParent;
         [Header("Clip Prevention")] 
-        [Tooltip("ViewPoint")][SerializeField]
+        [Tooltip("ViewPoint")]
         public Transform pointToCheckClip;
         public LayerMask obstacleMask;
         
@@ -38,9 +38,9 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
         public List<GameObject> VisibleTargets;
         
         private PlayerViewModel _viewModel;
-        private TurnController _turnController;
+        private LookPlayerController _lookPlayerController;
         private AimController _aimController;
-        private MovementController _movementController;
+        private PlayerMovementController _playerMovementController;
         private GameplayUIManager _gameplayUIManager;
         private bool _inventoryIsOpened;
 
@@ -56,8 +56,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
             _gameplayUIManager = gameplayUIManager;
             InputManager = viewModel.InputManager;
             PlayerSettings = viewModel.PlayerSettings;
-            _turnController = GetComponent<TurnController>();
-            _movementController = GetComponent<MovementController>();
+            _lookPlayerController = GetComponent<LookPlayerController>();
+            _playerMovementController = GetComponent<PlayerMovementController>();
             _aimController = GetComponent<AimController>();
             CurrentEnemy = viewModel.CurrentEnemy;
             IsAim = viewModel.IsAim;
@@ -72,9 +72,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
             _disposables.Add(InputManager.IsAim.Skip(1).Subscribe(isAim =>
             {
                 if (isAim)
-                    _aimController.Aim();
+                {
+                    IsAim = true;
+                    _aimController.Aim(ArsenalView, IsCheckWall);
+                }
                 else
-                    _aimController.RemoveAim();
+                {
+                    IsAim = false;
+                    _aimController.RemoveAim(ArsenalView);
+                }
             }));
             _disposables.Add(InputManager.IsReload.Skip(1).Subscribe(_ =>
             {
@@ -98,13 +104,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
 
         private void Update()
         {
-            _movementController.Move();
-            _turnController.Look();
+            _playerMovementController.Move();
+            _lookPlayerController.Look();
             //_viewModel.UpdatePlayerPosition(transform.position);
             PressShoot();
             if (ArsenalView.ActiveGun.WeaponType != WeaponType.Unarmed)
             {
-                ArsenalView.ClipPrevention();
+                ArsenalView.ClipPrevention(IsAim, ref IsCheckWall);
             }
 
             if (Input.GetKeyDown(KeyCode.I))
@@ -153,8 +159,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
         {
             var arsenal = Instantiate(_arsenalPrefab, transform);
             var arsenalView = arsenal.GetComponent<ArsenalView>();
-            arsenalView.Bind(this, arsenalViewModel,
-                _pistolParent, _rifleParent, _unarmedParent);
+            arsenalView.Bind(arsenalViewModel,
+                _pistolParent, 
+                _rifleParent,
+                _unarmedParent,
+                pointToCheckClip,
+                obstacleMask);
             return arsenalView;
         }
     }

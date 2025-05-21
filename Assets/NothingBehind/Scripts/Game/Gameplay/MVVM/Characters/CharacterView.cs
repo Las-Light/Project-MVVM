@@ -1,12 +1,23 @@
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
 using R3;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
 {
     public class CharacterView : MonoBehaviour
     {
+        [SerializeField] private GameObject _arsenalPrefab;
+        [SerializeField] private Transform _pistolParent;
+        [SerializeField] private Transform _rifleParent;
+        [SerializeField] private Transform _unarmedParent;
+        public Transform pointToCheckClip;
+        public LayerMask obstacleMask;
+        
+        public ArsenalView ArsenalView { get; private set; }
+        
         private bool _triggered;
         private GameplayUIManager _gameplayUIManager;
         private int _characterId;
@@ -20,7 +31,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             transform.position = viewModel.Position.CurrentValue;
             _gameplayUIManager = gameplayUIManager;
             _characterId = viewModel.CharacterEntityId;
-            
+            ArsenalView = CreateArsenalView(viewModel.ArsenalViewModel);
         }
 
         private void OnTriggerStay(Collider other)
@@ -44,6 +55,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
         private void OnTriggerExit(Collider other)
         {
             _triggered = false;
+        }
+
+        public ArsenalView CreateArsenalView(ArsenalViewModel arsenalViewModel)
+        {
+            var arsenal = Instantiate(_arsenalPrefab, transform);
+            var arsenalView = arsenal.GetComponent<ArsenalView>();
+            arsenalView.Bind(arsenalViewModel,
+                _pistolParent,
+                _rifleParent,
+                _unarmedParent,
+                pointToCheckClip,
+                obstacleMask);
+            return arsenalView;
         }
     }
 }

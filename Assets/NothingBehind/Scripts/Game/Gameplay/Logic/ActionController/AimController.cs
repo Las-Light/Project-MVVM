@@ -8,62 +8,51 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 {
     public class AimController : MonoBehaviour
     {
-        public bool AimAssistON;
         public Transform AimPoint;
         [SerializeField] private float minDistToTargetSqrt = 9f;
         [SerializeField] private Transform pistolWeaponPose;
         [SerializeField] private Transform rifleWeaponPose;
 
-        private PlayerView _playerView;
-        private ArsenalView _arsenalView;
         private AnimatorController _animatorController;
         private RigController _rigController;
 
 
         private void Start()
         {
-            _playerView = GetComponent<PlayerView>();
-            _arsenalView = _playerView.ArsenalView;
             _animatorController = GetComponent<AnimatorController>();
             _rigController = GetComponent<RigController>();
         }
 
-        public void Aim()
+        public void Aim(ArsenalView arsenalView, bool isCheckWall)
         {
-            //устанавливаем поле isAim если нажата кнопка "Прицелиться"
-            _playerView.IsAim = true;
             pistolWeaponPose.rotation.SetLookRotation(Vector3.forward);
             rifleWeaponPose.rotation.SetLookRotation(Vector3.forward);
 
             //устанавливаем триггер для аниматора в зависимости от нажатия кнопки "прицеливание"
-            _animatorController.Aim(_playerView.IsAim);
+            _animatorController.Aim(true);
 
-            if (!_playerView.IsCheckWall)
+            if (!isCheckWall)
             {
-                _rigController.SetRigAim(_arsenalView.ActiveGun.WeaponType);
+                _rigController.SetRigAim(arsenalView.ActiveGun.WeaponType, true);
             }
 
-            if (_arsenalView.ActiveGun.WeaponType == WeaponType.Pistol && !_arsenalView.IsReloading)
+            if (arsenalView.ActiveGun.WeaponType == WeaponType.Pistol && !arsenalView.IsReloading)
             {
                 _rigController.SetRigLayerLeftHandIK(1, WeaponType.Pistol);
             }
         }
 
-        public void RemoveAim()
+        public void RemoveAim(ArsenalView arsenalView)
         {
-            //устанавливаем поле isAim false, если отпущена кнопка "Прицелиться"
-            _playerView.IsAim = false;
-            
             //после прицеливания оружия может выкручиваться в руках, поэтому сбрасываем ротацию
             pistolWeaponPose.rotation = Quaternion.LookRotation(Vector3.forward);
             rifleWeaponPose.rotation = Quaternion.LookRotation(Vector3.forward);
 
             //задаём анимацию прицеливания
-            _animatorController.Aim(_playerView.IsAim);
+            _animatorController.Aim(false);
 
-            _rigController.AimRifleRig(false);
-            _rigController.AimPistolRig(false);
-            if (_arsenalView.ActiveGun.WeaponType == WeaponType.Pistol)
+            _rigController.SetRigAim(arsenalView.ActiveGun.WeaponType, false);
+            if (arsenalView.ActiveGun.WeaponType == WeaponType.Pistol)
             {
                 _rigController.SetRigLayerLeftHandIK(0, WeaponType.Pistol);
             }
@@ -83,50 +72,22 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             }
             else
             {
-                SetAimPointForward(aimPosition);
+                SetAimPointForward(aimPosition, gun);
             }
         }
 
         //устанавливает направление AimPointa на дефолтное по отношению к телу юнита
-        private void SetAimPointForward()
+        public void SetAimPointForward()
         {
             AimPoint.position = Vector3.Lerp(AimPoint.position,
                 new Vector3(transform.position.x, 1.2f, transform.position.z) + transform.forward * 8,
                 Time.deltaTime * 20);
         }
 
-        private void SetAimPointForward(Vector3 aimPosition)
+        public void SetAimPointForward(Vector3 aimPosition, WeaponView gun)
         {
             AimPoint.position = Vector3.Lerp(AimPoint.position,
-                aimPosition + transform.forward * _arsenalView.ActiveGun.CheckDistanceToWall, Time.deltaTime * 20);
-        }
-
-        //направляет AimPoint к близшайшей цели, если целей нет в зоне видимости то AimPoint возвращается дефолтное состояние
-        public void AimPointTargetGamepad()
-        {
-            if (AimAssistON)
-            {
-                if (_playerView.CurrentEnemy)
-                    SetAimPointPosition(_playerView.CurrentEnemy.transform.GetChild(0).position,
-                        _arsenalView.ActiveGun);
-                else
-                    SetAimPointForward();
-            }
-            else
-                SetAimPointForward();
-        }
-
-        public void AimPointTargetMouse(Vector3 mouseWorldPosition)
-        {
-            if (AimAssistON)
-            {
-                if (_playerView.CurrentEnemy)
-                    SetAimPointPosition(_playerView.CurrentEnemy.transform.GetChild(0).position, _arsenalView.ActiveGun);
-                else
-                    SetAimPointPosition(mouseWorldPosition, _arsenalView.ActiveGun);
-            }
-            else
-                SetAimPointPosition(mouseWorldPosition, _arsenalView.ActiveGun);
+                aimPosition + transform.forward * gun.CheckDistanceToWall, Time.deltaTime * 20);
         }
     }
 }

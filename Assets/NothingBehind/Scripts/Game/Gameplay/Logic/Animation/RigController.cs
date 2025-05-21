@@ -64,10 +64,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Animation
         public void AimRifleRig(bool takeAim) => StartCoroutine(SetWeightRig(takeAim ? 1 : 0, rifleAimRig));
         public void AimPistolRig(bool takeAim) => StartCoroutine(SetWeightRig(takeAim ? 1 : 0, pistolAimRig));
 
-        public void SetRigAim(WeaponType weaponType)
+        public void SetRigAim(WeaponType weaponType, bool isAim)
         {
-            if (weaponType == WeaponType.Pistol) AimPistolRig(true);
-            else if (weaponType == WeaponType.Rifle) AimRifleRig(true);
+            if (weaponType == WeaponType.Pistol) AimPistolRig(isAim);
+            else if (weaponType == WeaponType.Rifle) AimRifleRig(isAim);
         }
 
         // Метод для обработки стены

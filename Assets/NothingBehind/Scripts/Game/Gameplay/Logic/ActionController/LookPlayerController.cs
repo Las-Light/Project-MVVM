@@ -10,8 +10,10 @@ using Math = System.Math;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 {
-    public class TurnController: MonoBehaviour
+    public class LookPlayerController : MonoBehaviour
     {
+        public bool AimAssistON;
+
         private Camera _mainCamera;
         private PlayerInput _playerInput;
         private AnimatorController _animatorController;
@@ -21,28 +23,30 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         private float _turnRotation;
         private GameplayInputManager _inputManager;
         private PlayerSettings _playerSettings;
+        private PlayerView _playerView;
 
         private void Start()
         {
             _mainCamera = Camera.main;
             _playerInput = GetComponent<PlayerInput>();
             _animatorController = GetComponent<AnimatorController>();
-            _inputManager = GetComponent<PlayerView>().InputManager;
-            _playerSettings = GetComponent<PlayerView>().PlayerSettings;
+            _playerView = GetComponent<PlayerView>();
+            _inputManager = _playerView.InputManager;
+            _playerSettings = _playerView.PlayerSettings;
             _aimController = GetComponent<AimController>();
         }
-        
+
         public void Look()
         {
             if (_playerInput.currentControlScheme == AppConstants.GamepadControlScheme)
                 LookGamepad();
-            
+
             if (_playerInput.currentControlScheme == AppConstants.KeyboardMouseControlScheme)
                 LookMouse();
         }
 
         //метод задает направление игрока когда игрок не движется
-        public void LookMouse()
+        private void LookMouse()
         {
             if (_playerInput.currentControlScheme != AppConstants.KeyboardMouseControlScheme)
                 return;
@@ -71,7 +75,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                     transform.rotation = Quaternion.RotateTowards(transform.rotation,
                         Quaternion.LookRotation(aimDirection),
                         _playerSettings.MouseRotationSpeed * Time.deltaTime);
-                    _aimController.AimPointTargetMouse(MouseWorldPosition.Value);
+                    AimPointTargetMouse(MouseWorldPosition.Value);
                 }
 
                 //анимация поворота на месте
@@ -92,7 +96,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 
         //метод позволяет поворачивать игрока лицом в направлении движения правого стика геймпада
         //матрица применяется для уточнения направления с учетом поворота камеры 
-        public void LookGamepad()
+        private void LookGamepad()
         {
             if (_playerInput.currentControlScheme != AppConstants.GamepadControlScheme)
                 return;
@@ -122,7 +126,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
                     _playerSettings.GamepadRotationSpeed * Time.deltaTime);
                 //StartCoroutine(RotationToSkewedInput(skewedInput));
 
-                _aimController.AimPointTargetGamepad();
+                AimPointTargetGamepad();
 
                 // выбор скорости вращения игрока стиком с учетом на какрй угол происходит поворот
                 // чем меньше угол тем плавнее поворачивается игрок
@@ -139,6 +143,35 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
             }
             else
                 _animatorController.Turn(0, 0);
+        }
+
+        //направляет AimPoint к близшайшей цели, если целей нет в зоне видимости то AimPoint возвращается дефолтное состояние
+        private void AimPointTargetGamepad()
+        {
+            if (AimAssistON)
+            {
+                if (_playerView.CurrentEnemy)
+                    _aimController.SetAimPointPosition(_playerView.CurrentEnemy.transform.GetChild(0).position,
+                        _playerView.ArsenalView.ActiveGun);
+                else
+                    _aimController.SetAimPointForward();
+            }
+            else
+                _aimController.SetAimPointForward();
+        }
+
+        private void AimPointTargetMouse(Vector3 mouseWorldPosition)
+        {
+            if (AimAssistON)
+            {
+                if (_playerView.CurrentEnemy)
+                    _aimController.SetAimPointPosition(_playerView.CurrentEnemy.transform.GetChild(0).position,
+                        _playerView.ArsenalView.ActiveGun);
+                else
+                    _aimController.SetAimPointPosition(mouseWorldPosition, _playerView.ArsenalView.ActiveGun);
+            }
+            else
+                _aimController.SetAimPointPosition(mouseWorldPosition, _playerView.ArsenalView.ActiveGun);
         }
 
         private Vector3 CalculateAimMousePosition(Vector3 hit, Vector2 mousePos)

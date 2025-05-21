@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 {
-    public class MovementController : MonoBehaviour
+    public class PlayerMovementController : MonoBehaviour
     {
         [Header("Aim")] 
         [Tooltip("TargetAimPoint")]

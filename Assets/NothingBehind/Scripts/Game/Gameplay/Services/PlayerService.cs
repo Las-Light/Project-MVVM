@@ -18,11 +18,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
     {
         public readonly ReactiveProperty<PlayerViewModel> PlayerViewModel = new();
 
-        private readonly MovementController _movementController;
-        private readonly TurnController _turnController;
+        private readonly PlayerMovementController _playerMovementController;
+        private readonly LookPlayerController _lookPlayerController;
         private readonly Player _player;
+        private readonly InventoryService _inventoryService;
+        private readonly ArsenalService _arsenalService;
+        private readonly GameplayInputManager _inputManager;
         private readonly ICommandProcessor _cmd;
         private readonly SceneEnterParams _sceneEnterParams;
+        private readonly PlayerSettings _playerSettings;
 
         public PlayerService(InventoryService inventoryService,
             ArsenalService arsenalService,
@@ -32,10 +36,15 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             SceneEnterParams sceneEnterParams,
             PlayerSettings playerSettings)
         {
+            _inventoryService = inventoryService;
+            _arsenalService = arsenalService;
+            _player = player;
+            _inputManager = inputManager;
             _cmd = cmd;
             _sceneEnterParams = sceneEnterParams;
+            _playerSettings = playerSettings;
 
-            InitialPlayer(player, arsenalService, inputManager, playerSettings);
+            InitialPlayer();
         }
 
         public CommandResult UpdatePlayerPosOnMap(Vector3 position, MapId currentMap)
@@ -53,21 +62,19 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             return result;
         }
 
-        private void InitialPlayer(Player player, ArsenalService arsenalService, GameplayInputManager inputManager,
-            PlayerSettings playerSettings)
+        private void InitialPlayer()
         {
             InitialPosOnMap();
-            CreatePlayerViewModel(player, arsenalService, inputManager, playerSettings);
+            CreatePlayerViewModel();
         }
 
-        private void CreatePlayerViewModel(Player player, ArsenalService arsenalService,
-            GameplayInputManager inputManager, PlayerSettings playerSettings)
+        private void CreatePlayerViewModel()
         {
-            if (!arsenalService.ArsenalMap.TryGetValue(player.Id, out var arsenalViewModel))
+            if (!_arsenalService.ArsenalMap.TryGetValue(_player.Id, out var arsenalViewModel))
             {
-                throw new Exception($"ArsenalViewModel for owner with Id {player.Id} not found");
+                throw new Exception($"ArsenalViewModel for owner with Id {_player.Id} not found");
             }
-            var viewModel = new PlayerViewModel(player,this, inputManager, arsenalViewModel, playerSettings);
+            var viewModel = new PlayerViewModel(_player,this, _inputManager, arsenalViewModel, _playerSettings);
 
             PlayerViewModel.Value = viewModel;
         }

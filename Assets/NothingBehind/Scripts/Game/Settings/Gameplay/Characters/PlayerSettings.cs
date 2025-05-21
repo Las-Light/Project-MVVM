@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Settings.Gameplay.Characters
 {
-    [CreateAssetMenu(fileName = "HeroSettings", menuName = "Game Settings/Characters/New Hero Settings")]
+    [CreateAssetMenu(fileName = "PlayerSettings", menuName = "Game Settings/Characters/New Player Settings")]
     public class PlayerSettings : ScriptableObject
     {
         public EntityType EntityType;

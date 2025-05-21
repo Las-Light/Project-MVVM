@@ -29,15 +29,14 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
         private WeaponView _weaponSlot2;
         private readonly ReactiveProperty<WeaponView> _activeGun = new();
         private WeaponView _unarmedView;
-        
+
         private Transform _pistolParent;
         private Transform _rifleParent;
         private Transform _unarmedParent;
         private Transform _pointToCheckClip;
-        private PlayerView _playerView;
-        
+
         private LayerMask _obstacleMask;
-        private bool autoReload = false;
+        private bool autoReload = true;
 
         private readonly Dictionary<int, WeaponView> _weaponViewMap = new();
 
@@ -61,18 +60,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 
         private CompositeDisposable _disposables = new();
 
-        public void Bind(PlayerView playerView,
-            ArsenalViewModel viewModel,
+        public void Bind(ArsenalViewModel viewModel,
             Transform pistolParent,
             Transform rifleParent,
-            Transform unarmedParent)
+            Transform unarmedParent,
+            Transform pointToCheckClip,
+            LayerMask obstacleMask)
         {
             AllWeaponViewModels = viewModel.AllWeaponViewModels;
             EquippedItems = viewModel.EquipmentItems;
-            _playerView = playerView;
-            _pointToCheckClip = playerView.pointToCheckClip;
-            _obstacleMask = playerView.obstacleMask;
 
+            _pointToCheckClip = pointToCheckClip;
+            _obstacleMask = obstacleMask;
             _animatorController = GetComponentInParent<AnimatorController>();
             _rigController = GetComponentInParent<RigController>();
             _soundController = GetComponentInParent<SoundController>();
@@ -263,7 +262,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
 
         //проверяет лучом есть ли перед игроком препятствие, если есть то поднимает оружие и не дает стрелять
         //точка откуда выходит луч находится на уровне шеи, задается через инспектор (подумать как можно заменить без инспектора)
-        public void ClipPrevention()
+        public bool ClipPrevention(bool isAim, ref bool isCheckWall)
         {
             Vector3 aimDirection = (_aimController.AimPoint.position - _pointToCheckClip.position).normalized;
             if (Physics.Raycast(
@@ -272,25 +271,26 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     _activeGun.Value.CheckDistanceToWall, _obstacleMask) &&
                 _activeGun.Value.WeaponType != WeaponType.Unarmed)
             {
-                _playerView.IsCheckWall = true;
-                if (_playerView.IsAim)
+                isCheckWall = true;
+                if (isAim)
                 {
                     if (_activeGun.Value.WeaponType == WeaponType.Pistol)
                         _rigController.AimPistolRig(false);
                     else if (_activeGun.Value.WeaponType == WeaponType.Rifle)
                     {
                         _rigController.AimRifleRig(false);
-                        _rigController.ClipWallRig(_playerView.IsCheckWall);
                     }
                 }
+
+                _rigController.ClipWallRig(isCheckWall);
 
                 _shootEnable = false;
             }
             else
             {
                 _shootEnable = true;
-                _playerView.IsCheckWall = false;
-                if (_playerView.IsAim)
+                isCheckWall = false;
+                if (isAim)
                 {
                     if (_activeGun.Value.WeaponType == WeaponType.Pistol)
                         _rigController.AimPistolRig(true);
@@ -298,10 +298,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons
                     if (_activeGun.Value.WeaponType == WeaponType.Rifle)
                     {
                         _rigController.AimRifleRig(true);
-                        _rigController.ClipWallRig(_playerView.IsCheckWall);
                     }
                 }
+
+                _rigController.ClipWallRig(isCheckWall);
             }
+
+            return isCheckWall;
         }
 
         private void WeaponSwitchRifle(WeaponView weaponView)

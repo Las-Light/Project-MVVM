@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Commands.CharactersCommands;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
@@ -88,8 +89,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             {
                 Debug.LogError($"Inventory with Id - {character.Id} not found");
             }
+            if (!_arsenalService.ArsenalMap.TryGetValue(character.Id, out var arsenalViewModel))
+            {
+                throw new Exception($"ArsenalViewModel for owner with Id {character.Id} not found");
+            }
             var characterViewModel = new CharacterViewModel(character,
-                characterSettings, this, inventoryViewModel);
+                characterSettings, this, inventoryViewModel, arsenalViewModel);
             
             _allCharacters.Add(characterViewModel);
             _characterMap[character.Id] = characterViewModel;

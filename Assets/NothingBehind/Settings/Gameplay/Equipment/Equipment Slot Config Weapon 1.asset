@@ -16,4 +16,4 @@ MonoBehaviour:
   ItemType: 0
   Width: 2
   Height: 1
-  EquippedItemSettings: {fileID: 0}
+  EquippedItemSettings: {fileID: 11400000, guid: e4cebf37e903abc4094c477ffc5d464e, type: 2}

@@ -39,7 +39,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM
             _isRotateCameraLeft = cameraViewModel.InputManager.IsRotateCameraLeft;
             _isRotateCameraRight = cameraViewModel.InputManager.IsRotateCameraRight;
             _isAim = cameraViewModel.InputManager.IsAim;
-            playerView.GetComponent<TurnController>().MouseWorldPosition.Subscribe(value => { _mousePosition = value; })
+            playerView.GetComponent<LookPlayerController>().MouseWorldPosition.Subscribe(value => { _mousePosition = value; })
                 .AddTo(_disposables);
             _disposables.Add(_isRotateCameraLeft.Skip(1).Subscribe(_ => StartCoroutine(RotateBy45Deg(Vector3.up))));
             _disposables.Add(_isRotateCameraRight.Skip(1).Subscribe(_ => StartCoroutine(RotateBy45Deg(Vector3.down))));

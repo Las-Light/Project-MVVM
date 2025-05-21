@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
+using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Entities;
@@ -19,6 +20,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
 
         public readonly int CharacterEntityId;
         public readonly EntityType EntityType;
+        public readonly ArsenalViewModel ArsenalViewModel;
         public ReadOnlyReactiveProperty<Vector3> Position { get; }
         public ReadOnlyReactiveProperty<int> Level { get; }
         public ReadOnlyReactiveProperty<float> Health { get; }
@@ -26,7 +28,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
         public CharacterViewModel(Character character,
             CharacterSettings characterSettings,
             CharactersService charactersService, 
-            InventoryViewModel inventoryViewModel)
+            InventoryViewModel inventoryViewModel,
+            ArsenalViewModel arsenalViewModel)
         {
             EntityType = character.EntityType;
             CharacterEntityId = character.Id;
@@ -38,6 +41,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Characters
             _characterSettings = characterSettings;
             _charactersService = charactersService;
             _inventoryViewModel = inventoryViewModel;
+            ArsenalViewModel = arsenalViewModel;
 
             foreach (var characterLevelSettings in characterSettings.LevelSettings)
             {

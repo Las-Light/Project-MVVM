@@ -4,6 +4,7 @@ using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Root;
 using NothingBehind.Scripts.Game.GameRoot.Services;
+using NothingBehind.Scripts.Game.GlobalMap.Root;
 using NothingBehind.Scripts.Game.MainMenu.Root;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
@@ -80,6 +81,16 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 _coroutines.StartCoroutine(LoadingAndStartGameplay(gameSettings, enterParams));
                 return;
             }
+            
+            if (sceneName == Scenes.GLOBAL_MAP)
+            {
+                var enterParams =
+                    new GlobalMapEnterParams(
+                        "StartFromGlobalMapScene.save",
+                        MapId.GlobalMap); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
+                _coroutines.StartCoroutine(LoadingAndStartGlobalMap(gameSettings, enterParams));
+                return;
+            }
 
             if (sceneName == Scenes.MAIN_MENU)
             {
@@ -120,10 +131,50 @@ namespace NothingBehind.Scripts.Game.GameRoot
                     _coroutines.StartCoroutine(LoadingAndStartMainMenu(gameSettings,
                         gameplayExitParams.SceneEnterParams));
                 }
+                else if (targetSceneName == Scenes.GLOBAL_MAP)
+                {
+                    _coroutines.StartCoroutine(LoadingAndStartGlobalMap(gameSettings,
+                        gameplayExitParams.SceneEnterParams));
+                }
                 else
                 {
                     _coroutines.StartCoroutine(LoadingAndStartGameplay(gameSettings,
                         gameplayExitParams.SceneEnterParams));
+                }
+            });
+
+            _uiRoot.HideLoadingScreen();
+        }
+        
+        private IEnumerator LoadingAndStartGlobalMap(GameSettings gameSettings, SceneEnterParams enterParams)
+        {
+            _uiRoot.ShowLoadingScreen();
+            _cachedSceneContainer?.Dispose();
+
+            yield return LoadScene(Scenes.BOOT);
+            yield return LoadScene(GetSceneName(enterParams.TargetMapId));
+
+            //yield return new WaitForSeconds(1);
+
+            var isGameStateLoaded = false;
+            _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
+                .Subscribe(_ => isGameStateLoaded = true);
+            yield return new WaitUntil(() => isGameStateLoaded);
+            
+            var sceneEntryPoint = Object.FindFirstObjectByType<GlobalMapEntryPoint>();
+            var globalMapContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
+            sceneEntryPoint.Run(globalMapContainer, enterParams).Subscribe(globalMapExitParams =>
+            {
+                var targetSceneName = GetSceneName(globalMapExitParams.SceneEnterParams.TargetMapId);
+                if (targetSceneName == Scenes.MAIN_MENU)
+                {
+                    _coroutines.StartCoroutine(LoadingAndStartMainMenu(gameSettings,
+                        globalMapExitParams.SceneEnterParams));
+                }
+                else
+                {
+                    _coroutines.StartCoroutine(LoadingAndStartGameplay(gameSettings,
+                        globalMapExitParams.SceneEnterParams));
                 }
             });
 
@@ -158,6 +209,11 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 {
                     _coroutines.StartCoroutine(
                         LoadingAndStartGameplay(gameSettings, mainMenuExitParams.SceneEnterParams));
+                }
+                else if (targetSceneName == Scenes.GLOBAL_MAP)
+                {
+                    _coroutines.StartCoroutine(LoadingAndStartGlobalMap(gameSettings,
+                        mainMenuExitParams.SceneEnterParams));
                 }
             });
 

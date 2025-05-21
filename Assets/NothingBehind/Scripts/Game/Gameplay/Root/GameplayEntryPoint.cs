@@ -10,7 +10,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 {
     public class GameplayEntryPoint : MonoBehaviour
     {
-        [SerializeField] private UIGameplayRootView _sceneUIRootPrefab;
+        [SerializeField] private UIGameplayRootView sceneUIRootPrefab;
         [SerializeField] private WorldGameplayRootView worldRootView;
 
         public Subject<GameplayExitParams> Run(DIContainer gameplayContainer, SceneEnterParams enterParams)
@@ -42,7 +42,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
         {
             // Создали UI для сцены
             var uiRoot = viewsContainer.Resolve<UIRootView>();
-            var uiSceneRootBinder = Instantiate(_sceneUIRootPrefab);
+            var uiSceneRootBinder = Instantiate(sceneUIRootPrefab);
             uiRoot.AttachSceneUI(uiSceneRootBinder.gameObject);
             
             // Запрашиваем рутовую вью модель и пихаем её в байндер, который создали

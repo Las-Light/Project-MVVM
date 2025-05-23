@@ -3,6 +3,7 @@ using NothingBehind.Scripts.Game.Gameplay.Logic;
 using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 

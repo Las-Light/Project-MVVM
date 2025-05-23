@@ -4,6 +4,8 @@ using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventories;
 using NothingBehind.Scripts.Game.State.Maps;
+using NothingBehind.Scripts.Game.State.Maps.GameplayMap;
+using NothingBehind.Scripts.Game.State.Maps.GlobalMap;
 using NothingBehind.Scripts.Game.State.Weapons;
 using ObservableCollections;
 using R3;
@@ -16,7 +18,8 @@ namespace NothingBehind.Scripts.Game.State.Root
         public readonly GameState GameState;
         public readonly ReactiveProperty<MapId> CurrentMapId = new();
         public ReactiveProperty<Player> Player { get; }
-        public ObservableList<Map> Maps { get; } = new();
+        public ReactiveProperty<Maps.GlobalMap.GlobalMap> GlobalMap { get; }
+        public ObservableList<GameplayMap> Maps { get; } = new();
         public ObservableList<Resource> Resources { get; } = new();
         public ObservableList<Inventory> Inventories { get; } = new();
         public ObservableList<Equipment> Equipments { get; } = new();
@@ -27,13 +30,17 @@ namespace NothingBehind.Scripts.Game.State.Root
             GameState = gameState;
             CurrentMapId.Value = gameState.CurrentMapId;
 
-            InitMaps(gameState);
+            InitGameplayMaps(gameState);
             InitResources(gameState);
             InitInventories(gameState);
             InitEquipments(gameState);
             InitArsenals(gameState);
             Player = new ReactiveProperty<Player>(new Player(gameState.PlayerData));
             Player.Subscribe(player => gameState.PlayerData = player.Origin);
+            
+            GlobalMap = new ReactiveProperty<Maps.GlobalMap.GlobalMap>(
+                new Maps.GlobalMap.GlobalMap(gameState.GlobalMap));
+            GlobalMap.Subscribe(map => gameState.GlobalMap = map.Origin);
 
             CurrentMapId.Skip(1).Subscribe(newValue => gameState.CurrentMapId = newValue);
         }
@@ -53,22 +60,22 @@ namespace NothingBehind.Scripts.Game.State.Root
             return GameState.CreateGridId();
         }
 
-        private void InitMaps(GameState gameState)
+        private void InitGameplayMaps(GameState gameState)
         {
-            gameState.Maps.ForEach(mapOrigin => Maps.Add(new Map(mapOrigin)));
+            gameState.GameplayMaps.ForEach(mapOrigin => Maps.Add(new GameplayMap(mapOrigin)));
 
             Maps.ObserveAdd().Subscribe(e =>
             {
                 var addedMap = e.Value;
-                gameState.Maps.Add(addedMap.Origin);
+                gameState.GameplayMaps.Add(addedMap.Origin);
             });
 
             Maps.ObserveRemove().Subscribe(e =>
             {
                 var removedMap = e.Value;
                 var removedMapState =
-                    gameState.Maps.FirstOrDefault(c => c.Id == removedMap.Id);
-                gameState.Maps.Remove(removedMapState);
+                    gameState.GameplayMaps.FirstOrDefault(c => c.Id == removedMap.Id);
+                gameState.GameplayMaps.Remove(removedMapState);
             });
         }
 

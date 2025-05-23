@@ -6,9 +6,9 @@ using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using ObservableCollections;
 using R3;
 
-namespace NothingBehind.Scripts.Game.State.Maps
+namespace NothingBehind.Scripts.Game.State.Maps.GameplayMap
 {
-    public class Map
+    public class GameplayMap
     {
         public MapId Id => Origin.Id;
         public string SceneName => Origin.SceneName;
@@ -16,47 +16,45 @@ namespace NothingBehind.Scripts.Game.State.Maps
         public ObservableList<Storage> Storages { get; } = new();
         public ObservableList<MapTransferData> MapTransfers { get; } = new();
         public ObservableList<EnemySpawn> EnemySpawns { get; } = new();
-        public MapData Origin { get; }
+        public GameplayMapData Origin { get; }
 
-        public Map(MapData mapState)
+        public GameplayMap(GameplayMapData gameplayMapState)
         {
-            Origin = mapState;
-            mapState.Characters.ForEach(characterOrigin =>
+            Origin = gameplayMapState;
+            gameplayMapState.Characters.ForEach(characterOrigin =>
                 Characters.Add(new Character(characterOrigin)));
-            mapState.Storages.ForEach(storageOrigin => 
+            gameplayMapState.Storages.ForEach(storageOrigin => 
                 Storages.Add(new Storage(storageOrigin)));
-            mapState.MapTransfers.ForEach(mapTransferData =>
-                MapTransfers.Add(new MapTransferData(
-                    mapTransferData.TargetMapId,
-                    mapTransferData.Position)));
-            mapState.EnemySpawns.ForEach(enemySpawnData =>
+            gameplayMapState.MapTransfers.ForEach(mapTransferData =>
+                MapTransfers.Add(mapTransferData));
+            gameplayMapState.EnemySpawns.ForEach(enemySpawnData =>
                 EnemySpawns.Add(new EnemySpawn(enemySpawnData)));
 
             Characters.ObserveAdd().Subscribe(e =>
             {
                 var addedCharacterEntity = e.Value;
-                mapState.Characters.Add(addedCharacterEntity.Origin);
+                gameplayMapState.Characters.Add(addedCharacterEntity.Origin);
             });
 
             Characters.ObserveRemove().Subscribe(e =>
             {
                 var removedCharacter = e.Value;
                 var removedCharacterData =
-                    mapState.Characters.FirstOrDefault(c => c.UniqueId == removedCharacter.Id);
-                mapState.Characters.Remove(removedCharacterData);
+                    gameplayMapState.Characters.FirstOrDefault(c => c.UniqueId == removedCharacter.Id);
+                gameplayMapState.Characters.Remove(removedCharacterData);
             });
 
             Storages.ObserveAdd().Subscribe(e =>
             {
                 var addedStorage = e.Value;
-                mapState.Storages.Add(addedStorage.Origin);
+                gameplayMapState.Storages.Add(addedStorage.Origin);
             });
             Storages.ObserveRemove().Subscribe(e =>
             {
                 var removedStorage = e.Value;
                 var removedStorageData =
-                    mapState.Storages.FirstOrDefault(c => c.UniqueId == removedStorage.Id);
-                mapState.Storages.Remove(removedStorageData);
+                    gameplayMapState.Storages.FirstOrDefault(c => c.UniqueId == removedStorage.Id);
+                gameplayMapState.Storages.Remove(removedStorageData);
             });
         }
     }

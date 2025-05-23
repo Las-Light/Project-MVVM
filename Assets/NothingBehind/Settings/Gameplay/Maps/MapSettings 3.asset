@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a129c86f554b41ff86c03101b4681e6c, type: 3}
   m_Name: MapSettings 3
   m_EditorClassIdentifier: 
-  MapId: 2
+  MapId: 3
   SceneName: Gameplay_1
   InitialStateSettings:
     PlayerInitialPosition: {x: -12.503803, y: 0.6, z: -1.8886919}
     Characters: []
     MapTransfers:
-    - TargetMapId: 1
+    - TargetMapId: 2
       Position: {x: -8.7181, y: 0, z: 8.882269}
     EnemySpawns:
     - Id: SpawnMarker

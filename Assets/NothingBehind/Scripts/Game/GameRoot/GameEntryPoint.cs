@@ -3,6 +3,7 @@ using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Root;
+using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.GlobalMap.Root;
 using NothingBehind.Scripts.Game.MainMenu.Root;
@@ -51,7 +52,8 @@ namespace NothingBehind.Scripts.Game.GameRoot
             _rootContainer.RegisterInstance<ISettingsProvider>(settingsProvider);
             _rootContainer.RegisterFactory(_ => new InitialGameStateService()).AsSingle();
 
-            var gameStateProvider = new PlayerPrefsGameStateProvider(_rootContainer.Resolve<InitialGameStateService>());
+            var initialGameStateService = _rootContainer.Resolve<InitialGameStateService>();
+            var gameStateProvider = new PlayerPrefsGameStateProvider(initialGameStateService);
             _rootContainer.RegisterInstance<IGameStateProvider>(gameStateProvider);
         }
 
@@ -81,7 +83,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 _coroutines.StartCoroutine(LoadingAndStartGameplay(gameSettings, enterParams));
                 return;
             }
-            
+
             if (sceneName == Scenes.GLOBAL_MAP)
             {
                 var enterParams =
@@ -120,7 +122,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
                 .Subscribe(_ => isGameStateLoaded = true);
             yield return new WaitUntil(() => isGameStateLoaded);
-            
+
             var sceneEntryPoint = Object.FindFirstObjectByType<GameplayEntryPoint>();
             var gameplayContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
             sceneEntryPoint.Run(gameplayContainer, enterParams).Subscribe(gameplayExitParams =>
@@ -145,7 +147,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
 
             _uiRoot.HideLoadingScreen();
         }
-        
+
         private IEnumerator LoadingAndStartGlobalMap(GameSettings gameSettings, SceneEnterParams enterParams)
         {
             _uiRoot.ShowLoadingScreen();
@@ -160,7 +162,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
                 .Subscribe(_ => isGameStateLoaded = true);
             yield return new WaitUntil(() => isGameStateLoaded);
-            
+
             var sceneEntryPoint = Object.FindFirstObjectByType<GlobalMapEntryPoint>();
             var globalMapContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
             sceneEntryPoint.Run(globalMapContainer, enterParams).Subscribe(globalMapExitParams =>

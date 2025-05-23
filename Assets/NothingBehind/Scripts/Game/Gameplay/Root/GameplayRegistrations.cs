@@ -15,6 +15,7 @@ using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Commands;
@@ -73,13 +74,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 
             container.RegisterFactory(c => new GameplayInputManager()).AsSingle();
             var inputManager = container.Resolve<GameplayInputManager>();
+
+            // регистрируем сервисы
             
             container.RegisterFactory(c => new CameraService(
                 inputManager,
                 gameplayCameraSettings)).AsSingle();
-            var cameraService = container.Resolve<CameraService>();
-
-            // регистрируем сервисы
+            
             container.RegisterFactory(c => new EquipmentService(gameState.Equipments, itemsSettings,
                 commandProcessor)).AsSingle();
             var equipmentService = container.Resolve<EquipmentService>();

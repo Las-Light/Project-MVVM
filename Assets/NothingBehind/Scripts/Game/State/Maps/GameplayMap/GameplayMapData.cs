@@ -8,7 +8,7 @@ using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 namespace NothingBehind.Scripts.Game.State.Maps
 {
     [Serializable]
-    public class MapData
+    public class GameplayMapData
     {
         public MapId Id;
         public string SceneName;

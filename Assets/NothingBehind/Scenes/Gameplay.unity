@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebf336f93d0d4e89b99610fd757771a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sceneUIRootPrefab: {fileID: 91992379363235827, guid: d4d1b1e10906526448a2405c61017e7f, type: 3}
+  sceneUIRootPrefab: {fileID: 91992379363235827, guid: d4d1b1e10906526448a2405c61017e7f, type: 3}
   worldRootView: {fileID: 1780069855}
 --- !u!4 &207031324
 Transform:
@@ -565,7 +565,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1826281224756418159, guid: ed1c143b0e8c5f049a868e787c250b57, type: 3}
       propertyPath: TargetMapId
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

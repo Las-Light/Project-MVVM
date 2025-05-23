@@ -8,6 +8,7 @@ using NothingBehind.Scripts.Game.Gameplay.MVVM.Maps;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Storages;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Entities;

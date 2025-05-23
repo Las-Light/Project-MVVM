@@ -32,7 +32,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             gameState.Equipments = new List<EquipmentData>();
             gameState.Inventories = new List<InventoryData>();
             gameState.Arsenals = new List<ArsenalData>();
-            gameState.Maps = CreateMaps(gameState, gameSettings);
+            gameState.GameplayMaps = CreateMaps(gameState, gameSettings);
             gameState.CurrentMapId = currentMapId;
             gameState.PlayerData = CreatePlayer(gameState, gameSettings, currentMapId, currentMapSettings);
             gameState.Resources = new List<ResourceData>()
@@ -69,9 +69,9 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             return player;
         }
 
-        private List<MapData> CreateMaps(GameState gameState, GameSettings gameSettings)
+        private List<GameplayMapData> CreateMaps(GameState gameState, GameSettings gameSettings)
         {
-            var maps = new List<MapData>();
+            var maps = new List<GameplayMapData>();
             foreach (var map in gameSettings.MapsSettings.Maps)
             {
                 maps.Add(CreateMapState(map.MapId, gameState, gameSettings));
@@ -80,13 +80,13 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             return maps;
         }
 
-        private MapData CreateMapState(MapId mapId, GameState gameState, GameSettings gameSettings)
+        private GameplayMapData CreateMapState(MapId mapId, GameState gameState, GameSettings gameSettings)
         {
             var newMapSettings = gameSettings.MapsSettings.Maps.First(m => m.MapId == mapId);
             var newMapInitialStateSettings = newMapSettings.InitialStateSettings;
 
             var sceneName = newMapSettings.SceneName;
-            var newMapState = new MapData
+            var newMapState = new GameplayMapData
             {
                 Id = mapId,
                 SceneName = sceneName,
@@ -115,10 +115,8 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
         private List<MapTransferData> InitialMapTransfers(MapInitialStateSettings newMapInitialStateSettings)
         {
             var initialMapTransfers = new List<MapTransferData>();
-            foreach (var mapTransferSettings in newMapInitialStateSettings.MapTransfers)
+            foreach (var mapTransferData in newMapInitialStateSettings.MapTransfers)
             {
-                var mapTransferData = new MapTransferData(mapTransferSettings.TargetMapId,
-                    mapTransferSettings.Position);
                 initialMapTransfers.Add(mapTransferData);
             }
 

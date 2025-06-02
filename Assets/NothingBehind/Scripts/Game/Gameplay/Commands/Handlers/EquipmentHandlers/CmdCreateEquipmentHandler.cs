@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Commands.EquipmentCommands;
 using NothingBehind.Scripts.Game.Settings;
-using NothingBehind.Scripts.Game.Settings.Equipment;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Equipment;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Equipments;

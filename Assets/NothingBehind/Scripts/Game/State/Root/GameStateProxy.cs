@@ -5,7 +5,6 @@ using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventories;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.GameplayMap;
-using NothingBehind.Scripts.Game.State.Maps.GlobalMap;
 using NothingBehind.Scripts.Game.State.Weapons;
 using ObservableCollections;
 using R3;
@@ -18,7 +17,7 @@ namespace NothingBehind.Scripts.Game.State.Root
         public readonly GameState GameState;
         public readonly ReactiveProperty<MapId> CurrentMapId = new();
         public ReactiveProperty<Player> Player { get; }
-        public ReactiveProperty<Maps.GlobalMap.GlobalMap> GlobalMap { get; }
+        public ReactiveProperty<Maps.GlobalMaps.GlobalMap> GlobalMap { get; }
         public ObservableList<GameplayMap> Maps { get; } = new();
         public ObservableList<Resource> Resources { get; } = new();
         public ObservableList<Inventory> Inventories { get; } = new();
@@ -37,9 +36,9 @@ namespace NothingBehind.Scripts.Game.State.Root
             InitArsenals(gameState);
             Player = new ReactiveProperty<Player>(new Player(gameState.PlayerData));
             Player.Subscribe(player => gameState.PlayerData = player.Origin);
-            
-            GlobalMap = new ReactiveProperty<Maps.GlobalMap.GlobalMap>(
-                new Maps.GlobalMap.GlobalMap(gameState.GlobalMap));
+
+            GlobalMap = new ReactiveProperty<Maps.GlobalMaps.GlobalMap>(
+                new Maps.GlobalMaps.GlobalMap(gameState.GlobalMap));
             GlobalMap.Subscribe(map => gameState.GlobalMap = map.Origin);
 
             CurrentMapId.Skip(1).Subscribe(newValue => gameState.CurrentMapId = newValue);

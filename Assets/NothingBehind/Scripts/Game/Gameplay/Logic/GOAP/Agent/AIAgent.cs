@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.Gameplay.Logic.ActionController;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
 using NothingBehind.Scripts.Game.Gameplay.Logic.GOAP.GOAP;
-using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Gameplay.Logic.GOAP.Agent

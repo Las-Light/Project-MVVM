@@ -87,6 +87,23 @@ namespace DI.Scripts
             throw new Exception($"Couldn't find dependency for tag {tag} and type {key.Item2.FullName}");
         }
 
+        public bool IsRegistered<T>()
+        {
+            return IsRegistered<T>(null);
+        }
+
+        public bool IsRegistered<T>(string tag)
+        {
+            var key = (tag, typeof(T));
+
+            if (_entriesMap.ContainsKey(key))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public void Dispose()
         {
             var entries = _entriesMap.Values;

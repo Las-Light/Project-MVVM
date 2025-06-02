@@ -1,10 +1,9 @@
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
-using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
 using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.ActionController
 {
     public class AimController : MonoBehaviour
     {

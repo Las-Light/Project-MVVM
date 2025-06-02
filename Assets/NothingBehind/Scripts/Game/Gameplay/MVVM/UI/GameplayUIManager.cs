@@ -1,13 +1,13 @@
 using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.PopupA;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.PopupB;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI.ScreenGameplay;
 using NothingBehind.Scripts.Game.Gameplay.Root;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.MVVM.UI;
 using NothingBehind.Scripts.Utils;
@@ -24,7 +24,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
         private readonly EquipmentService _equipmentService;
         private readonly StorageService _storageService;
         private readonly PlayerService _playerService;
-        private readonly GameplayInputManager _gameplayInputManager;
+        private readonly InputManager _inputManager;
 
         public GameplayUIManager(DIContainer container) : base(container)
         {
@@ -34,7 +34,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
             _equipmentService = container.Resolve<EquipmentService>();
             _storageService = container.Resolve<StorageService>();
             _playerService = container.Resolve<PlayerService>();
-            _gameplayInputManager = container.Resolve<GameplayInputManager>();
+            _inputManager = container.Resolve<InputManager>();
         }
 
         public ScreenGameplayViewModel OpenScreenGameplay()
@@ -57,10 +57,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI
                 position,
                 targetOwnerId,
                 _exitInventoryRequest,
-                _gameplayInputManager);
+                _inputManager);
             var rootUI = Container.Resolve<UIGameplayRootViewModel>();
             
-            _gameplayInputManager.UIInputEnabled();
+            _inputManager.UIInputEnabled();
             rootUI.OpenPopup(inventoryUI);
             return inventoryUI;
         }

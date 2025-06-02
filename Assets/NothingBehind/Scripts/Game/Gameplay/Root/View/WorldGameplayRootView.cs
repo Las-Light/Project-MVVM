@@ -18,7 +18,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
     {
         private readonly Dictionary<int, CharacterView> _createCharactersMap = new();
         private readonly Dictionary<int, StorageView> _createStoragesMap = new();
-        private readonly Dictionary<MapId, MapTransferBinder> _createMapTransfersMap = new();
+        private readonly Dictionary<MapId, GameplayMapTransferView> _createMapTransfersMap = new();
         private readonly Dictionary<string, EnemySpawnView> _createSpawns = new();
         private PlayerView _playerView;
         private CameraView _camera;
@@ -132,12 +132,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             }
         }
 
-        private void CreateMapTransfer(MapTransferViewModel transferViewModel,
+        private void CreateMapTransfer(GameplayMapTransferViewModel transferViewModel,
             Subject<GameplayExitParams> exitSceneSignal)
         {
             var transferId = transferViewModel.MapId;
             var prefabMapTransferPath = "Prefabs/Gameplay/World/Entities/MapTransfers/MapTransfer";
-            var mapTransferPrefab = Resources.Load<MapTransferBinder>(prefabMapTransferPath);
+            var mapTransferPrefab = Resources.Load<GameplayMapTransferView>(prefabMapTransferPath);
 
             var createdMapTransfer = Instantiate(mapTransferPrefab);
             createdMapTransfer.Bind(exitSceneSignal, transferViewModel);

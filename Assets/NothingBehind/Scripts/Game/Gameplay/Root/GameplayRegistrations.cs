@@ -1,7 +1,6 @@
 using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
-using NothingBehind.Scripts.Game.Gameplay.Commands.EquipmentCommands;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.CharactersHandlers;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.EquipmentHandlers;
@@ -9,13 +8,9 @@ using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.InventoriesHandlers;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.PlayerHandlers;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.StoragesHandlers;
 using NothingBehind.Scripts.Game.Gameplay.Commands.Handlers.Weapons;
-using NothingBehind.Scripts.Game.Gameplay.Commands.Weapons;
-using NothingBehind.Scripts.Game.Gameplay.Logic;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
-using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot;
-using NothingBehind.Scripts.Game.GameRoot.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Commands;
@@ -45,8 +40,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             container.RegisterInstance(AppConstants.EXIT_SCENE_REQUEST_TAG, new Subject<GameplayExitParams>());
             container.RegisterInstance(AppConstants.EXIT_INVENTORY_REQUEST_TAG, new Subject<ExitInventoryRequestResult>());
 
-            // регистрируем процессор и команды, а также кладём CommandProcessor в контейнер
-            var commandProcessor = new CommandProcessor(gameStateProvider);
+            // регистрируем команды
+            var commandProcessor = container.Resolve<ICommandProcessor>();
             commandProcessor.RegisterHandler(new CmdInitPlayerPosOnMapHandler(gameState, gameSettings));
             commandProcessor.RegisterHandler(new CmdCreateCharacterHandler(gameState, charactersSettings));
             commandProcessor.RegisterHandler(new CmdRemoveCharacterHandler(gameState));
@@ -68,12 +63,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
             commandProcessor.RegisterHandler(new CmdResourcesSpendHandler(gameState));
             commandProcessor.RegisterHandler(new CmdTriggeredEnemySpawnHandler(gameState));
             commandProcessor.RegisterHandler(new CmdUpdatePlayerPosOnMapHandler(gameState));
-            container.RegisterInstance<ICommandProcessor>(commandProcessor);
 
             // регистрируем менеджеры
 
-            container.RegisterFactory(c => new GameplayInputManager()).AsSingle();
-            var inputManager = container.Resolve<GameplayInputManager>();
+            var inputManager = container.Resolve<InputManager>();
 
             // регистрируем сервисы
             
@@ -81,18 +74,18 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
                 inputManager,
                 gameplayCameraSettings)).AsSingle();
             
-            container.RegisterFactory(c => new EquipmentService(gameState.Equipments, itemsSettings,
-                commandProcessor)).AsSingle();
+            // container.RegisterFactory(c => new EquipmentService(gameState.Equipments, itemsSettings,
+            //     commandProcessor)).AsSingle();
             var equipmentService = container.Resolve<EquipmentService>();
             
-            container.RegisterFactory(c =>
-                new InventoryService(gameState.Inventories, 
-                    equipmentService,
-                    inventoriesSettings,
-                    itemsSettings,
-                    commandProcessor, 
-                    gameState.Player.Value.Id))
-                .AsSingle();
+            // container.RegisterFactory(c =>
+            //     new InventoryService(gameState.Inventories, 
+            //         equipmentService,
+            //         inventoriesSettings,
+            //         itemsSettings,
+            //         commandProcessor, 
+            //         gameState.Player.Value.Id))
+            //     .AsSingle();
             var inventoryService = container.Resolve<InventoryService>();
 
             container.RegisterFactory(c => new ArsenalService(gameState.Arsenals, equipmentService, inventoryService,
@@ -113,7 +106,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 
             var loadingMap = gameState.Maps.First(m => m.Id == enterParams.TargetMapId);
 
-            container.RegisterFactory(c => new MapTransferService(
+            container.RegisterFactory(c => new GameplayMapTransferService(
                 loadingMap.MapTransfers)).AsSingle();
 
             container.RegisterFactory(c => new StorageService(

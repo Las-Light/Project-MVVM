@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Player;
@@ -23,7 +23,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
         public ReadOnlyReactiveProperty<float> Health { get; }
         public ReadOnlyReactiveProperty<Vector3> Position { get; }
         public readonly ArsenalViewModel ArsenalViewModel;
-        public readonly GameplayInputManager InputManager;
+        public readonly InputManager InputManager;
         public readonly PlayerSettings PlayerSettings;
         
         public GameObject CurrentEnemy { get; set; }
@@ -45,7 +45,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
 
         public PlayerViewModel(State.Entities.Player.Player player,
             PlayerService playerService,
-            GameplayInputManager inputManager,
+            InputManager inputManager,
             ArsenalViewModel arsenalViewModel, 
             PlayerSettings playerSettings)
         {

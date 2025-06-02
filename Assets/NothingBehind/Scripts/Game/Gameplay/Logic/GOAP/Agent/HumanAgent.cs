@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Data;
-using NothingBehind.Scripts.Game.Gameplay.Logic.GOAP.Agent;
 using NothingBehind.Scripts.Game.Gameplay.Logic.WeaponSystem;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Logic.GOAP
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.GOAP.Agent
 {
     public class HumanAgent: AIAgent
     {

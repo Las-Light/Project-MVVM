@@ -3,17 +3,19 @@ using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Root;
-using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.GlobalMap.Root;
 using NothingBehind.Scripts.Game.MainMenu.Root;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
+using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Utils;
 using R3;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace NothingBehind.Scripts.Game.GameRoot
 {
@@ -51,10 +53,13 @@ namespace NothingBehind.Scripts.Game.GameRoot
             var settingsProvider = new SettingsProvider();
             _rootContainer.RegisterInstance<ISettingsProvider>(settingsProvider);
             _rootContainer.RegisterFactory(_ => new InitialGameStateService()).AsSingle();
-
+            
             var initialGameStateService = _rootContainer.Resolve<InitialGameStateService>();
             var gameStateProvider = new PlayerPrefsGameStateProvider(initialGameStateService);
             _rootContainer.RegisterInstance<IGameStateProvider>(gameStateProvider);
+            _rootContainer.RegisterFactory(c => new InputManager()).AsSingle();
+            var commandProcessor = new CommandProcessor(gameStateProvider);
+            _rootContainer.RegisterInstance<ICommandProcessor>(commandProcessor);
         }
 
         private async void RunGame()
@@ -89,7 +94,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 var enterParams =
                     new GlobalMapEnterParams(
                         "StartFromGlobalMapScene.save",
-                        MapId.GlobalMap); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
+                        MapId.Global_Map); //нужно для того, чтобы можно было стартовать в редакторе со сцены геймплея
                 _coroutines.StartCoroutine(LoadingAndStartGlobalMap(gameSettings, enterParams));
                 return;
             }
@@ -116,11 +121,15 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return LoadScene(Scenes.BOOT);
             yield return LoadScene(GetSceneName(enterParams.TargetMapId));
 
-            //yield return new WaitForSeconds(1);
 
             var isGameStateLoaded = false;
             _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
-                .Subscribe(_ => isGameStateLoaded = true);
+                .Subscribe(_ =>
+                {
+                    isGameStateLoaded = true;
+                    // Регистрация общих сервисов после загрузки состояния
+                    GameCommonServicesRegistrations.Register(_rootContainer);
+                });
             yield return new WaitUntil(() => isGameStateLoaded);
 
             var sceneEntryPoint = Object.FindFirstObjectByType<GameplayEntryPoint>();
@@ -145,6 +154,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 }
             });
 
+            yield return new WaitForSeconds(1);
             _uiRoot.HideLoadingScreen();
         }
 
@@ -156,11 +166,16 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return LoadScene(Scenes.BOOT);
             yield return LoadScene(GetSceneName(enterParams.TargetMapId));
 
-            //yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(1);
 
             var isGameStateLoaded = false;
             _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
-                .Subscribe(_ => isGameStateLoaded = true);
+                .Subscribe(_ =>
+                {
+                    isGameStateLoaded = true;
+                    // Регистрация общих сервисов после загрузки состояния
+                    GameCommonServicesRegistrations.Register(_rootContainer);
+                });
             yield return new WaitUntil(() => isGameStateLoaded);
 
             var sceneEntryPoint = Object.FindFirstObjectByType<GlobalMapEntryPoint>();
@@ -198,8 +213,6 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 yield return LoadScene(Scenes.MAIN_MENU);
             }
 
-            yield return new WaitForSeconds(1);
-
             var sceneEntryPoint = Object.FindFirstObjectByType<MainMenuEntryPoint>();
             var mainMenuContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
 
@@ -219,6 +232,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 }
             });
 
+            yield return new WaitForSeconds(1);
             _uiRoot.HideLoadingScreen();
         }
 
@@ -230,9 +244,19 @@ namespace NothingBehind.Scripts.Game.GameRoot
         private string GetSceneName(MapId targetMapId)
         {
             var settingsProvider = _rootContainer.Resolve<ISettingsProvider>();
-            var mapSettings = settingsProvider.GameSettings.MapsSettings.Maps.First(m => m.MapId == targetMapId);
+            string sceneName;
+            switch (targetMapId)
+            {
+                case MapId.Global_Map:
+                    sceneName = settingsProvider.GameSettings.GlobalMapSettings.SceneName;
+                    break;
+                default:
+                    sceneName = settingsProvider.GameSettings.MapsSettings.Maps.First(m => m.MapId == targetMapId)
+                        .SceneName;
+                    break;
+            }
 
-            return mapSettings.SceneName;
+            return sceneName;
         }
     }
 }

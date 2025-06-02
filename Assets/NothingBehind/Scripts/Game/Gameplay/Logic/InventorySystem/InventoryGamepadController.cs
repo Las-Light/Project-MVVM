@@ -53,13 +53,13 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.InventorySystem
             UpdateSelection();
 
             //Подписываемся на UI Input
-            _inventoryUIView.GameplayInputManager.IsSubmit.Subscribe(OnSelect).AddTo(_disposables);
-            _inventoryUIView.GameplayInputManager.IsCancel.Subscribe(OnCancel).AddTo(_disposables);
+            _inventoryUIView.InputManager.IsSubmit.Subscribe(OnSelect).AddTo(_disposables);
+            _inventoryUIView.InputManager.IsCancel.Subscribe(OnCancel).AddTo(_disposables);
         }
 
         private void LateUpdate()
         {
-            HandleNavigationInput(_inventoryUIView.GameplayInputManager.Navigation.CurrentValue);
+            HandleNavigationInput(_inventoryUIView.InputManager.Navigation.CurrentValue);
         }
 
         private void OnDestroy()

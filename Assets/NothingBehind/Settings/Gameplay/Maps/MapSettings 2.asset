@@ -18,7 +18,7 @@ MonoBehaviour:
     PlayerInitialPosition: {x: 0, y: 0, z: 0}
     Characters: []
     MapTransfers:
-    - TargetMapId: 3
+    - TargetMapId: 1
       Position: {x: -9.971256, y: 0, z: -16.402199}
     EnemySpawns:
     - Id: SpawnMarker

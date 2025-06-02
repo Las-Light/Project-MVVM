@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
-using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
+using NothingBehind.Scripts.Game.Gameplay.Logic.ActionController;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using R3;
@@ -24,7 +24,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.Player
         public LayerMask obstacleMask;
         
         public PlayerSettings PlayerSettings { get; private set; }
-        public GameplayInputManager InputManager { get; private set; }
+        public InputManager InputManager { get; private set; }
         public ArsenalView ArsenalView { get; private set; }
         public int PlayerId { get; private set; }
         

@@ -1,9 +1,9 @@
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Gameplay.Logic;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.UI;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 
@@ -23,8 +23,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
                     c.Resolve<PlayerService>(),
                     c.Resolve<ResourcesService>(),
                     c.Resolve<SpawnService>(),
-                    c.Resolve<MapTransferService>(),
-                    c.Resolve<GameplayInputManager>(),
+                    c.Resolve<GameplayMapTransferService>(),
+                    c.Resolve<InputManager>(),
                     c.Resolve<CameraService>(),
                     c.Resolve<InventoryService>()))
                 .AsSingle();

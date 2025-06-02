@@ -1,6 +1,7 @@
 using NothingBehind.Scripts.Game.Gameplay.Logic.Data;
 using NothingBehind.Scripts.Game.Gameplay.Logic.EventManager;
 using NothingBehind.Scripts.Game.Gameplay.Logic.GOAP;
+using NothingBehind.Scripts.Game.Gameplay.Logic.GOAP.Agent;
 using NothingBehind.Scripts.Game.Gameplay.Logic.PatrolSystem;
 using UnityEngine;
 

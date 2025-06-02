@@ -21,3 +21,4 @@ MonoBehaviour:
   StoragesSettings: {fileID: 11400000, guid: 1860906ac8d24704ca13deef131d3187, type: 2}
   GameplayCameraSettings: {fileID: 11400000, guid: fa7c3e452673d0b41bc4a24d07c5f1d0, type: 2}
   MapsSettings: {fileID: 11400000, guid: a0467520b93e95f43a27c9409e429d2d, type: 2}
+  GlobalMapSettings: {fileID: 11400000, guid: 57fdc7693f4f71d448708dae7ecb86a1, type: 2}

@@ -1,6 +1,5 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.Gameplay.Logic;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Characters;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
@@ -9,6 +8,7 @@ using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Storages;
 using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Entities;
@@ -30,7 +30,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         private readonly IGameStateProvider _gameStateProvider;
         private readonly PlayerService _playerService;
         private readonly ResourcesService _resourcesService;
-        private readonly GameplayInputManager _gameplayInputManager;
+        private readonly InputManager _inputManager;
         private readonly CameraService _cameraService;
         private readonly InventoryService _inventoryService;
 
@@ -39,7 +39,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
         public readonly IObservableCollection<StorageViewModel> AllStorages;
         public readonly IObservableCollection<InventoryViewModel> AllInventories;
-        public readonly IObservableCollection<MapTransferViewModel> AllMapTransfers;
+        public readonly IObservableCollection<GameplayMapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<EnemySpawnViewModel> AllSpawns;
 
         public WorldGameplayRootViewModel(
@@ -50,8 +50,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             PlayerService playerService,
             ResourcesService resourcesService,
             SpawnService spawnService,
-            MapTransferService mapService,
-            GameplayInputManager gameplayInputManager,
+            GameplayMapTransferService gameplayMapService,
+            InputManager inputManager,
             CameraService cameraService,
             InventoryService inventoryService)
         {
@@ -61,7 +61,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             _gameStateProvider = gameStateProvider;
             _playerService = playerService;
             _resourcesService = resourcesService;
-            _gameplayInputManager = gameplayInputManager;
+            _inputManager = inputManager;
             _cameraService = cameraService;
             _inventoryService = inventoryService;
 
@@ -70,7 +70,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root.View
             AllCharacters = charactersService.AllCharacters;
             AllStorages = storageService.AllStorages;
             AllInventories = inventoryService.AllInventories;
-            AllMapTransfers = mapService.MapTransfers;
+            AllMapTransfers = gameplayMapService.MapTransfers;
             AllSpawns = spawnService.EnemySpawns;
 
             resourcesService.ObserveResource(ResourceType.SoftCurrency)

@@ -5,7 +5,7 @@ using NothingBehind.Scripts.Game.State.Entities.Storages;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 
-namespace NothingBehind.Scripts.Game.State.Maps
+namespace NothingBehind.Scripts.Game.State.Maps.GameplayMap
 {
     [Serializable]
     public class GameplayMapData

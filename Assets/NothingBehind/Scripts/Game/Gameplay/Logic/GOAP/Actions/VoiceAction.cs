@@ -1,9 +1,9 @@
-﻿using NothingBehind.Scripts.Game.Gameplay.Logic.Data;
+﻿using NothingBehind.Scripts.Game.Gameplay.Logic.ActionController;
+using NothingBehind.Scripts.Game.Gameplay.Logic.Data;
 using NothingBehind.Scripts.Game.Gameplay.Logic.GOAP.GOAP;
-using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using UnityEngine;
 
-namespace Code.GOAP.Actions
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.GOAP.Actions
 {
     public class VoiceAction : GoapAction
     {

@@ -11,7 +11,7 @@ namespace NothingBehind.Scripts.Game.GlobalMap.Root
 {
     public class GlobalMapEntryPoint : MonoBehaviour
     {
-        [SerializeField] private UIGlobalMapRootView sceneUIRootPrefab;
+        [SerializeField] private UIGlobalMapRootBinder sceneUIRootPrefab;
         [SerializeField] private WorldGlobalMapRootView worldRootView;
         public Subject<GlobalMapExitParams> Run(DIContainer globalMapContainer, SceneEnterParams enterParams)
         {
@@ -50,7 +50,7 @@ namespace NothingBehind.Scripts.Game.GlobalMap.Root
             uiSceneRootBinder.Bind(uiSceneRootViewModel);
             
             // Можно открывать окошки
-            var uiManager = viewsContainer.Resolve<GameplayUIManager>();
+            var uiManager = viewsContainer.Resolve<GlobalMapUIManager>();
             uiManager.OpenScreenGameplay();
         }
     }

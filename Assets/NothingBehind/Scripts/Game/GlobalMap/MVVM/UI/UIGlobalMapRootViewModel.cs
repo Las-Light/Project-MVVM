@@ -1,6 +1,8 @@
+using NothingBehind.Scripts.MVVM.UI;
+
 namespace NothingBehind.Scripts.Game.GlobalMap.MVVM.UI
 {
-    public class UIGlobalMapRootViewModel
+    public class UIGlobalMapRootViewModel: UIRootViewModel
     {
         
     }

@@ -1,11 +1,11 @@
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using R3;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.ActionController
 {
     public class PlayerMovementController : MonoBehaviour
     {
@@ -14,7 +14,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
         [SerializeField] private Transform targetPointForAim;
         
         private PlayerSettings _playerSettings;
-        private GameplayInputManager _inputManager;
+        private InputManager _inputManager;
 
         private PlayerView _playerView;
         private CharacterController _playerCharacterController;

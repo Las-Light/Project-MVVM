@@ -1,7 +1,7 @@
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.MVVM.UI;
 using NothingBehind.Scripts.Utils;
@@ -14,12 +14,12 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
     {
         public override string Id => "InventoryUI";
         public readonly int OwnerId;
-        public GameplayInputManager GameplayInputManager => _gameplayInputManager;
+        public InputManager InputManager => _inputManager;
 
         private readonly InventoryService _inventoryService;
         private readonly EquipmentService _equipmentService;
         private readonly StorageService _storageService;
-        private readonly GameplayInputManager _gameplayInputManager;
+        private readonly InputManager _inputManager;
         public readonly int TargetOwnerId;
         public readonly EntityType TargetType;
         private readonly Subject<ExitInventoryRequestResult> _exitInventoryRequest;
@@ -33,7 +33,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             Vector3 ownerPosition,
             int targetOwnerId,
             Subject<ExitInventoryRequestResult> exitInventoryRequest, 
-            GameplayInputManager gameplayInputManager)
+            InputManager inputManager)
         {
             _inventoryService = inventoryService;
             _equipmentService = equipmentService;
@@ -43,8 +43,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
             TargetOwnerId = targetOwnerId;
             TargetType = targetType;
             _exitInventoryRequest = exitInventoryRequest;
-            _gameplayInputManager = gameplayInputManager;
-            _gameplayInputManager.PlayerInputDisabled();
+            _inputManager = inputManager;
+            _inputManager.PlayerInputDisabled();
         }
 
 
@@ -106,8 +106,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         public override void Dispose()
         {
             base.Dispose();
-            _gameplayInputManager.PlayerInputEnabled();
-            _gameplayInputManager.UIInputDisabled();
+            _inputManager.PlayerInputEnabled();
+            _inputManager.UIInputDisabled();
         }
     }
 }

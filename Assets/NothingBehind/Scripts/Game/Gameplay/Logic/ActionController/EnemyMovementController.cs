@@ -8,7 +8,7 @@ using NothingBehind.Scripts.Game.Gameplay.MVVM.Weapons;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.ActionController
 {
     public class EnemyMovementController : MonoBehaviour
     {

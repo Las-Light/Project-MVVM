@@ -13,6 +13,8 @@ using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
+using NothingBehind.Scripts.Game.State.Maps.GameplayMap;
+using NothingBehind.Scripts.Game.State.Maps.GlobalMaps;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using NothingBehind.Scripts.Game.State.Root;
 using NothingBehind.Scripts.Game.State.Weapons;
@@ -32,6 +34,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             gameState.Equipments = new List<EquipmentData>();
             gameState.Inventories = new List<InventoryData>();
             gameState.Arsenals = new List<ArsenalData>();
+            gameState.GlobalMap = CreateGlobalMap(gameState, gameSettings);
             gameState.GameplayMaps = CreateMaps(gameState, gameSettings);
             gameState.CurrentMapId = currentMapId;
             gameState.PlayerData = CreatePlayer(gameState, gameSettings, currentMapId, currentMapSettings);
@@ -42,6 +45,19 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             };
 
             return gameState;
+        }
+
+        private GlobalMapData CreateGlobalMap(GameState gameState, GameSettings gameSettings)
+        {
+            var globalMapSettings = gameSettings.GlobalMapSettings;
+            var newGlobalMap = new GlobalMapData
+            {
+                MapId = globalMapSettings.MapId,
+                SceneName = globalMapSettings.SceneName,
+                MapTransfers = globalMapSettings.MapTransfers,
+                PlayerInitialPosition = globalMapSettings.PlayerInitialPosition
+            };
+            return newGlobalMap;
         }
 
         private PlayerData CreatePlayer(GameState gameState, GameSettings gameSettings, MapId currentMapId,

@@ -10,7 +10,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Root
 {
     public class GameplayEntryPoint : MonoBehaviour
     {
-        [SerializeField] private UIGameplayRootView sceneUIRootPrefab;
+        [SerializeField] private UIGameplayRootBinder sceneUIRootPrefab;
         [SerializeField] private WorldGameplayRootView worldRootView;
 
         public Subject<GameplayExitParams> Run(DIContainer gameplayContainer, SceneEnterParams enterParams)

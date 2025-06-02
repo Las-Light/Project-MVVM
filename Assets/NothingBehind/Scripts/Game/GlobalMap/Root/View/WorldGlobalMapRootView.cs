@@ -8,7 +8,6 @@ namespace NothingBehind.Scripts.Game.GlobalMap.Root.View
     {
         public void Bind(WorldGlobalMapRootViewModel viewModel, GlobalMapUIManager globalMapUIManager, Subject<GlobalMapExitParams> exitSceneRequest)
         {
-            throw new System.NotImplementedException();
         }
     }
 }

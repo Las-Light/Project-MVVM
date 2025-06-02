@@ -3,7 +3,7 @@ using NothingBehind.Scripts.Game.Gameplay.Logic.GOAP.GOAP;
 using NothingBehind.Scripts.Game.Gameplay.Logic.PatrolSystem;
 using UnityEngine;
 
-namespace Code.GOAP.Actions
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.GOAP.Actions
 {
     public class PatrolAction : GoapAction
     {

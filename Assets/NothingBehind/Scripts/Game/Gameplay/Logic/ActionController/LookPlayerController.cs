@@ -1,14 +1,14 @@
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Math = System.Math;
 
-namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
+namespace NothingBehind.Scripts.Game.Gameplay.Logic.ActionController
 {
     public class LookPlayerController : MonoBehaviour
     {
@@ -21,7 +21,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Logic.Player
 
         public ReactiveProperty<Vector3> MouseWorldPosition = new();
         private float _turnRotation;
-        private GameplayInputManager _inputManager;
+        private InputManager _inputManager;
         private PlayerSettings _playerSettings;
         private PlayerView _playerView;
 

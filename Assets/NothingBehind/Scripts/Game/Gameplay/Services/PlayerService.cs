@@ -1,9 +1,8 @@
 using System;
 using NothingBehind.Scripts.Game.Gameplay.Commands.PlayerCommands;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
-using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Player;
@@ -18,12 +17,10 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
     {
         public readonly ReactiveProperty<PlayerViewModel> PlayerViewModel = new();
 
-        private readonly PlayerMovementController _playerMovementController;
-        private readonly LookPlayerController _lookPlayerController;
         private readonly Player _player;
         private readonly InventoryService _inventoryService;
         private readonly ArsenalService _arsenalService;
-        private readonly GameplayInputManager _inputManager;
+        private readonly InputManager _inputManager;
         private readonly ICommandProcessor _cmd;
         private readonly SceneEnterParams _sceneEnterParams;
         private readonly PlayerSettings _playerSettings;
@@ -31,7 +28,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
         public PlayerService(InventoryService inventoryService,
             ArsenalService arsenalService,
             Player player,
-            GameplayInputManager inputManager,
+            InputManager inputManager,
             ICommandProcessor cmd,
             SceneEnterParams sceneEnterParams,
             PlayerSettings playerSettings)
@@ -74,7 +71,8 @@ namespace NothingBehind.Scripts.Game.Gameplay.Services
             {
                 throw new Exception($"ArsenalViewModel for owner with Id {_player.Id} not found");
             }
-            var viewModel = new PlayerViewModel(_player,this, _inputManager, arsenalViewModel, _playerSettings);
+
+            var viewModel = new PlayerViewModel(_player, this, _inputManager, arsenalViewModel, _playerSettings);
 
             PlayerViewModel.Value = viewModel;
         }

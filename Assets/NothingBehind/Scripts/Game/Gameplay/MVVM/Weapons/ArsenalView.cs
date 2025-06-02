@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.Gameplay.Logic.ActionController;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Animation;
-using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
 using NothingBehind.Scripts.Game.Gameplay.Logic.Sound;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.State.Equipments;

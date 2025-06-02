@@ -1,11 +1,12 @@
-using NothingBehind.Scripts.Game.Settings.Equipment;
 using NothingBehind.Scripts.Game.Settings.Gameplay;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Equipment;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Inventory;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Items;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Storages;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Weapons;
+using NothingBehind.Scripts.Game.Settings.GlobalMap;
 using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.Settings
@@ -22,5 +23,6 @@ namespace NothingBehind.Scripts.Game.Settings
         public StoragesSettings StoragesSettings;
         public GameplayCameraSettings GameplayCameraSettings;
         public MapsSettings MapsSettings;
+        public GlobalMapSettings GlobalMapSettings;
     }
 }

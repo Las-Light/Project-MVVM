@@ -5,7 +5,8 @@ using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.GameResources;
 using NothingBehind.Scripts.Game.State.Inventories;
 using NothingBehind.Scripts.Game.State.Maps;
-using NothingBehind.Scripts.Game.State.Maps.GlobalMap;
+using NothingBehind.Scripts.Game.State.Maps.GameplayMap;
+using NothingBehind.Scripts.Game.State.Maps.GlobalMaps;
 using NothingBehind.Scripts.Game.State.Weapons;
 
 namespace NothingBehind.Scripts.Game.State.Root

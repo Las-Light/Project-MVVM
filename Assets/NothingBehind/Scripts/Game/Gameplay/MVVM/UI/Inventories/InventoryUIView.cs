@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using NothingBehind.Scripts.Game.Gameplay.Logic.InputManager;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Equipments;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Items;
+using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.MVVM.UI;
 using UnityEngine;
@@ -23,7 +23,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         public InventoryView LootInventoryView;
         public EquipmentView LootEquipmentView;
 
-        public GameplayInputManager GameplayInputManager;
+        public InputManager InputManager;
         public List<ItemView> ItemViews => _itemViews;
 
         private List<ItemView> _itemViews = new ();
@@ -32,7 +32,7 @@ namespace NothingBehind.Scripts.Game.Gameplay.MVVM.UI.Inventories
         protected override void OnBind(InventoryUIViewModel viewModel)
         {
             base.OnBind(viewModel);
-            GameplayInputManager = viewModel.GameplayInputManager;
+            InputManager = viewModel.InputManager;
             if (viewModel.TargetType == EntityType.Player)
             {
                 CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.OwnerId), _itemViews);

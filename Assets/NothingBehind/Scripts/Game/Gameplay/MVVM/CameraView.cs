@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using NothingBehind.Scripts.Game.Gameplay.Logic.Player;
+using NothingBehind.Scripts.Game.Gameplay.Logic.ActionController;
 using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Settings.Gameplay;
 using R3;

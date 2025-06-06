@@ -1,5 +1,5 @@
 using System.Linq;
-using NothingBehind.Scripts.Game.Gameplay.Logic.WeaponSystem;
+using NothingBehind.Scripts.Game.BattleGameplay.Logic.WeaponSystem;
 using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using R3;
 using UnityEngine;

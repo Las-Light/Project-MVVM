@@ -20,6 +20,8 @@ MonoBehaviour:
     MapTransfers:
     - TargetMapId: 1
       Position: {x: -9.971256, y: 0, z: -16.402199}
+    - TargetMapId: 3
+      Position: {x: -19.54, y: 0, z: -1.78}
     EnemySpawns:
     - Id: SpawnMarker
       Characters:

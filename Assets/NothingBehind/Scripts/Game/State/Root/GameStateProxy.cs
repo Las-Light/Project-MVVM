@@ -8,6 +8,7 @@ using NothingBehind.Scripts.Game.State.Maps.GameplayMap;
 using NothingBehind.Scripts.Game.State.Weapons;
 using ObservableCollections;
 using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Root
 {
@@ -105,6 +106,7 @@ namespace NothingBehind.Scripts.Game.State.Root
             {
                 var addedEquipment = e.Value;
                 gameState.Equipments.Add(addedEquipment.Origin);
+                Debug.Log("Create equip in gameState");
             });
 
             Equipments.ObserveRemove().Subscribe(e =>

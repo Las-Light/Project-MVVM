@@ -1,5 +1,6 @@
-using NothingBehind.Scripts.Game.Gameplay.MVVM.Player;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
 using NothingBehind.Scripts.Game.GlobalMap.Root;
 using R3;
 using UnityEngine;

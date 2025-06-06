@@ -1,6 +1,5 @@
 using DI.Scripts;
 using NothingBehind.Scripts.Game.Common;
-using NothingBehind.Scripts.Game.Gameplay.MVVM.UI;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.GlobalMap.MVVM.UI;
 using NothingBehind.Scripts.Game.GlobalMap.Root.View;

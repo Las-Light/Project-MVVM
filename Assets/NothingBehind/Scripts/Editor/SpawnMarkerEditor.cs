@@ -1,5 +1,5 @@
 using System.Linq;
-using NothingBehind.Scripts.Game.Gameplay.Markers;
+using NothingBehind.Scripts.Game.BattleGameplay.Markers;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Maps;

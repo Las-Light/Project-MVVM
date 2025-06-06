@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Linq;
 using DI.Scripts;
+using NothingBehind.Scripts.Game.BattleGameplay.Root;
 using NothingBehind.Scripts.Game.Common;
-using NothingBehind.Scripts.Game.Gameplay.Root;
 using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.GlobalMap.Root;
@@ -26,6 +26,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
         private UIRootView _uiRoot;
         private readonly DIContainer _rootContainer = new();
         private DIContainer _cachedSceneContainer;
+        private DIContainer _cachedGameplayContainer;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void AutostartGame()
@@ -71,6 +72,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
 
             if (sceneName == Scenes.GAMEPLAY)
             {
+                _cachedGameplayContainer = new DIContainer(_rootContainer);
                 var enterParams =
                     new GameplayEnterParams(
                         "StartFromGameplayScene.save",
@@ -81,6 +83,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
 
             if (sceneName == Scenes.GAMEPLAY_1)
             {
+                _cachedGameplayContainer = new DIContainer(_rootContainer);
                 var enterParams =
                     new GameplayEnterParams(
                         "StartFromGameplayScene.save",
@@ -91,6 +94,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
 
             if (sceneName == Scenes.GLOBAL_MAP)
             {
+                _cachedGameplayContainer = new DIContainer(_rootContainer);
                 var enterParams =
                     new GlobalMapEnterParams(
                         "StartFromGlobalMapScene.save",
@@ -121,20 +125,19 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return LoadScene(Scenes.BOOT);
             yield return LoadScene(GetSceneName(enterParams.TargetMapId));
 
-
             var isGameStateLoaded = false;
             _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
                 .Subscribe(_ =>
                 {
                     isGameStateLoaded = true;
                     // Регистрация общих сервисов после загрузки состояния
-                    GameCommonServicesRegistrations.Register(_rootContainer);
+                    RootServicesRegistrations.Register(_cachedGameplayContainer);
                 });
             yield return new WaitUntil(() => isGameStateLoaded);
 
             var sceneEntryPoint = Object.FindFirstObjectByType<GameplayEntryPoint>();
-            var gameplayContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
-            sceneEntryPoint.Run(gameplayContainer, enterParams).Subscribe(gameplayExitParams =>
+            var sceneContainer = _cachedSceneContainer = new DIContainer(_cachedGameplayContainer);;
+            sceneEntryPoint.Run(sceneContainer, enterParams).Subscribe(gameplayExitParams =>
             {
                 var targetSceneName = GetSceneName(gameplayExitParams.SceneEnterParams.TargetMapId);
                 if (targetSceneName == Scenes.MAIN_MENU)
@@ -166,20 +169,18 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return LoadScene(Scenes.BOOT);
             yield return LoadScene(GetSceneName(enterParams.TargetMapId));
 
-            yield return new WaitForSeconds(1);
-
             var isGameStateLoaded = false;
             _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
                 .Subscribe(_ =>
                 {
                     isGameStateLoaded = true;
                     // Регистрация общих сервисов после загрузки состояния
-                    GameCommonServicesRegistrations.Register(_rootContainer);
+                    RootServicesRegistrations.Register(_cachedGameplayContainer);
                 });
             yield return new WaitUntil(() => isGameStateLoaded);
 
             var sceneEntryPoint = Object.FindFirstObjectByType<GlobalMapEntryPoint>();
-            var globalMapContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
+            var globalMapContainer = _cachedSceneContainer = new DIContainer(_cachedGameplayContainer);
             sceneEntryPoint.Run(globalMapContainer, enterParams).Subscribe(globalMapExitParams =>
             {
                 var targetSceneName = GetSceneName(globalMapExitParams.SceneEnterParams.TargetMapId);
@@ -195,6 +196,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
                 }
             });
 
+            yield return new WaitForSeconds(1);
             _uiRoot.HideLoadingScreen();
         }
 
@@ -202,6 +204,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
         {
             _uiRoot.ShowLoadingScreen();
             _cachedSceneContainer?.Dispose();
+            _cachedGameplayContainer?.Dispose();
 
             yield return LoadScene(Scenes.BOOT);
             if (enterParam != null)
@@ -214,7 +217,8 @@ namespace NothingBehind.Scripts.Game.GameRoot
             }
 
             var sceneEntryPoint = Object.FindFirstObjectByType<MainMenuEntryPoint>();
-            var mainMenuContainer = _cachedSceneContainer = new DIContainer(_rootContainer);
+            var gameplayContainer = _cachedGameplayContainer = new DIContainer(_rootContainer);
+            var mainMenuContainer = _cachedSceneContainer = new DIContainer(gameplayContainer);
 
             sceneEntryPoint.Run(mainMenuContainer, enterParam).Subscribe(mainMenuExitParams =>
             {

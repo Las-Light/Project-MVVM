@@ -1,10 +1,9 @@
 using DI.Scripts;
+using NothingBehind.Scripts.Game.BattleGameplay.Services;
 using NothingBehind.Scripts.Game.Common;
-using NothingBehind.Scripts.Game.Gameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot;
+using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
-using NothingBehind.Scripts.Game.GlobalMap.Commands.Handlers.PlayerHandlers;
-using NothingBehind.Scripts.Game.GlobalMap.Services;
 using NothingBehind.Scripts.Game.Settings;
 using NothingBehind.Scripts.Game.State;
 using NothingBehind.Scripts.Game.State.Commands;
@@ -27,8 +26,6 @@ namespace NothingBehind.Scripts.Game.GlobalMap.Root
             // регистрируем процессор и команды, а также кладём CommandProcessor в контейнер
 
             var commandProcessor = container.Resolve<ICommandProcessor>();
-            commandProcessor.RegisterHandler(new CmdInitPlayerPosOnGlobalMapHandler(gameState, gameSettings));
-            commandProcessor.RegisterHandler(new CmdUpdatePlayerPosOnGlobalMapHandler(gameState));
            
             // регистрируем менеджеры
 
@@ -37,15 +34,6 @@ namespace NothingBehind.Scripts.Game.GlobalMap.Root
             // регистрируем сервисы
 
             var equipmentService = container.Resolve<EquipmentService>();
-
-            container.RegisterFactory(c => new GlobalMapTransferService(globalMap.Value.MapTransfers)).AsSingle();
-            
-            container.RegisterFactory(c => new GlobalMapPlayerService(inputManager, 
-                    gameState.Player,
-                    equipmentService,
-                    enterParams,
-                    commandProcessor))
-                .AsSingle();
         }
     }
 }

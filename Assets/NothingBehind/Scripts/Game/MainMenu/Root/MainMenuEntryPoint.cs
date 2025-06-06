@@ -1,6 +1,5 @@
 using System;
 using DI.Scripts;
-using NothingBehind.Scripts.Game.Gameplay.Root;
 using NothingBehind.Scripts.Game.GameRoot;
 using NothingBehind.Scripts.Game.MainMenu.Root.View;
 using R3;

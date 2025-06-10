@@ -7,6 +7,7 @@ using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using R3;
 using UnityEngine;
@@ -88,6 +89,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player
                 if (!InputManager.IsAim.CurrentValue)
                 {
                     ArsenalView.WeaponSwitch(ArsenalView.WeaponSlot1);
+                    ArsenalView.CurrentWeaponSlot.OnNext(SlotType.Weapon1);
                 }
             }));
             _disposables.Add(InputManager.IsSwitchSlot2.Skip(1).Subscribe(_ =>
@@ -95,6 +97,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player
                 if (!InputManager.IsAim.CurrentValue)
                 {
                     ArsenalView.WeaponSwitch(ArsenalView.WeaponSlot2);
+                    ArsenalView.CurrentWeaponSlot.OnNext(SlotType.Weapon2);
                 }
             }));
         }
@@ -105,7 +108,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player
             _lookPlayerController.Look();
             //_viewModel.UpdatePlayerPosition(transform.position);
             PressShoot();
-            if (ArsenalView.ActiveGun.WeaponType != WeaponType.Unarmed)
+            if (ArsenalView.CurrentWeapon.WeaponType != WeaponType.Unarmed)
             {
                 ArsenalView.ClipPrevention(IsAim, ref IsCheckWall);
             }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.State.Equipments;
 
 namespace NothingBehind.Scripts.Game.State.Weapons
 {
@@ -7,6 +8,7 @@ namespace NothingBehind.Scripts.Game.State.Weapons
     public class ArsenalData
     {
         public int OwnerId;
+        public SlotType CurrentWeaponSlot;
         public List<WeaponData> Weapons;
     }
 }

@@ -220,6 +220,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             var arsenalData = new ArsenalData
             {
                 OwnerId = ownerId,
+                CurrentWeaponSlot = SlotType.Weapon1,
                 Weapons = new List<WeaponData>()
             };
             var weaponSettings =

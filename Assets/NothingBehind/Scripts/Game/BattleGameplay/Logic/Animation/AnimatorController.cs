@@ -22,6 +22,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Logic.Animation
         private static readonly int AnimIDHit = Animator.StringToHash("Hit");
         private static readonly int AnimIDHitInt = Animator.StringToHash("Hit_int");
         private static readonly int AnimIDReload = Animator.StringToHash("Reload");
+        private static readonly int AnimIDRecoil = Animator.StringToHash("Recoil");
         private static readonly int AnimIDMeleeAttack = Animator.StringToHash("MeleeAttack");
 
         // animations state hash
@@ -100,6 +101,11 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Logic.Animation
         public void Reload()
         {
             _animator.SetTrigger(AnimIDReload);
+        }
+
+        public void Recoil()
+        {
+            _animator.SetTrigger(AnimIDRecoil);
         }
 
         public void MeleeAttack()

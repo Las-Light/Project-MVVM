@@ -16,6 +16,7 @@ using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using NothingBehind.Scripts.Utils;
 using ObservableCollections;
 using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
 {
@@ -29,12 +30,15 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
             _allMagazines;
 
         public IReadOnlyObservableList<WeaponViewModel> AllWeaponViewModels => _allWeaponViewModels;
-        public ReactiveProperty<int> ActiveGunId = new();
-        public ReactiveProperty<WeaponViewModel> ActiveGunVM = new();
+        public Dictionary<int, WeaponViewModel> WeaponViewModelMap => _weaponViewModelMap;
+        public ReactiveProperty<SlotType> CurrentWeaponSlot { get; } = new();
+        public ReactiveProperty<WeaponViewModel> CurrentWeapon { get; } = new();
 
         private readonly ObservableList<WeaponViewModel> _allWeaponViewModels = new();
         private readonly Dictionary<int, WeaponViewModel> _weaponViewModelMap = new();
+        private readonly Dictionary<WeaponViewModel, Weapon> _weaponsMap = new();
         private readonly Dictionary<WeaponName, WeaponSettings> _weaponSettingsMap = new();
+
         private readonly ObservableDictionary<InventoryGridViewModel, ObservableList<AmmoItem>> _allAmmo = new();
 
         private readonly ObservableDictionary<InventoryGridViewModel, ObservableList<MagazinesItem>> _allMagazines =
@@ -53,6 +57,9 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
             _arsenal = arsenal;
             _commandProcessor = commandProcessor;
             OwnerId = arsenal.OwnerId;
+            
+            //Устанавливаем курентСлот из даты
+            CurrentWeaponSlot.OnNext(arsenal.CurrentWeaponSlot.Value);
 
             foreach (var weaponConfig in weaponsSettings.WeaponConfigs)
             {
@@ -102,7 +109,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
                 _allAmmo[inventoryGrid].AddRange(ammoCollection);
 
                 //тут же подписываемся на добавление и удаление предметов из сетки
-                _disposables.Add(inventoryGrid.ItemsMap.ObserveRemove().Subscribe(e =>
+                inventoryGrid.ItemsMap.ObserveRemove().Subscribe(e =>
                 {
                     var removedItem = e.Value.Value;
                     if (removedItem is MagazinesItem magazinesItem)
@@ -114,8 +121,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
                     {
                         _allAmmo[inventoryGrid].Remove(ammoItem);
                     }
-                }));
-                _disposables.Add(inventoryGrid.ItemsMap.ObserveAdd().Subscribe(e =>
+                }).AddTo(_disposables);
+                inventoryGrid.ItemsMap.ObserveAdd().Subscribe(e =>
                 {
                     var addedItem = e.Value.Value;
                     if (addedItem is MagazinesItem magazinesItem)
@@ -127,13 +134,14 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
                     {
                         _allAmmo[inventoryGrid].Add(ammoItem);
                     }
-                }));
+                }).AddTo(_disposables);
             }
 
             //создаем вью-модели Weapon (в том числе Unarmed, которая добавлена при инициализации)
             foreach (var weapon in arsenal.Weapons)
             {
-                CreateWeaponViewModel(weapon, this);
+                var viewModel = CreateWeaponViewModel(weapon, this);
+                _weaponsMap[viewModel] = weapon;
             }
 
             EquipmentItems.ObserveRemove().Subscribe(e =>
@@ -165,21 +173,22 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
             arsenal.Weapons.ObserveRemove().Subscribe(e =>
             {
                 var removedWeapon = e.Value;
-                RemoveWeaponViewModel(removedWeapon);
+                var viewModel = RemoveWeaponViewModel(removedWeapon);
+                _weaponsMap.Remove(viewModel);
             }).AddTo(_disposables);
 
             arsenal.Weapons.ObserveAdd().Subscribe(e =>
             {
                 var addedWeapon = e.Value;
-                CreateWeaponViewModel(addedWeapon, this);
+                var viewModel = CreateWeaponViewModel(addedWeapon, this);
+                _weaponsMap[viewModel] = addedWeapon;
             }).AddTo(_disposables);
 
-            ActiveGunId.Subscribe(id =>
+            //Подписываемся на курентСлот и передаем его в дату для сохранения стейта (важно скипать 1 событие,
+            // иначе событие зарекурситься
+            CurrentWeaponSlot.Skip(1).Subscribe(slot =>
             {
-                if (_weaponViewModelMap.TryGetValue(id, out var gunViewModel))
-                {
-                    ActiveGunVM.OnNext(gunViewModel);
-                }
+                arsenal.CurrentWeaponSlot.OnNext(slot);
             }).AddTo(_disposables);
         }
 
@@ -199,15 +208,17 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
             return result;
         }
 
-        private void CreateWeaponViewModel(Weapon weapon, ArsenalViewModel arsenalViewModel)
+        private WeaponViewModel CreateWeaponViewModel(Weapon weapon, ArsenalViewModel arsenalViewModel)
         {
             var weaponSettings = _weaponSettingsMap[weapon.WeaponName];
             var weaponViewModel = new WeaponViewModel(weapon, weaponSettings, arsenalViewModel);
             _allWeaponViewModels.Add(weaponViewModel);
             _weaponViewModelMap[weapon.Id] = weaponViewModel;
+
+            return weaponViewModel;
         }
 
-        private void RemoveWeaponViewModel(Weapon weapon)
+        private WeaponViewModel RemoveWeaponViewModel(Weapon weapon)
         {
             if (!_weaponViewModelMap.TryGetValue(weapon.Id, out var viewModel))
             {
@@ -216,6 +227,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
 
             _allWeaponViewModels.Remove(viewModel);
             _weaponViewModelMap.Remove(weapon.Id);
+
+            return viewModel;
         }
 
         public void Dispose()

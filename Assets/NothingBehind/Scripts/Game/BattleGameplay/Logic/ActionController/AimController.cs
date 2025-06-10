@@ -32,10 +32,10 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Logic.ActionController
 
             if (!isCheckWall)
             {
-                _rigController.SetRigAim(arsenalView.ActiveGun.WeaponType, true);
+                _rigController.SetRigAim(arsenalView.CurrentWeapon.WeaponType, true);
             }
 
-            if (arsenalView.ActiveGun.WeaponType == WeaponType.Pistol && !arsenalView.IsReloading)
+            if (arsenalView.CurrentWeapon.WeaponType == WeaponType.Pistol && !arsenalView.IsReloading)
             {
                 _rigController.SetRigLayerLeftHandIK(1, WeaponType.Pistol);
             }
@@ -50,8 +50,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Logic.ActionController
             //задаём анимацию прицеливания
             _animatorController.Aim(false);
 
-            _rigController.SetRigAim(arsenalView.ActiveGun.WeaponType, false);
-            if (arsenalView.ActiveGun.WeaponType == WeaponType.Pistol)
+            _rigController.SetRigAim(arsenalView.CurrentWeapon.WeaponType, false);
+            if (arsenalView.CurrentWeapon.WeaponType == WeaponType.Pistol)
             {
                 _rigController.SetRigLayerLeftHandIK(0, WeaponType.Pistol);
             }

@@ -153,7 +153,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Logic.ActionController
             {
                 if (_playerView.CurrentEnemy)
                     _aimController.SetAimPointPosition(_playerView.CurrentEnemy.transform.GetChild(0).position,
-                        _playerView.ArsenalView.ActiveGun);
+                        _playerView.ArsenalView.CurrentWeapon);
                 else
                     _aimController.SetAimPointForward();
             }
@@ -167,12 +167,12 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Logic.ActionController
             {
                 if (_playerView.CurrentEnemy)
                     _aimController.SetAimPointPosition(_playerView.CurrentEnemy.transform.GetChild(0).position,
-                        _playerView.ArsenalView.ActiveGun);
+                        _playerView.ArsenalView.CurrentWeapon);
                 else
-                    _aimController.SetAimPointPosition(mouseWorldPosition, _playerView.ArsenalView.ActiveGun);
+                    _aimController.SetAimPointPosition(mouseWorldPosition, _playerView.ArsenalView.CurrentWeapon);
             }
             else
-                _aimController.SetAimPointPosition(mouseWorldPosition, _playerView.ArsenalView.ActiveGun);
+                _aimController.SetAimPointPosition(mouseWorldPosition, _playerView.ArsenalView.CurrentWeapon);
         }
 
         private Vector3 CalculateAimMousePosition(Vector3 hit, Vector2 mousePos)

@@ -21,7 +21,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.UI.ScreenGameplay
 
         private ReadOnlyReactiveProperty<int> CurrentAmmo;
         private IDisposable _subscriptionCurrentAmmo;
-        private ReadOnlyReactiveProperty<WeaponViewModel> ActiveGun;
+        private ReadOnlyReactiveProperty<WeaponViewModel> CurrentWeapon;
 
         private ReadOnlyReactiveProperty<int> _appropriateMagazinesCount;
         private ReadOnlyReactiveProperty<int> _appropriateAmmoCount;
@@ -35,8 +35,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.UI.ScreenGameplay
 
         protected override void OnBind(ScreenGameplayViewModel viewModel)
         {
-            ActiveGun = viewModel.ArsenalViewModel.ActiveGunVM;
-            _disposables.Add(ActiveGun.Subscribe(activeGun =>
+            CurrentWeapon = viewModel.ArsenalViewModel.CurrentWeapon;
+            _disposables.Add(CurrentWeapon.Subscribe(activeGun =>
             {
                 if (_subscriptionCurrentAmmo != null)
                 {

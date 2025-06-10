@@ -61,7 +61,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM
             if (distanceSquared >= 80f)
             {
                 // Смещаем камеру в направлении прицеливания
-                FollowCameraToAimDirection(_playerView.ArsenalView.ActiveGun.AimRange, _playerView.transform);
+                FollowCameraToAimDirection(_playerView.ArsenalView.CurrentWeapon.AimRange, _playerView.transform);
             }
             else
             {

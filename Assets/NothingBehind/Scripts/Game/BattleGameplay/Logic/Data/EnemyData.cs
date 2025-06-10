@@ -23,7 +23,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Logic.Data
         public float TargetLastKnownDetectionTime;
         public Vector3 HeardSoundPosition;
         public float SoundDetectionTime;
-        public WeaponType WeaponType => _arsenalView.ActiveGun.WeaponType;
+        public WeaponType WeaponType => _arsenalView.CurrentWeapon.WeaponType;
         public SoundType SoundType;
 
         public List<GameObject> VisibleTargets = new List<GameObject>();

@@ -174,7 +174,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Logic.ActionController
 
                 _rigController.AimRifleRig(true);
 
-                _aimController.SetAimPointPosition(_data.TargetAimPos, _arsenalView.ActiveGun);
+                _aimController.SetAimPointPosition(_data.TargetAimPos, _arsenalView.CurrentWeapon);
 
                 if (Physics.Raycast(_data.SelfAimPos,
                         (_data.TargetAimPos - _data.SelfAimPos).normalized, out RaycastHit hitInfo))

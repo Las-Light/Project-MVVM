@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MapId: 1
   SceneName: Global_Map
-  PlayerInitialPosition: {x: -12.503803, y: 0.6, z: -1.8886919}
+  PlayerInitialPosition: {x: 0, y: 0, z: 0}
   MapTransfers:
   - TargetMapId: 2
-    Position: {x: -8.7181, y: 0, z: 8.882269}
+    Position: {x: -3.47, y: 0, z: 1.74}

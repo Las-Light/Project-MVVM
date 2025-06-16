@@ -9,16 +9,16 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
 {
     public class MapTransferService
     {
-        private readonly ObservableList<GameplayMapTransferViewModel> _allMapTransferViewModels = new();
+        private readonly ObservableList<MapTransferViewModel> _allMapTransferViewModels = new();
 
-        private readonly Dictionary<MapId, ObservableList<GameplayMapTransferViewModel>> _mapTransfersViewModelMap = new();
+        private readonly Dictionary<MapId, ObservableList<MapTransferViewModel>> _mapTransfersViewModelMap = new();
 
-        private readonly Dictionary<MapTransferData, GameplayMapTransferViewModel> _dataViewModelMaps = new();
+        private readonly Dictionary<MapTransferData, MapTransferViewModel> _dataViewModelMaps = new();
 
-        public ObservableList<GameplayMapTransferViewModel> AllMapTransferViewModels =>
+        public ObservableList<MapTransferViewModel> AllMapTransferViewModels =>
             _allMapTransferViewModels;
 
-        public Dictionary<MapId, ObservableList<GameplayMapTransferViewModel>> AllTransfersMaps =>
+        public Dictionary<MapId, ObservableList<MapTransferViewModel>> AllTransfersMaps =>
             _mapTransfersViewModelMap;
 
         public MapTransferService(
@@ -32,7 +32,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
 
         private void InitialMapTransfers(KeyValuePair<MapId, ObservableList<MapTransferData>> kvp)
         {
-            _mapTransfersViewModelMap.Add(kvp.Key, new ObservableList<GameplayMapTransferViewModel>());
+            _mapTransfersViewModelMap.Add(kvp.Key, new ObservableList<MapTransferViewModel>());
             foreach (var mapTransferData in kvp.Value)
             {
                 CreateMapTransferViewModel(kvp.Key, mapTransferData);
@@ -44,7 +44,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
 
         private void CreateMapTransferViewModel(MapId mapId, MapTransferData mapTransferData)
         {
-            var mapTransferViewModel = new GameplayMapTransferViewModel(mapTransferData);
+            var mapTransferViewModel = new MapTransferViewModel(mapTransferData);
             _mapTransfersViewModelMap[mapId].Add(mapTransferViewModel);
             _dataViewModelMaps[mapTransferData] = mapTransferViewModel;
 

@@ -1,21 +1,21 @@
 using System.Collections;
 using NothingBehind.Scripts.Game.BattleGameplay.Logic.ActionController;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
+using NothingBehind.Scripts.Game.GameRoot.MVVM.Camera;
 using NothingBehind.Scripts.Game.Settings.Gameplay;
 using R3;
 using Unity.Cinemachine;
 using UnityEngine;
 
-namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM
+namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Camera
 {
-    public class CameraView : MonoBehaviour
+    public class BGCameraView : MonoBehaviour
     {
         private CameraViewModel _cameraViewModel;
         private GameplayCameraSettings _cameraSettings;
         private CinemachineCamera _cinemachineCamera;
         private CinemachineFollow _cinemachineFollow;
-        private Camera _cameraMain;
+        private UnityEngine.Camera _cameraMain;
         private PlayerView _playerView;
 
         private ReadOnlyReactiveProperty<bool> _isRotateCameraLeft;
@@ -31,7 +31,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM
         {
             _cameraViewModel = cameraViewModel;
             _cameraSettings = cameraViewModel.CameraSettings;
-            _cameraMain = Camera.main;
+            _cameraMain = UnityEngine.Camera.main;
             _cinemachineCamera = GetComponent<CinemachineCamera>();
             _cinemachineFollow = GetComponent<CinemachineFollow>();
             _cinemachineCamera.Follow = playerView.transform;

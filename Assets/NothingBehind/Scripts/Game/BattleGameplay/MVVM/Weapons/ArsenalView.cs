@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.BattleGameplay.Logic.ActionController;
 using NothingBehind.Scripts.Game.BattleGameplay.Logic.Animation;
+using NothingBehind.Scripts.Game.BattleGameplay.Logic.Data;
 using NothingBehind.Scripts.Game.BattleGameplay.Logic.Sound;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Items;
@@ -230,6 +231,12 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
         {
             if (_shootEnable)
             {
+                if (_currentWeapon.Value.WeaponType == WeaponType.Unarmed)
+                {
+                    _animatorController.MeleeAttack();
+                    return true;
+                }
+                
                 if (ShouldAutoReload())
                 {
                     Reload();
@@ -249,12 +256,18 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
                     _animatorController.Recoil();
                 }
 
-                //_soundController.MakeSoundSelf(ActiveGun.GetRaycastOrigin(), SoundType.Shoot);
+                _soundController.MakeSoundSelf(CurrentWeapon.GetRaycastOrigin(), SoundType.Shoot);
 
                 return true;
             }
 
             return false;
+        }
+
+        public bool MeleeAttack()
+        {
+            _animatorController.MeleeAttack();
+            return true;
         }
 
         public void WeaponSwitch(WeaponView targetWeapon)

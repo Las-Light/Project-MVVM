@@ -5,6 +5,7 @@ using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Maps;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Storages;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons;
 using NothingBehind.Scripts.Game.BattleGameplay.Services;
+using NothingBehind.Scripts.Game.GameRoot.MVVM.Camera;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Transfers;
@@ -37,7 +38,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
         public readonly Dictionary<int, InventoryViewModel> InventoriesMap;
         public readonly ReadOnlyReactiveProperty<PlayerViewModel> Player;
         public readonly ReadOnlyReactiveProperty<CameraViewModel> CameraViewModel;
-        public readonly ObservableList<GameplayMapTransferViewModel> AllMapTransfers;
+        public readonly ObservableList<MapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
         public readonly IObservableCollection<StorageViewModel> AllStorages;
         public readonly IObservableCollection<InventoryViewModel> AllInventories;

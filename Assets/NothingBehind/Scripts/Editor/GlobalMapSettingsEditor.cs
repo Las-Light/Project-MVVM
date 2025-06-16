@@ -17,19 +17,42 @@ namespace NothingBehind.Scripts.Editor
 
             GlobalMapSettings mapSettings = (GlobalMapSettings)target;
 
-            if (GUILayout.Button("Collect"))
+            if (GUILayout.Button("CollectSceneName"))
             {
                 mapSettings.SceneName = SceneManager.GetActiveScene().name;
+            }
+
+            if (GUILayout.Button("CollectPlayerInitialPosition"))
+            {
                 mapSettings.PlayerInitialPosition =
                     GameObject.FindGameObjectWithTag("InitialPoint").transform.position;
+            }
+            
+            if (GUILayout.Button("CollectMapTransfers"))
+            {
                 mapSettings.MapTransfers =
                     FindObjectsByType<MapTransferMarker>(FindObjectsInactive.Exclude,
                             FindObjectsSortMode.None)
                         .Select(x => new MapTransferData(x.TargetMapId, x.transform.position))
                         .ToList();
             }
+            
+            if (GUILayout.Button("ClearSceneName"))
+            {
+                mapSettings.SceneName = "";
+            }
+            
+            if (GUILayout.Button("ClearPlayerInitialPosition"))
+            {
+                mapSettings.PlayerInitialPosition = Vector3.zero;
+            }
+            
+            if (GUILayout.Button("ClearMapTransfers"))
+            {
+                mapSettings.MapTransfers.Clear();
+            }
 
-            if (GUILayout.Button("Clear"))
+            if (GUILayout.Button("ClearAll"))
             {
                 mapSettings.SceneName = "";
                 mapSettings.PlayerInitialPosition = Vector3.zero;

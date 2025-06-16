@@ -1,9 +1,8 @@
-using NothingBehind.Scripts.Game.BattleGameplay.MVVM;
-using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
+using NothingBehind.Scripts.Game.GameRoot.MVVM.Camera;
 using NothingBehind.Scripts.Game.Settings.Gameplay;
 using R3;
 
-namespace NothingBehind.Scripts.Game.BattleGameplay.Services
+namespace NothingBehind.Scripts.Game.GameRoot.Services
 {
     public class CameraService
     {
@@ -16,14 +15,14 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Services
 
         private bool _progressRotate;
 
-        public CameraService(InputManager inputManager,
+        public CameraService(InputManager.InputManager inputManager,
             GameplayCameraSettings cameraSettings)
         {
             CreateCameraViewModel(inputManager, cameraSettings);
 
         }
 
-        private void CreateCameraViewModel(InputManager inputManager, GameplayCameraSettings cameraSettings)
+        private void CreateCameraViewModel(InputManager.InputManager inputManager, GameplayCameraSettings cameraSettings)
         {
             var cameraViewModel = new CameraViewModel(this, inputManager, cameraSettings);
 

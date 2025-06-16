@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.BattleGameplay.Root.Commands.Handlers.PlayerHandlers;
+using NothingBehind.Scripts.Game.BattleGameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot.Commands.Handlers.EquipmentHandlers;
 using NothingBehind.Scripts.Game.GameRoot.Commands.Handlers.InventoriesHandlers;
 using NothingBehind.Scripts.Game.GameRoot.Commands.Handlers.ResourcesHandlers;
@@ -55,6 +56,11 @@ namespace NothingBehind.Scripts.Game.GameRoot
             var inputManager = container.Resolve<InputManager>();
 
             // регистрируем общие сервисы
+
+            if (!container.IsRegistered<CameraService>())
+            {
+                container.RegisterFactory(c => new CameraService(inputManager, gameplayCameraSettings)).AsSingle();
+            }
             
             if (!container.IsRegistered<MapTransferService>())
             {

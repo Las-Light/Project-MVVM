@@ -1,8 +1,8 @@
-using NothingBehind.Scripts.Game.BattleGameplay.Services;
+using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.Settings.Gameplay;
 
-namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM
+namespace NothingBehind.Scripts.Game.GameRoot.MVVM.Camera
 {
     public class CameraViewModel
     {

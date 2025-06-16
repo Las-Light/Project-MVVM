@@ -54,14 +54,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root
 
             // регистрируем менеджеры
 
-            var inputManager = container.Resolve<InputManager>();
-
             // регистрируем сервисы
 
-            container.RegisterFactory(c => new CameraService(
-                inputManager,
-                gameplayCameraSettings)).AsSingle();
-            
             container.RegisterFactory(c => new ArsenalService(gameState.Arsenals,
                 equipmentService,
                 inventoryService,

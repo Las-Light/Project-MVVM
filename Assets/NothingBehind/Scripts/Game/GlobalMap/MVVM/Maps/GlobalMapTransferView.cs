@@ -1,6 +1,6 @@
-using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
+using NothingBehind.Scripts.Game.GameRoot.MVVM.Transfers;
+using NothingBehind.Scripts.Game.GlobalMap.MVVM.Player;
 using NothingBehind.Scripts.Game.GlobalMap.Root;
 using R3;
 using UnityEngine;
@@ -11,9 +11,9 @@ namespace NothingBehind.Scripts.Game.GlobalMap.MVVM.Maps
     {
         private bool _triggered;
         private Subject<GlobalMapExitParams> _exitSceneSignalSubj;
-        private GlobalMapTransferViewModel _viewModel;
+        private MapTransferViewModel _viewModel;
 
-        public void Bind(Subject<GlobalMapExitParams> exitSceneSignal, GlobalMapTransferViewModel viewModel)
+        public void Bind(Subject<GlobalMapExitParams> exitSceneSignal, MapTransferViewModel viewModel)
         {
             _exitSceneSignalSubj = exitSceneSignal;
             _viewModel = viewModel;
@@ -25,10 +25,10 @@ namespace NothingBehind.Scripts.Game.GlobalMap.MVVM.Maps
         {
             if (_triggered)
                 return;
-            other.TryGetComponent<PlayerView>(out var heroView);
-            if (heroView!=null)
+            other.TryGetComponent<GMPlayerView>(out var playerView);
+            if (playerView!=null)
             {
-                if (heroView.IsInteractiveActionPressed())
+                if (playerView.IsInteractiveActionPressed())
                 {
                     _exitSceneSignalSubj?.OnNext(
                         new GlobalMapExitParams(

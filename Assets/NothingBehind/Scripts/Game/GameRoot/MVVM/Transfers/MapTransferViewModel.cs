@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.GameRoot.MVVM.Transfers
 {
-    public class GameplayMapTransferViewModel
+    public class MapTransferViewModel
     {
         public readonly MapId MapId;
         public readonly Vector3 Position;
 
-        public GameplayMapTransferViewModel(MapTransferData mapTransferData)
+        public MapTransferViewModel(MapTransferData mapTransferData)
         {
             MapId = mapTransferData.TargetMapId;
             Position = mapTransferData.Position;

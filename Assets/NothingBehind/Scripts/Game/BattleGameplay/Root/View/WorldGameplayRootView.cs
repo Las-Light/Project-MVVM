@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
-using NothingBehind.Scripts.Game.BattleGameplay.MVVM;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Camera;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Characters;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Maps;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Storages;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Transfers;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.UI;
+using NothingBehind.Scripts.Game.GameRoot.MVVM.Camera;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Transfers;
 using NothingBehind.Scripts.Game.State;
@@ -23,7 +25,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
         private readonly Dictionary<MapId, GameplayMapTransferView> _createMapTransfersMap = new();
         private readonly Dictionary<string, EnemySpawnView> _createSpawnsMap = new();
         private PlayerView _playerView;
-        private CameraView _camera;
+        private BGCameraView _bgCamera;
         private readonly CompositeDisposable _disposables = new();
         private WorldGameplayRootViewModel _viewModel;
 
@@ -91,11 +93,11 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
         private void CreateCamera(CameraViewModel cameraViewModel, PlayerView hero)
         {
             var prefabCameraPath = "Prefabs/Gameplay/World/Entities/Camera/VirtualCamera";
-            var cameraPrefab = Resources.Load<CameraView>(prefabCameraPath);
+            var cameraPrefab = Resources.Load<BGCameraView>(prefabCameraPath);
 
             var cameraBinder = Instantiate(cameraPrefab);
             cameraBinder.Bind(cameraViewModel, hero);
-            _camera = cameraBinder;
+            _bgCamera = cameraBinder;
         }
 
         private void CreatePlayer(PlayerViewModel playerViewModel, GameplayUIManager gameplayUIManager)
@@ -111,9 +113,9 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
                 throw new Exception(
                     $"InventoryViewModel for owner with Id {_viewModel.Player.CurrentValue.Id} not found");
 
-            var heroBinder = Instantiate(heroPrefab);
-            heroBinder.Bind(playerViewModel, arsenalViewModel, inventoryViewModel, gameplayUIManager);
-            _playerView = heroBinder;
+            var playerView = Instantiate(heroPrefab);
+            playerView.Bind(playerViewModel, arsenalViewModel, inventoryViewModel, gameplayUIManager);
+            _playerView = playerView;
         }
 
         private void CreateCharacter(CharacterViewModel characterViewModel, GameplayUIManager gameplayUIManager)
@@ -142,7 +144,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
             }
         }
 
-        private void CreateMapTransfer(GameplayMapTransferViewModel transferViewModel,
+        private void CreateMapTransfer(MapTransferViewModel transferViewModel,
             IGameStateProvider gameStateProvider,
             Subject<GameplayExitParams> exitSceneSignal)
         {

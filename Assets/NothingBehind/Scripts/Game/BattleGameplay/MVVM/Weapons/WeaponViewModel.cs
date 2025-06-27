@@ -70,6 +70,11 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
             Trail = CreateTrailData(weaponSettings.trailSettings);
             AudioWeapon = CreateAudioWeaponData(weaponSettings.audioSettings);
 
+            weapon.FeedSystem.Value.MagazinesItem.Subscribe(value =>
+            {
+                Debug.Log(value.Id);
+            });
+
             _allMagazines = arsenalViewModel.AllMagazines;
             _allAmmo = arsenalViewModel.AllAmmo;
 

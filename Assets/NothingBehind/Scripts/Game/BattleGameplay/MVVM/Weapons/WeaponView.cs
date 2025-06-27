@@ -41,6 +41,11 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
             ClipSize = viewModel.FeedSystem.MagazinesItem.Value.Magazines.ClipSize;
             CheckDistanceToWall = viewModel.CheckDistanceToWall;
             AimRange = viewModel.AimingRange;
+
+            CurrentAmmo.Subscribe(value =>
+            {
+                Debug.Log(value);
+            });
         }
 
 

@@ -154,10 +154,10 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player
                 ArsenalView.Shoot();
             }
 
-            if (InputManager.IsAttack.CurrentValue && !IsAim)
-            {
-                ArsenalView.MeleeAttack();
-            }
+            // if (InputManager.IsAttack.CurrentValue && !IsAim)
+            // {
+            //     ArsenalView.MeleeAttack();
+            // }
         }
 
         private ArsenalView CreateArsenalView(ArsenalViewModel arsenalViewModel)

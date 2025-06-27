@@ -233,7 +233,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
             {
                 if (_currentWeapon.Value.WeaponType == WeaponType.Unarmed)
                 {
-                    _animatorController.MeleeAttack();
+                    //_animatorController.MeleeAttack();
                     return true;
                 }
                 
@@ -247,13 +247,13 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
                 if (_currentWeapon.Value.WeaponType == WeaponType.Rifle)
                 {
                     _animatorController.RifleShootRecoil();
-                    _animatorController.Recoil();
+                    //_animatorController.Recoil();
                 }
 
                 if (_currentWeapon.Value.WeaponType == WeaponType.Pistol)
                 {
                     _animatorController.PistolShootRecoil();
-                    _animatorController.Recoil();
+                    //_animatorController.Recoil();
                 }
 
                 _soundController.MakeSoundSelf(CurrentWeapon.GetRaycastOrigin(), SoundType.Shoot);
@@ -608,6 +608,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
 
         private bool ShouldAutoReload()
         {
+            // Debug.Log(_currentWeapon.Value.CurrentAmmo.Value);
+            // Debug.Log(_currentWeapon.Value.CanReload());
             return !_reloading
                    && autoReload
                    && _currentWeapon.Value.CurrentAmmo.Value == 0

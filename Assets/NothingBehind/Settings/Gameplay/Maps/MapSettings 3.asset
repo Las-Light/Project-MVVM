@@ -15,13 +15,9 @@ MonoBehaviour:
   MapId: 3
   SceneName: Gameplay_1
   InitialStateSettings:
-    PlayerInitialPosition: {x: -12.503803, y: 0.6, z: -1.8886919}
+    PlayerInitialPosition: {x: -5.023552, y: 0.16821289, z: 66.5719}
     Characters: []
     MapTransfers:
-    - TargetMapId: 2
-      Position: {x: -8.7181, y: 0, z: 8.882269}
-    EnemySpawns:
-    - Id: SpawnMarker
-      Characters: []
-      Position: {x: -1.6145668, y: 0, z: -30.860727}
-      IsTriggered: 0
+    - TargetMapId: 1
+      Position: {x: 48.11687, y: 0.26272774, z: 68.04069}
+    EnemySpawns: []

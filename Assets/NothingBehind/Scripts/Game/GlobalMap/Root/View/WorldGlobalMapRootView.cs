@@ -26,7 +26,7 @@ namespace NothingBehind.Scripts.Game.GlobalMap.Root.View
         {
             _viewModel = viewModel;
             CreatePlayer(viewModel.Player.Value, globalMapUIManager);
-            CreateCamera(viewModel.Camera.CurrentValue);
+            //CreateCamera(viewModel.Camera.CurrentValue);
             foreach (var mapTransferViewModel in viewModel.AllMapTransfers)
                 CreateMapTransfer(mapTransferViewModel, exitSceneRequest);
         }

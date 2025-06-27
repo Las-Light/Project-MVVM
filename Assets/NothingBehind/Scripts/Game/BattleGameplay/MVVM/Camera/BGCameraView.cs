@@ -1,4 +1,4 @@
-using System.Collections;
+using LitMotion;
 using NothingBehind.Scripts.Game.BattleGameplay.Logic.ActionController;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Camera;
@@ -11,38 +11,47 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Camera
 {
     public class BGCameraView : MonoBehaviour
     {
+        [SerializeField] private float transitionDuration = 0.5f;
+
         private CameraViewModel _cameraViewModel;
         private GameplayCameraSettings _cameraSettings;
         private CinemachineCamera _cinemachineCamera;
-        private CinemachineFollow _cinemachineFollow;
-        private UnityEngine.Camera _cameraMain;
+        private CinemachineCameraOffset _cinemachineCameraOffset;
+        private CinemachinePanTilt _cinemachineRotation;
+        private CinemachinePositionComposer _cinemachinePosition;
         private PlayerView _playerView;
 
         private ReadOnlyReactiveProperty<bool> _isRotateCameraLeft;
         private ReadOnlyReactiveProperty<bool> _isRotateCameraRight;
         private ReadOnlyReactiveProperty<bool> _isAim;
-        private bool _progressRotate;
-        private bool _isFollowing;
+        private Vector3 _aimDirection;
+        private Vector3 _mousePosition;
 
         private CompositeDisposable _disposables = new();
-        private Vector3 _mousePosition;
+
+        private MotionHandle _rotationMotionHandle;
+        private MotionHandle _aimMotionHandle;
 
         public void Bind(CameraViewModel cameraViewModel, PlayerView playerView)
         {
             _cameraViewModel = cameraViewModel;
             _cameraSettings = cameraViewModel.CameraSettings;
-            _cameraMain = UnityEngine.Camera.main;
             _cinemachineCamera = GetComponent<CinemachineCamera>();
-            _cinemachineFollow = GetComponent<CinemachineFollow>();
+            _cinemachineCameraOffset = GetComponent<CinemachineCameraOffset>();
+            _cinemachineRotation = GetComponent<CinemachinePanTilt>();
+            _cinemachinePosition = GetComponent<CinemachinePositionComposer>();
             _cinemachineCamera.Follow = playerView.transform;
             _playerView = playerView;
             _isRotateCameraLeft = cameraViewModel.InputManager.IsRotateCameraLeft;
             _isRotateCameraRight = cameraViewModel.InputManager.IsRotateCameraRight;
             _isAim = cameraViewModel.InputManager.IsAim;
-            playerView.GetComponent<LookPlayerController>().MouseWorldPosition.Subscribe(value => { _mousePosition = value; })
+            
+            playerView.GetComponent<LookPlayerController>().MouseWorldPosition
+                .Subscribe(value => { _mousePosition = value; })
                 .AddTo(_disposables);
-            _disposables.Add(_isRotateCameraLeft.Skip(1).Subscribe(_ => StartCoroutine(RotateBy45Deg(Vector3.up))));
-            _disposables.Add(_isRotateCameraRight.Skip(1).Subscribe(_ => StartCoroutine(RotateBy45Deg(Vector3.down))));
+            _isRotateCameraLeft.Skip(1).Subscribe(_ => { RotateBy45DegWithLitMotion(-45f); }).AddTo(_disposables);
+            _isRotateCameraRight.Skip(1).Subscribe(_ => { RotateBy45DegWithLitMotion(45f); }).AddTo(_disposables);
+            _isAim.Skip(1).Subscribe(isAim => { if (!isAim) ResetCamera(); }).AddTo(_disposables);
         }
 
         private void Update()
@@ -50,12 +59,11 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Camera
             if (!_isAim.CurrentValue)
             {
                 // Если игрок не прицеливается, сбрасываем камеру и выходим
-                ResetCamera();
                 return;
             }
 
             // Кэшируем направление мыши относительно игрока
-            Vector3 aimDirection = _mousePosition - _playerView.transform.position;
+            var aimDirection = _mousePosition - _playerView.transform.position;
             float distanceSquared = aimDirection.sqrMagnitude;
 
             if (distanceSquared >= 80f)
@@ -80,76 +88,63 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Camera
         /// </summary>
         /// <param name="aimingRange">Дистанция прицеливания оружия.</param>
         /// <param name="playerTransform">Трансформ игрока.</param>
-        public void FollowCameraToAimDirection(float aimingRange, Transform playerTransform)
+        private void FollowCameraToAimDirection(float aimingRange, Transform playerTransform)
         {
-            if (_cinemachineFollow == null || _cameraSettings == null) return;
+            if (_cinemachineCameraOffset == null || _cameraSettings == null) return;
 
-            // Рассчитываем новое смещение камеры
-            Vector3 targetOffset = playerTransform.forward * aimingRange;
+            // 1. Получаем направление прицела в мировых координатах (от игрока к курсору)
+            _aimDirection = playerTransform.forward;
 
-            // Проверяем, нужно ли обновлять смещение
-            if (Vector3.SqrMagnitude(_cinemachineFollow.FollowOffset - targetOffset) < 0.01f)
-            {
-                // Если текущее смещение близко к целевому, прекращаем интерполяцию
-                _cinemachineFollow.FollowOffset = targetOffset;
-                return;
-            }
+            // 2. Преобразуем мировое направление в локальное пространство камеры
+            Vector3 localAimDirection = transform.InverseTransformDirection(_aimDirection);
 
-            // Плавно изменяем смещение камеры
-            _cinemachineFollow.FollowOffset = Vector3.Lerp(
-                _cinemachineFollow.FollowOffset,
-                targetOffset,
-                Time.deltaTime * _cameraSettings.FollowSpeed
-            );
+            // 3. Умножаем на силу смещения
+            localAimDirection *= aimingRange;
+
+            // 4. Преобразуем в новый вектор для CameraOffset (там смещение по х и у)
+            var offset = new Vector3(localAimDirection.x, localAimDirection.z, 0f);
+
+            SetOffset(offset, 1);
         }
 
         /// <summary>
         /// Возвращает камеру в исходное положение.
         /// </summary>
-        public void ResetCamera()
+        private void ResetCamera()
         {
-            if (_cinemachineFollow == null || _cameraSettings == null || _cinemachineFollow.FollowOffset == Vector3.zero) return;
+            if (_cinemachineCameraOffset == null) return;
+            if (_cinemachinePosition.Composition.ScreenPosition != Vector2.zero) 
+                _cinemachinePosition.Composition.ScreenPosition = Vector2.zero;
 
-            // Проверяем, нужно ли обновлять смещение
-            if (Vector3.SqrMagnitude(_cinemachineFollow.FollowOffset) < 0.01f)
-            {
-                // Если смещение уже близко к нулю, прекращаем интерполяцию
-                _cinemachineFollow.FollowOffset = Vector3.zero;
-                return;
-            }
-
-            // Плавно возвращаем смещение камеры к нулевому значению
-            _cinemachineFollow.FollowOffset = Vector3.Lerp(
-                _cinemachineFollow.FollowOffset,
-                Vector3.zero,
-                Time.deltaTime * _cameraSettings.FollowSpeed
-            );
+            ResetOffset();
         }
 
-        private IEnumerator RotateBy45Deg(Vector3 rotDir)
+        private void ResetOffset(float duration = 1f)
         {
-            if (_progressRotate)
-            {
-                yield break;
-            }
+            SetOffset(Vector3.zero, duration);
+        }
 
-            _progressRotate = true;
-            float t = 0;
-            Quaternion start = transform.rotation;
-            Quaternion target = Quaternion.AngleAxis(45, rotDir) * transform.localRotation;
+        private void SetOffset(Vector3 targetOffset, float duration = -1f)
+        {
+            if (duration < 0) duration = transitionDuration;
+            _aimMotionHandle.TryCancel();
 
-            do
-            {
-                if (transform == null)
-                    yield break;
+            _aimMotionHandle = LMotion.Create(_cinemachineCameraOffset.Offset, targetOffset, duration)
+                .WithEase(Ease.OutCubic)
+                .Bind(value => { _cinemachineCameraOffset.Offset = value; })
+                .AddTo(gameObject);
+        }
 
-                t += _cameraSettings.RotationSpeed / 45f * Time.deltaTime;
+        private void RotateBy45DegWithLitMotion(float axisRotation)
+        {
+            if (_cinemachineCameraOffset == null || _rotationMotionHandle.IsActive())
+                return;
 
-                transform.rotation = Quaternion.Lerp(start, target, t);
-                yield return null;
-            } while (t < 1f);
-
-            _progressRotate = false;
+            var targetRotation = _cinemachineRotation.PanAxis.Value + axisRotation;
+            _rotationMotionHandle = LMotion.Create(_cinemachineRotation.PanAxis.Value, targetRotation, 0.5f)
+                .WithEase(Ease.OutCubic)
+                .Bind(value => _cinemachineRotation.PanAxis.Value = value)
+                .AddTo(gameObject);
         }
     }
 }

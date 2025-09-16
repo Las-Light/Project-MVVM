@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons;
 using NothingBehind.Scripts.Game.BattleGameplay.Services;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
 using R3;
@@ -12,7 +12,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Characters
 {
     public class CharacterViewModel
     {
-        private readonly Character _character;
+        private readonly CharacterEntity _characterEntity;
         private readonly CharacterSettings _characterSettings;
         private readonly CharactersService _charactersService;
         private readonly InventoryViewModel _inventoryViewModel;
@@ -25,25 +25,25 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Characters
         public ReadOnlyReactiveProperty<int> Level { get; }
         public ReadOnlyReactiveProperty<float> Health { get; }
 
-        public CharacterViewModel(Character character,
+        public CharacterViewModel(CharacterEntity characterEntity,
             CharacterSettings characterSettings,
             CharactersService charactersService, 
             InventoryViewModel inventoryViewModel,
             ArsenalViewModel arsenalViewModel)
         {
-            EntityType = character.EntityType;
-            CharacterEntityId = character.Id;
-            Level = character.Level;
-            Health = character.Health;
-            Position = character.Position;
+            EntityType = characterEntity.EntityType;
+            CharacterEntityId = characterEntity.UniqueId;
+            Level = characterEntity.Level;
+            Health = characterEntity.Health;
+            Position = characterEntity.Position;
             
-            _character = character;
+            _characterEntity = characterEntity;
             _characterSettings = characterSettings;
             _charactersService = charactersService;
             _inventoryViewModel = inventoryViewModel;
             ArsenalViewModel = arsenalViewModel;
 
-            foreach (var characterLevelSettings in characterSettings.LevelSettings)
+            foreach (var characterLevelSettings in characterSettings.Levels)
             {
                 _levelSettingsMap[characterLevelSettings.Level] = characterLevelSettings;
             }

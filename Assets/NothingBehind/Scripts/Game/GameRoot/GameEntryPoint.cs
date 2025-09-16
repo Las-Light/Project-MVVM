@@ -126,6 +126,7 @@ namespace NothingBehind.Scripts.Game.GameRoot
             yield return LoadScene(GetSceneName(enterParams.TargetMapId));
 
             var isGameStateLoaded = false;
+            Debug.Log("Start Load");
             _rootContainer.Resolve<IGameStateProvider>().LoadGameState(gameSettings, enterParams)
                 .Subscribe(_ =>
                 {

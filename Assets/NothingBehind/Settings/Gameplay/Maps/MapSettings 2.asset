@@ -16,7 +16,7 @@ MonoBehaviour:
   SceneName: Gameplay
   InitialStateSettings:
     PlayerInitialPosition: {x: 0, y: 0, z: 0}
-    Characters: []
+    Entities: []
     MapTransfers:
     - TargetMapId: 1
       Position: {x: -9.971256, y: 0, z: -16.402199}
@@ -25,8 +25,9 @@ MonoBehaviour:
     EnemySpawns:
     - Id: SpawnMarker
       Characters:
-      - EntityType: 2
-        LevelSettings: {fileID: 11400000, guid: f8100abe7c7d69d438304a5bb4453e35, type: 2}
-        Position: {x: -11.008, y: 0.00000011920929, z: 26.739}
+      - <EntityType>k__BackingField: 0
+        <ConfigId>k__BackingField: 
+        <Level>k__BackingField: 0
+        <InitialPosition>k__BackingField: {x: 0, y: 0, z: 0}
       Position: {x: -10.954521, y: -0.0000038146973, z: 26.492702}
       IsTriggered: 0

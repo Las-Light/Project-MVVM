@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using NothingBehind.Scripts.Game.BattleGameplay.Commands.CharactersCommands;
+using NothingBehind.Scripts.Game.BattleGameplay.Commands.EntityCommands;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Characters;
 using NothingBehind.Scripts.Game.GameRoot.Services;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities.Characters;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Characters;
@@ -16,6 +17,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Services
 {
     public class CharactersService
     {
+        public IObservableCollection<CharacterViewModel> AllCharacters => _allCharacters;
+        
         private readonly EquipmentService _equipmentService;
         private readonly InventoryService _inventoryService;
         private readonly ArsenalService _arsenalService;
@@ -24,9 +27,9 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Services
         private readonly Dictionary<int, CharacterViewModel> _characterMap = new();
         private readonly Dictionary<EntityType, CharacterSettings> _characterSettingsMap = new();
 
-        public IObservableCollection<CharacterViewModel> AllCharacters => _allCharacters;
-
-        public CharactersService(IObservableCollection<Character> characters,
+        private readonly CompositeDisposable _disposables = new();
+        
+        public CharactersService(IObservableCollection<Entity> entities,
             CharactersSettings charactersSettings,
             EquipmentService equipmentService,
             InventoryService inventoryService,
@@ -39,74 +42,83 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Services
             _arsenalService = arsenalService;
             _commandProcessor = commandProcessor;
 
-            foreach (var characterSettings in charactersSettings.AllCharacters)
+            foreach (var characterSettings in charactersSettings.Characters)
             {
                 _characterSettingsMap[characterSettings.EntityType] = characterSettings;
             }
 
-            foreach (var characterEntity in characters)
+            foreach (var entity in entities)
             {
-                CreateCharacterViewModel(characterEntity);
+                if (entity is CharacterEntity characterEntity)
+                {
+                    CreateCharacterViewModel(characterEntity);
+                }
             }
 
-            characters.ObserveAdd().Subscribe(e =>
+            entities.ObserveAdd().Subscribe(e =>
             {
-                CreateCharacterViewModel(e.Value);
-            });
+                var addedEntity = e.Value;
+                if (addedEntity is CharacterEntity characterEntity)
+                {
+                    CreateCharacterViewModel(characterEntity);
+                }
+            }).AddTo(_disposables);
+            entities.ObserveRemove().Subscribe(e =>
+            {
+                var removedEntity = e.Value;
+                if (removedEntity is CharacterEntity characterEntity)
+                {
+                    RemoveCharacterViewModel(characterEntity);
+                }
+            }).AddTo(_disposables);
 
-            characters.ObserveRemove().Subscribe(e =>
-            {
-                RemoveCharacterViewModel(e.Value);
-            });
-            
             exitInventorRequest.Where(result => result.IsEmptyInventory && result.EntityType == EntityType.Character)
                 .Subscribe(result =>
                 {
-                    RemoveCharacter(result.OwnerId);
+                    RemoveEntity(result.OwnerId);
                 });
         }
 
-        public CommandResult CreateCharacter(EntityType characterType, int level, Vector3 position)
+        public CommandResult CreateEntity(EntityType entityType, string configId, int level, Vector3 position)
         {
-            var command = new CmdCreateCharacter(characterType, level,
-                position, _equipmentService, _inventoryService, _arsenalService);
+            var command = new CmdCreateEntity(entityType, configId, level, position);
             var result = _commandProcessor.Process(command);
-            
+
             return result;
         }
 
-        public CommandResult RemoveCharacter(int characterEntityId)
+        public CommandResult RemoveEntity(int entityId)
         {
-            var command = new CmdRemoveCharacter(characterEntityId, _inventoryService, _equipmentService, _arsenalService);
+            var command = new CmdRemoveEntity(entityId);
             var result = _commandProcessor.Process(command);
-            
+
             return result;
         }
 
-        private void CreateCharacterViewModel(Character character)
+        private void CreateCharacterViewModel(CharacterEntity characterEntity)
         {
-            var characterSettings = _characterSettingsMap[character.EntityType];
-            if (!_inventoryService.InventoryMap.TryGetValue(character.Id, out var inventoryViewModel))
+            var characterSettings = _characterSettingsMap[characterEntity.EntityType];
+            if (!_inventoryService.InventoryMap.TryGetValue(characterEntity.UniqueId, out var inventoryViewModel))
             {
-                Debug.LogError($"Inventory with Id - {character.Id} not found");
+                Debug.LogError($"Inventory with Id - {characterEntity.UniqueId} not found");
             }
-            if (!_arsenalService.ArsenalMap.TryGetValue(character.Id, out var arsenalViewModel))
+            if (!_arsenalService.ArsenalMap.TryGetValue(characterEntity.UniqueId, out var arsenalViewModel))
             {
-                throw new Exception($"ArsenalViewModel for owner with Id {character.Id} not found");
+                throw new Exception($"ArsenalViewModel for owner with Id {characterEntity.UniqueId} not found");
             }
-            var characterViewModel = new CharacterViewModel(character,
+            var characterViewModel = new CharacterViewModel(characterEntity,
                 characterSettings, this, inventoryViewModel, arsenalViewModel);
             
             _allCharacters.Add(characterViewModel);
-            _characterMap[character.Id] = characterViewModel;
+            _characterMap[characterEntity.UniqueId] = characterViewModel;
         }
 
-        private void RemoveCharacterViewModel(Character characterEntityProxy)
+        private void RemoveCharacterViewModel(CharacterEntity characterEntityEntityProxy)
         {
-            if (_characterMap.TryGetValue(characterEntityProxy.Id, out var characterViewModel))
+            if (_characterMap.TryGetValue(characterEntityEntityProxy.UniqueId, out var characterViewModel))
             {
                 _allCharacters.Remove(characterViewModel);
-                _characterMap.Remove(characterEntityProxy.Id);
+                _characterMap.Remove(characterEntityEntityProxy.UniqueId);
             }
         }
     }

@@ -20,8 +20,9 @@ namespace NothingBehind.Scripts.Game.State.Weapons
             CurrentAmmo = new ReactiveProperty<int>(data.CurrentAmmo);
             IsEmpty = new ReactiveProperty<bool>(data.IsFull);
 
-            CurrentAmmo.Skip(1).Subscribe(value =>
+            CurrentAmmo.Subscribe(value =>
             {
+                Debug.Log("Current ammo subscribe - " + data.CurrentAmmo);
                 data.CurrentAmmo = value;
                 if (value == 0)
                 {

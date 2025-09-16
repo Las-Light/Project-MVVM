@@ -27,9 +27,9 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
                     c.Resolve<InputManager>(),
                     c.Resolve<CameraService>(),
                     c.Resolve<InventoryService>(),
+                    c.Resolve<EquipmentService>(),
                     c.Resolve<ArsenalService>()))
                 .AsSingle();
-            Debug.Log(container.Resolve<PlayerService>().PlayerViewModel.Value);
         }
     }
 }

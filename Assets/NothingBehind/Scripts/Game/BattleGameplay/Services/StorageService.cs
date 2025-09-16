@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using NothingBehind.Scripts.Game.BattleGameplay.Commands.StoragesCommands;
+using NothingBehind.Scripts.Game.BattleGameplay.Commands.EntityCommands;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Storages;
 using NothingBehind.Scripts.Game.GameRoot.Services;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Storages;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities.Storages;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Entities.Storages;
@@ -15,17 +15,19 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Services
 {
     public class StorageService
     {
+        public IObservableCollection<StorageViewModel> AllStorages => _allStorages;
+        public Dictionary<int, StorageViewModel> StorageMap => _storagesMap;
+        
         private readonly InventoryService _inventoryService;
         private readonly ICommandProcessor _commandProcessor;
         private readonly ObservableList<StorageViewModel> _allStorages = new();
         private readonly Dictionary<int, StorageViewModel> _storagesMap = new();
         private readonly Dictionary<EntityType, StorageSettings> _storageSettingsMap = new();
 
-        public IObservableCollection<StorageViewModel> AllStorages => _allStorages;
-        public Dictionary<int, StorageViewModel> StorageMap => _storagesMap;
+        private readonly CompositeDisposable _disposables = new();
 
         public StorageService(
-            IObservableCollection<Storage> storages,
+            IObservableCollection<Entity> entities,
             StoragesSettings storagesSettings,
             InventoryService inventoryService,
             ICommandProcessor commandProcessor,
@@ -39,62 +41,78 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Services
                 _storageSettingsMap[storageSettings.EntityType] = storageSettings;
             }
 
-            foreach (var storage in storages)
+            foreach (var entity in entities)
             {
-                CreateStorageViewModel(storage);
+                if (entity is StorageEntity storageEntity)
+                {
+                    CreateStorageViewModel(storageEntity);
+                }
             }
 
-            storages.ObserveAdd().Subscribe(e => { CreateStorageViewModel(e.Value); });
-
-            storages.ObserveRemove().Subscribe(e => { RemoveStorageViewModel(e.Value); });
+            entities.ObserveAdd().Subscribe(e =>
+            {
+                var addedEntity = e.Value;
+                if (addedEntity is StorageEntity storageEntity)
+                {
+                    CreateStorageViewModel(storageEntity);
+                }
+            }).AddTo(_disposables);
+            entities.ObserveRemove().Subscribe(e =>
+            {
+                var removedEntity = e.Value;
+                if (removedEntity is StorageEntity storageEntity)
+                {
+                    RemoveStorageViewModel(storageEntity);
+                }
+            }).AddTo(_disposables);
 
             // Когда приходит реквест, то StorageService удаляет из GameState этот Storage (реквест приходит из InventoryUIView при его удалении)
             exitInventoryRequest.Where(result => result.IsEmptyInventory && result.EntityType == EntityType.Storage)
                 .Subscribe(result =>
             {
-                RemoveStorage(result.OwnerId);
+                RemoveEntity(result.OwnerId);
             });
         }
 
-        public CommandResult CreateStorage(EntityType entityType, Vector3 position)
+        public CommandResult CreateEntity(EntityType entityType, string configId, int level, Vector3 position)
         {
-            var command = new CmdCreateStorage(entityType, position, _inventoryService);
+            var command = new CmdCreateEntity(entityType, configId, level, position);
             var result = _commandProcessor.Process(command);
 
             return result;
         }
 
-        public CommandResult RemoveStorage(int id)
+        public CommandResult RemoveEntity(int entityId)
         {
-            var command = new CmdRemoveStorage(id, _inventoryService);
+            var command = new CmdRemoveEntity(entityId);
             var result = _commandProcessor.Process(command);
 
             return result;
         }
-
-        private void CreateStorageViewModel(Storage storage)
+        
+        private void CreateStorageViewModel(StorageEntity storageEntity)
         {
-            var storageSettings = _storageSettingsMap[storage.EntityType];
-            if (!_inventoryService.InventoryMap.TryGetValue(storage.Id, out var inventoryViewModel))
+            var storageSettings = _storageSettingsMap[storageEntity.EntityType];
+            if (!_inventoryService.InventoryMap.TryGetValue(storageEntity.UniqueId, out var inventoryViewModel))
             {
-                Debug.LogError($"Inventory with Id - {storage.Id} not found");
+                Debug.LogError($"Inventory with Id - {storageEntity.UniqueId} not found");
             }
 
-            var storageViewModel = new StorageViewModel(storage,
+            var storageViewModel = new StorageViewModel(storageEntity,
                 storageSettings,
                 this,
                 inventoryViewModel);
 
             _allStorages.Add(storageViewModel);
-            _storagesMap[storage.Id] = storageViewModel;
+            _storagesMap[storageEntity.UniqueId] = storageViewModel;
         }
 
-        private void RemoveStorageViewModel(Storage storage)
+        private void RemoveStorageViewModel(StorageEntity storageEntity)
         {
-            if (_storagesMap.TryGetValue(storage.Id, out var storageViewModel))
+            if (_storagesMap.TryGetValue(storageEntity.UniqueId, out var storageViewModel))
             {
                 _allStorages.Remove(storageViewModel);
-                _storagesMap.Remove(storage.Id);
+                _storagesMap.Remove(storageEntity.UniqueId);
             }
         }
     }

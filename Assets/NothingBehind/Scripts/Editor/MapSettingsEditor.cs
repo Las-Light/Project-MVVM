@@ -1,6 +1,6 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.BattleGameplay.Markers;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
@@ -23,13 +23,14 @@ namespace NothingBehind.Scripts.Editor
             if (GUILayout.Button("Collect"))
             {
                 mapSettings.SceneName = SceneManager.GetActiveScene().name;
-                mapSettings.InitialStateSettings = new MapInitialStateSettings(
+                mapSettings.InitialMapSettings = new MapInitialStateSettings(
                     GameObject.FindGameObjectWithTag("InitialPoint").transform.position,
                     FindObjectsByType<CharacterMarker>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
-                        .Select(x => new CharacterInitialStateSettings(
-                            x.Character.EntityType,
-                            x.Character.LevelSettings,
-                            x.transform.position
+                        .Select(x => new EntityInitialStateSettings(
+                            x.entity.EntityType,
+                            x.entity.Level,
+                            x.transform.position,
+                            x.entity.ConfigId
                         )).ToList(),
                     FindObjectsByType<MapTransferMarker>(FindObjectsInactive.Exclude,
                             FindObjectsSortMode.None)
@@ -45,7 +46,7 @@ namespace NothingBehind.Scripts.Editor
             if (GUILayout.Button("Clear"))
             {
                 mapSettings.SceneName = "";
-                mapSettings.InitialStateSettings = null;
+                mapSettings.InitialMapSettings = null;
             }
 
             EditorUtility.SetDirty(target);

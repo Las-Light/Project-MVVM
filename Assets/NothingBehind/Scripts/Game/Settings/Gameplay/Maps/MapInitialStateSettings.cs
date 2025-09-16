@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
@@ -11,19 +11,20 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Maps
     [Serializable]
     public class MapInitialStateSettings
     {
+        public MapType MapType;
         public Vector3 PlayerInitialPosition;
-        public List<CharacterInitialStateSettings> Characters;
+        public List<EntityInitialStateSettings> Entities;
         public List<MapTransferData> MapTransfers;
         public List<EnemySpawnData> EnemySpawns;
 
         public MapInitialStateSettings(
             Vector3 playerInitialPosition,
-            List<CharacterInitialStateSettings> characters, 
+            List<EntityInitialStateSettings> entities, 
             List<MapTransferData> mapTransfers, 
             List<EnemySpawnData> enemySpawns)
         {
             PlayerInitialPosition = playerInitialPosition;
-            Characters = characters;
+            Entities = entities;
             MapTransfers = mapTransfers;
             EnemySpawns = enemySpawns;
         }

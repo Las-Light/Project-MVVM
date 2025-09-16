@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Equipments;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Equipments;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.State.Inventories.Grids;
 using UnityEngine;
 

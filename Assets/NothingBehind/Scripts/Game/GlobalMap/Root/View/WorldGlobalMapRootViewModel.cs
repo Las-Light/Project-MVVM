@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.BattleGameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Camera;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Transfers;
 using NothingBehind.Scripts.Game.GameRoot.Services;

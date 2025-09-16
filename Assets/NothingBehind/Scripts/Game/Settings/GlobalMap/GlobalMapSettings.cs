@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.MapTransfer;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace NothingBehind.Scripts.Game.Settings.GlobalMap
         public MapId MapId;
         public string SceneName;
         public Vector3 PlayerInitialPosition;
-        public List<MapTransferData> MapTransfers; 
+        public List<MapTransferData> MapTransfers;
+        public List<Entity> Entities;
     }
 }

@@ -1,4 +1,4 @@
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.GlobalMap.Logic.ActionController;

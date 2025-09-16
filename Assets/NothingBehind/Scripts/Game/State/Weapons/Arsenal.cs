@@ -1,4 +1,5 @@
 using System.Linq;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Equipments;
 using ObservableCollections;
 using R3;
@@ -9,6 +10,7 @@ namespace NothingBehind.Scripts.Game.State.Weapons
     {
         public ArsenalData Origin { get; }
         public int OwnerId { get; }
+        public EntityType OwnerType { get; }
         public ReactiveProperty<SlotType> CurrentWeaponSlot { get; }
         public ObservableList<Weapon> Weapons { get; } = new();
 
@@ -16,6 +18,7 @@ namespace NothingBehind.Scripts.Game.State.Weapons
         {
             Origin = data;
             OwnerId = data.OwnerId;
+            OwnerType = data.OwnerType;
             CurrentWeaponSlot = new ReactiveProperty<SlotType>(data.CurrentWeaponSlot);
             data.Weapons.ForEach(weaponData => Weapons.Add(new Weapon(weaponData)));
 

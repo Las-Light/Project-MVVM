@@ -1,6 +1,6 @@
-using NothingBehind.Scripts.Game.BattleGameplay.Root.Commands.PlayerCommands;
+using NothingBehind.Scripts.Game.GameRoot.Commands.PlayerCommands;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities.Player;
 using NothingBehind.Scripts.Game.State.Commands;
 using NothingBehind.Scripts.Game.State.Entities.Player;
 using NothingBehind.Scripts.Game.State.Maps;
@@ -20,7 +20,7 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
         private readonly PlayerSettings _playerSettings;
 
         public PlayerService(
-            Player player,
+            PlayerEntity playerEntity,
             InputManager.InputManager inputManager,
             ICommandProcessor cmd,
             PlayerSettings playerSettings)
@@ -29,12 +29,12 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             _cmd = cmd;
             _playerSettings = playerSettings;
 
-            InitialPlayer(player);
+            InitialPlayer(playerEntity);
         }
 
-        public void UpdatePlayerService(Player player)
+        public void UpdatePlayerService(PlayerEntity playerEntity)
         {
-            InitialPlayer(player);
+            InitialPlayer(playerEntity);
         }
 
         public CommandResult UpdatePlayerPosOnMap(Vector3 position, MapId currentMap)
@@ -52,16 +52,16 @@ namespace NothingBehind.Scripts.Game.GameRoot.Services
             return result;
         }
 
-        private void InitialPlayer(Player player)
+        private void InitialPlayer(PlayerEntity playerEntity)
         {
             InitialPosOnMap();
-            CreatePlayerViewModel(player);
+            CreatePlayerViewModel(playerEntity);
         }
 
-        private void CreatePlayerViewModel(Player player)
+        private void CreatePlayerViewModel(PlayerEntity playerEntity)
         {
             var viewModel = new PlayerViewModel(
-                player,
+                playerEntity,
                 this,
                 _inputManager,
                 _playerSettings);

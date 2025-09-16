@@ -1,5 +1,6 @@
 using NothingBehind.Scripts.Game.State.Items;
 using R3;
+using UnityEngine;
 
 namespace NothingBehind.Scripts.Game.State.Equipments
 {
@@ -13,12 +14,17 @@ namespace NothingBehind.Scripts.Game.State.Equipments
 
         public EquipmentSlot(EquipmentSlotData equipmentSlotData)
         {
+            Debug.Log("Constr EqSlot");
             SlotType = equipmentSlotData.SlotType;
             ItemType = equipmentSlotData.ItemType;
             Width = equipmentSlotData.Width;
             Height = equipmentSlotData.Height;
 
             EquippedItem = new ReactiveProperty<Item?>(ItemsFactory.CreateItem(equipmentSlotData.EquippedItem));
+            if (EquippedItem.Value != null)
+            {
+                Debug.Log(EquippedItem.Value.ItemType);
+            }
 
             EquippedItem.Subscribe(value =>
             {
@@ -28,6 +34,7 @@ namespace NothingBehind.Scripts.Game.State.Equipments
 
         public void Equip(Item item)
         {
+            Debug.Log("Equip" + item);
             EquippedItem.Value = item;
         }
 

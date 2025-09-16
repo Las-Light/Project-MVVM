@@ -1,9 +1,9 @@
 using LitMotion;
 using LitMotion.Extensions;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Equipments;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Items;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.UI.Inventories;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Equipments;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
 using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;

@@ -1,4 +1,5 @@
 using NothingBehind.Scripts.Game.State.Weapons;
+using R3;
 
 namespace NothingBehind.Scripts.Game.State.Items.EquippedItems.MagazinesItems
 {

@@ -608,7 +608,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
 
         private bool ShouldAutoReload()
         {
-            // Debug.Log(_currentWeapon.Value.CurrentAmmo.Value);
+            Debug.Log("Current ammo - " + _currentWeapon.Value.CurrentAmmo.Value);
             // Debug.Log(_currentWeapon.Value.CanReload());
             return !_reloading
                    && autoReload

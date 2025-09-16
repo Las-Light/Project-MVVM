@@ -1,6 +1,6 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.BattleGameplay.Logic.WeaponSystem;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Weapons;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.MagazinesItems;

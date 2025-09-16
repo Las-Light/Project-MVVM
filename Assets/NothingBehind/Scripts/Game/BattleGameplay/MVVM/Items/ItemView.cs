@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using LitMotion;
 using LitMotion.Extensions;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Equipments;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Equipments;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.InventoryGridItems;
 using R3;

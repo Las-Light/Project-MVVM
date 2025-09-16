@@ -8,6 +8,6 @@ namespace NothingBehind.Scripts.Game.Settings.Gameplay.Maps
     {
         public MapId MapId;
         public string SceneName;
-        public MapInitialStateSettings InitialStateSettings;
+        public MapInitialStateSettings InitialMapSettings;
     }
 }

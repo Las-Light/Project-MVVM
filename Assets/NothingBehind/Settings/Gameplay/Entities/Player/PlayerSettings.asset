@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1714c2720904e8aa8af84b07f13b091, type: 3}
+  m_Name: PlayerSettings
+  m_EditorClassIdentifier: 
+  <EntityType>k__BackingField: 1
+  <ConfigId>k__BackingField: Player
+  <TitleLid>k__BackingField: 
+  <DescriptionLid>k__BackingField: 
+  <PrefabPath>k__BackingField: 
+  <Levels>k__BackingField:
+  - {fileID: 11400000, guid: 10ada2835a89d414e879eb04e86406e5, type: 2}
+  MoveSpeed: 1.5
+  AimSpeed: 1
+  CrouchSpeed: 1.3
+  SprintSpeed: 4
+  RotationSmoothTime: 0.158
+  GamepadRotationSpeed: 50
+  MouseRotationSpeed: 1000
+  SpeedBlendAim: 3.18
+  SpeedChangeRate: 10
+  CrouchHeight: 1.3
+  crouchCenter: {x: 0, y: 0.7, z: 0}
+  DefaultHeight: 1.8
+  DefaultCenter: {x: 0, y: 0.93, z: 0}
+  Gravity: -9.81
+  FallTimeout: 0.15
+  TerminalVelocity: 53
+  GroundedOffset: -0.14
+  GroundedRadius: 0.35
+  GroundLayers:
+    serializedVersion: 2
+    m_Bits: 192
+  AimColliderLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  WeaponHeightOffset: {x: 0, y: 1.2, z: 0}
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 128

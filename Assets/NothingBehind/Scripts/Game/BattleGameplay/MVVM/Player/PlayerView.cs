@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.BattleGameplay.Logic.ActionController;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.UI;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities.Player;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using R3;
@@ -57,7 +57,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player
             PlayerId = viewModel.Id;
             var currentMap = viewModel.CurrentMapId.CurrentValue;
             var currentPosOnMap = viewModel.PositionOnMaps.First(posOnMap => posOnMap.MapId == currentMap);
-            transform.position = currentPosOnMap.Position.Value;
+            // transform.position = currentPosOnMap.Position.Value;
+            transform.position = viewModel.Position.CurrentValue;
             _gameplayUIManager = gameplayUIManager;
             InputManager = viewModel.InputManager;
             PlayerSettings = viewModel.PlayerSettings;

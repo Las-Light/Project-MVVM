@@ -12,13 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0e4a7c6f8b34ee6af6d923b190e2010, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  PlayerSettings: {fileID: 11400000, guid: a8035d62227d7684286663f676fe255e, type: 2}
-  CharactersSettings: {fileID: 11400000, guid: 6eeb940890d75fb4ab918746b93564ad, type: 2}
+  EntitiesSettings: {fileID: 11400000, guid: 07fdd557e27d80347898a94e2b5731ec, type: 2}
   InventoriesSettings: {fileID: 11400000, guid: 8ba2d268abdc4e14d8001eb47cbb71fb, type: 2}
   ItemsSettings: {fileID: 11400000, guid: b2a2ee8a7cddba94db121e048249e4e0, type: 2}
   WeaponsSettings: {fileID: 11400000, guid: 103616d7e9980024b8c8466ff3872ed3, type: 2}
   EquipmentsSettings: {fileID: 11400000, guid: 864a80e844ff48046bb40e45b7ae8b0f, type: 2}
-  StoragesSettings: {fileID: 11400000, guid: 1860906ac8d24704ca13deef131d3187, type: 2}
   GameplayCameraSettings: {fileID: 11400000, guid: fa7c3e452673d0b41bc4a24d07c5f1d0, type: 2}
   MapsSettings: {fileID: 11400000, guid: a0467520b93e95f43a27c9409e429d2d, type: 2}
   GlobalMapSettings: {fileID: 11400000, guid: 57fdc7693f4f71d448708dae7ecb86a1, type: 2}

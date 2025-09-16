@@ -1,6 +1,6 @@
 using System.Linq;
 using NothingBehind.Scripts.Game.BattleGameplay.Markers;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Maps;
 using NothingBehind.Scripts.Game.State.Maps;
 using UnityEditor;
@@ -22,10 +22,11 @@ namespace NothingBehind.Scripts.Editor
                 spawnMarker.Id = spawnMarker.name;
                 spawnMarker.Characters =
                     FindObjectsByType<CharacterMarker>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
-                        .Select(x => new CharacterInitialStateSettings(
-                            x.Character.EntityType,
-                            x.Character.LevelSettings,
-                            x.transform.position
+                        .Select(x => new EntityInitialStateSettings(
+                            x.entity.EntityType,
+                            x.entity.Level,
+                            x.transform.position,
+                            x.entity.ConfigId
                         )).ToList();
                 spawnMarker.Position = spawnMarker.transform.position;
             }

@@ -3,7 +3,7 @@ using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Player;
 using NothingBehind.Scripts.Game.Common;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities.Player;
 using R3;
 using UnityEngine;
 using UnityEngine.InputSystem;

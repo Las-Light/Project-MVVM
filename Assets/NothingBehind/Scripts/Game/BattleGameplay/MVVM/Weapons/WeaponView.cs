@@ -1,9 +1,13 @@
+using System;
 using System.Collections;
 using NothingBehind.Scripts.Game.BattleGameplay.Logic.WeaponSystem;
+using NothingBehind.Scripts.Game.State.Items.EquippedItems.MagazinesItems;
+using NothingBehind.Scripts.Game.State.Weapons;
 using NothingBehind.Scripts.Game.State.Weapons.TypeData;
 using R3;
 using UnityEngine;
 using UnityEngine.Pool;
+using Random = UnityEngine.Random;
 
 namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
 {
@@ -12,6 +16,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
         public int Id;
         public WeaponType WeaponType;
         public ReactiveProperty<int> CurrentAmmo;
+        public ReactiveProperty<MagazinesItem> Magazines;
         public int ClipSize;
         public float CheckDistanceToWall { get; private set; }
         public float AimRange { get; private set; }
@@ -30,6 +35,11 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
         private bool LastFrameWantedToShoot;
 
         public WeaponViewModel _viewModel;
+        
+        private IDisposable _subscriptionMagazines;
+        private IDisposable _subscriptionCurrentAmmo;
+        
+        private CompositeDisposable _disposables = new();
 
 
         public void Bind(WeaponViewModel viewModel)
@@ -37,14 +47,18 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
             _viewModel = viewModel;
             Id = viewModel.Id;
             WeaponType = viewModel.WeaponType;
-            CurrentAmmo = viewModel.FeedSystem.MagazinesItem.Value.Magazines.CurrentAmmo;
+            Magazines = viewModel.FeedSystem.MagazinesItem;
             ClipSize = viewModel.FeedSystem.MagazinesItem.Value.Magazines.ClipSize;
             CheckDistanceToWall = viewModel.CheckDistanceToWall;
             AimRange = viewModel.AimingRange;
-
-            CurrentAmmo.Subscribe(value =>
+            
+            _subscriptionMagazines = Magazines.Subscribe(currentMagazines =>
             {
-                Debug.Log(value);
+                CurrentAmmo = currentMagazines.Magazines.CurrentAmmo;
+                _subscriptionCurrentAmmo = CurrentAmmo.Subscribe(currentAmmo =>
+                {
+                   Debug.Log("Ammo in magazines - " + currentAmmo);
+                }).AddTo(_disposables);
             });
         }
 

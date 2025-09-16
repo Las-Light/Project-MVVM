@@ -1,6 +1,6 @@
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Equipments;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.BattleGameplay.Services;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Equipments;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
 using NothingBehind.Scripts.Game.GameRoot.Services;
 using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.State.Entities;
@@ -70,7 +70,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.UI.Inventories
 
         public CommandResult CreateStorage()
         {
-            return _storageService.CreateStorage(EntityType.Storage, _ownerPosition);
+            return _storageService.CreateEntity(EntityType.Storage, "Empty", 0, _ownerPosition);
         }
 
         // Метод отправляет запрос на закрытие инвентаря и если лутовый инвентарь

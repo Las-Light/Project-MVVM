@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Equipments;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Items;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Equipments;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
 using NothingBehind.Scripts.Game.GameRoot.Services.InputManager;
 using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.MVVM.UI;
@@ -35,6 +35,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.UI.Inventories
             InputManager = viewModel.InputManager;
             if (viewModel.TargetType == EntityType.Player)
             {
+                Debug.Log("Create Player UI");
                 CreatePlayerInventoryView(viewModel.GetInventoryViewModel(viewModel.OwnerId), _itemViews);
                 CreatePlayerEquipmentView(viewModel.GetEquipmentViewModel(viewModel.OwnerId), _itemViews);
                 CreateEmptyInventoryView();
@@ -96,6 +97,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.UI.Inventories
         {
             var equipmentGO = Instantiate(_equipmentPrefab, _playerEquipmentContainer);
             var equipmentView = equipmentGO.GetComponent<EquipmentView>();
+            Debug.Log(itemViews.Count);
             equipmentView.Bind(equipmentViewModel, itemViews);
             PlayerEquipmentView = equipmentView;
         }

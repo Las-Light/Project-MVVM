@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Characters;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Equipments;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Maps;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Storages;
 using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons;
 using NothingBehind.Scripts.Game.BattleGameplay.Services;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Camera;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Player;
 using NothingBehind.Scripts.Game.GameRoot.MVVM.Transfers;
 using NothingBehind.Scripts.Game.GameRoot.Services;
@@ -33,6 +34,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
         private readonly InputManager _inputManager;
         private readonly CameraService _cameraService;
         private readonly InventoryService _inventoryService;
+        private readonly EquipmentService _equipmentService;
 
         public readonly Dictionary<int, ArsenalViewModel> ArsenalsMap;
         public readonly Dictionary<int, InventoryViewModel> InventoriesMap;
@@ -41,6 +43,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
         public readonly ObservableList<MapTransferViewModel> AllMapTransfers;
         public readonly IObservableCollection<CharacterViewModel> AllCharacters;
         public readonly IObservableCollection<StorageViewModel> AllStorages;
+        public readonly IObservableCollection<EquipmentViewModel> AllEquipments;
         public readonly IObservableCollection<InventoryViewModel> AllInventories;
         public readonly IObservableCollection<EnemySpawnViewModel> AllSpawns;
 
@@ -57,6 +60,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
             InputManager inputManager,
             CameraService cameraService,
             InventoryService inventoryService,
+            EquipmentService equipmentService,
             ArsenalService arsenalService)
         {
             _settingsProvider = settingsProvider;
@@ -68,6 +72,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
             _inputManager = inputManager;
             _cameraService = cameraService;
             _inventoryService = inventoryService;
+            _equipmentService = equipmentService;
 
             CameraViewModel = cameraService.CameraViewModel;
             Player = playerService.PlayerViewModel;
@@ -76,6 +81,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
             AllInventories = inventoryService.AllInventories;
             ArsenalsMap = arsenalService.ArsenalMap;
             InventoriesMap = inventoryService.InventoryMap;
+            AllEquipments = equipmentService.AllEquipmentViewModels;
             AllSpawns = spawnService.EnemySpawns;
 
             var gameState = _gameStateProvider.GameState;
@@ -115,22 +121,32 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.Root.View
                 // {
                 //     continue;
                 // }
-                Debug.Log("Inv ViewModel " + inventoryViewModel.OwnerType);
+                Debug.Log("Inv ViewModel " + inventoryViewModel.OwnerType + ", ID - " + inventoryViewModel.OwnerId);
 
-                foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
-                {
-                    Debug.Log(inventoryGridViewModel.GridId + " Type " + inventoryGridViewModel.GridType);
-                    foreach (var kvp in inventoryGridViewModel.ItemsPositionsMap)
-                    {
-                        Debug.Log($"In dictionary {kvp.Key.ItemType} {kvp.Key.Id} in position {kvp.Value}");
-                    }
-                }
+                // foreach (var inventoryGridViewModel in inventoryViewModel.AllInventoryGrids)
+                // {
+                //     Debug.Log(inventoryGridViewModel.GridId + " Type " + inventoryGridViewModel.GridType);
+                //     foreach (var kvp in inventoryGridViewModel.ItemsPositionsMap)
+                //     {
+                //         Debug.Log($"In dictionary {kvp.Key.ItemType} {kvp.Key.Id} in position {kvp.Value}");
+                //     }
+                // }
             }
 
-            foreach (var equipment in gameState.Equipments)
+            foreach (var arsenalViewModel in ArsenalsMap)
+            {
+                Debug.Log($"Arsenal ViewModel - {arsenalViewModel.Value.OwnerId}, Type - {arsenalViewModel.Value.OwnerType}");
+            }
+
+            foreach (var equipmentSlot in gameState.Player.Value.Equipment.Value.Slots)
+            {
+                //Debug.Log(equipmentSlot.EquippedItem.Value.ItemType);
+            }
+
+            foreach (var equipment in AllEquipments)
             {
                 Debug.Log(equipment.OwnerId);
-
+            
                 foreach (var slot in equipment.Slots)
                 {
                     Debug.Log($"Slot - {slot.SlotType} have item - {slot.EquippedItem.Value}");

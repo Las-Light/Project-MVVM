@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using NothingBehind.Scripts.Game.BattleGameplay.Services;
-using NothingBehind.Scripts.Game.Settings.Gameplay.Characters;
+using NothingBehind.Scripts.Game.Settings.Gameplay.Entities;
+using NothingBehind.Scripts.Game.State.Maps;
 using NothingBehind.Scripts.Game.State.Maps.EnemySpawns;
 using NothingBehind.Scripts.Utils;
 using R3;
@@ -12,7 +13,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Maps
     public class EnemySpawnViewModel
     {
         public readonly string Id;
-        public readonly List<CharacterInitialStateSettings> Characters;
+        public readonly List<EntityInitialStateSettings> Characters;
         public readonly Vector3 Position;
         public readonly ReactiveProperty<bool> Triggered;
         
@@ -35,7 +36,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Maps
             Triggered.Value = true;
             foreach (var character in Characters)
             {
-                _charactersService.CreateCharacter(character.EntityType, character.LevelSettings.Level, character.Position);
+                _charactersService.CreateEntity(character.EntityType, character.ConfigId, character.Level,
+                    character.InitialPosition);
                 yield return null;
             }
         }

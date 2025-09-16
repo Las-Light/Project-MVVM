@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NothingBehind.Scripts.Game.BattleGameplay.Commands.ArsenalCommands;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Equipments;
-using NothingBehind.Scripts.Game.GameRoot.MVVM.Inventories;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Equipments;
+using NothingBehind.Scripts.Game.BattleGameplay.MVVM.Inventories;
 using NothingBehind.Scripts.Game.Settings.Gameplay.Weapons;
 using NothingBehind.Scripts.Game.State.Commands;
+using NothingBehind.Scripts.Game.State.Entities;
 using NothingBehind.Scripts.Game.State.Equipments;
 using NothingBehind.Scripts.Game.State.Items;
 using NothingBehind.Scripts.Game.State.Items.EquippedItems.AmmoItems;
@@ -23,8 +24,10 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
     public class ArsenalViewModel : IDisposable
     {
         public int OwnerId { get; }
+        public EntityType OwnerType { get; }
         public IReadOnlyObservableDictionary<SlotType, Item> EquipmentItems { get; }
         public IReadOnlyObservableDictionary<InventoryGridViewModel, ObservableList<AmmoItem>> AllAmmo => _allAmmo;
+
 
         public IReadOnlyObservableDictionary<InventoryGridViewModel, ObservableList<MagazinesItem>> AllMagazines =>
             _allMagazines;
@@ -41,12 +44,14 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
 
         private readonly ObservableDictionary<InventoryGridViewModel, ObservableList<AmmoItem>> _allAmmo = new();
 
+
         private readonly ObservableDictionary<InventoryGridViewModel, ObservableList<MagazinesItem>> _allMagazines =
             new();
 
         private readonly Arsenal _arsenal;
         private readonly ICommandProcessor _commandProcessor;
         private readonly CompositeDisposable _disposables = new();
+
 
         public ArsenalViewModel(Arsenal arsenal,
             EquipmentViewModel equipmentViewModel,
@@ -57,7 +62,8 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
             _arsenal = arsenal;
             _commandProcessor = commandProcessor;
             OwnerId = arsenal.OwnerId;
-            
+            OwnerType = arsenal.OwnerType;
+
             //Устанавливаем курентСлот из даты
             CurrentWeaponSlot.OnNext(arsenal.CurrentWeaponSlot.Value);
 
@@ -78,7 +84,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
                             arsenal.Weapons.FirstOrDefault(weapon => weapon.Id == weaponItem.Id);
                         if (weapon == null)
                         {
-                            AddWeaponToArsenal(weaponItem.Weapon);
+                            AddWeaponToArsenal(arsenal.OwnerType, weaponItem.Weapon);
                         }
                     }
                 }
@@ -149,7 +155,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
                 var removedItem = e.Value.Value;
                 if (removedItem is WeaponItem weaponItem)
                 {
-                    RemoveWeaponFromArsenal(weaponItem.Id);
+                    RemoveWeaponFromArsenal(arsenal.OwnerType, weaponItem.Id);
                 }
             }).AddTo(_disposables);
 
@@ -164,7 +170,7 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
                             arsenal.Weapons.FirstOrDefault(weapon => weapon.Id == weaponItem.Id);
                         if (weapon == null)
                         {
-                            AddWeaponToArsenal(weaponItem.Weapon);
+                            AddWeaponToArsenal(arsenal.OwnerType, weaponItem.Weapon);
                         }
                     }
                 }
@@ -186,23 +192,21 @@ namespace NothingBehind.Scripts.Game.BattleGameplay.MVVM.Weapons
 
             //Подписываемся на курентСлот и передаем его в дату для сохранения стейта (важно скипать 1 событие,
             // иначе событие зарекурситься
-            CurrentWeaponSlot.Skip(1).Subscribe(slot =>
-            {
-                arsenal.CurrentWeaponSlot.OnNext(slot);
-            }).AddTo(_disposables);
+            CurrentWeaponSlot.Skip(1).Subscribe(slot => { arsenal.CurrentWeaponSlot.OnNext(slot); })
+                .AddTo(_disposables);
         }
 
-        private CommandResult AddWeaponToArsenal(Weapon weapon)
+        private CommandResult AddWeaponToArsenal(EntityType ownerType, Weapon weapon)
         {
-            var command = new CmdAddWeaponToArsenal(OwnerId, weapon);
+            var command = new CmdAddWeaponToArsenal(ownerType, OwnerId, weapon);
             var result = _commandProcessor.Process(command);
 
             return result;
         }
 
-        private CommandResult RemoveWeaponFromArsenal(int weaponItemId)
+        private CommandResult RemoveWeaponFromArsenal(EntityType ownerType, int weaponItemId)
         {
-            var command = new CmdRemoveWeaponFromArsenal(OwnerId, weaponItemId);
+            var command = new CmdRemoveWeaponFromArsenal(ownerType, OwnerId, weaponItemId);
             var result = _commandProcessor.Process(command);
 
             return result;

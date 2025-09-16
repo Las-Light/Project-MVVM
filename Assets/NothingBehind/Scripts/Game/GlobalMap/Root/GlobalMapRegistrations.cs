@@ -1,3 +1,4 @@
+using System.Linq;
 using DI.Scripts;
 using NothingBehind.Scripts.Game.BattleGameplay.Services;
 using NothingBehind.Scripts.Game.Common;
@@ -17,23 +18,39 @@ namespace NothingBehind.Scripts.Game.GlobalMap.Root
         {
             var gameStateProvider = container.Resolve<IGameStateProvider>();
             var gameState = gameStateProvider.GameState;
-            var globalMap = gameState.GlobalMap;
             var settingsProvider = container.Resolve<ISettingsProvider>();
             var gameSettings = settingsProvider.GameSettings;
+            var itemsSettings = gameSettings.ItemsSettings;
+            var inventoriesSettings = gameSettings.InventoriesSettings;
+            var commandProcessor = container.Resolve<ICommandProcessor>();
             
             container.RegisterInstance(AppConstants.EXIT_SCENE_REQUEST_TAG, new Subject<GlobalMapExitParams>());
             
             // регистрируем процессор и команды, а также кладём CommandProcessor в контейнер
 
-            var commandProcessor = container.Resolve<ICommandProcessor>();
            
             // регистрируем менеджеры
 
-            var inputManager = container.Resolve<InputManager>();
+            //var inputManager = container.Resolve<InputManager>();
             
             // регистрируем сервисы
-
+            var loadingMap = gameState.Maps.First(m => m.Id == enterParams.TargetMapId);
+            
+            container.RegisterFactory(c => new EquipmentService(gameState.Player, loadingMap.Entities, 
+                    itemsSettings,
+                    commandProcessor))
+                .AsSingle();
             var equipmentService = container.Resolve<EquipmentService>();
+
+            container.RegisterFactory(c => new InventoryService(gameState.Player, loadingMap.Entities,
+                    equipmentService,
+                    inventoriesSettings,
+                    itemsSettings,
+                    commandProcessor))
+                .AsSingle();
+            var inventoryService = container.Resolve<InventoryService>();
+
+            //var equipmentService = container.Resolve<EquipmentService>();
         }
     }
 }
